@@ -1,0 +1,344 @@
+# ZeroSpec 長期使用者指南（Day-2+）
+
+> 本文件描述 ZeroSpec 在 Day-1 初始化之後，工程師日常開發中如何「自然地」與 SDD 機制共存。
+> 適合已完成 INIT-SCAN + INIT-BUILD、手邊有 `AGENTS.md` + `docs/README.md` 的團隊。
+
+**版本**：v0.1 — 2026-04-11
+**對象**：已導入 ZeroSpec 的個人開發者或小型團隊
+
+---
+
+## 目錄
+
+1. [日常開發中的三種操作模式](#1-日常開發中的三種操作模式)
+2. [IDE 與代理平台配置建議](#2-ide-與代理平台配置建議)
+3. [ZeroSpec 本體的定位：參考而非常駐](#3-zerospec-本體的定位參考而非常駐)
+4. [典型情境劇本](#4-典型情境劇本)
+5. [長期維護會遇到的真實問題](#5-長期維護會遇到的真實問題)
+6. [月度/季度回顧實操流程](#6-月度季度回顧實操流程)
+7. [從個人到團隊的漸進擴散](#7-從個人到團隊的漸進擴散)
+
+---
+
+## 1. 日常開發中的三種操作模式
+
+ZeroSpec 導入後，日常開發不需要每次都翻 ZeroSpec 的 Prompt Pack。大部分時間，AI Agent 會**自動讀取你專案裡的 `AGENTS.md`**——這就是 ZeroSpec 設計的運作方式。
+
+### 模式 A：純寫程式碼（90% 時間）
+
+你照常開 Agent 模式寫 code。Agent 啟動時自動讀取 `AGENTS.md`，遵守你的架構規範。
+
+**你不需要做任何 ZeroSpec 相關動作。**
+
+> 這正是 ZeroSpec 的目標：Day-1 之後，它應該是「隱形基礎設施」。
+
+### 模式 B：事件觸發文件更新（~8% 時間）
+
+當 PR 涉及 API 新增、架構決策、或重大變更時，切回「文件模式」：
+
+1. 開新分頁或新對話
+2. 從 ZeroSpec 複製對應 Prompt Pack（SPEC / ADR / SA）
+3. 貼入 Agent → 產出草稿 → 審核 → 合併進 PR
+
+**關鍵認知**：文件更新是 PR 的一部分，不是獨立任務。養成習慣後，這步驟約 5-10 分鐘。
+
+### 模式 C：定期回顧（~2% 時間）
+
+每月或每季，用 UPDATE Prompt 做一次健檢。詳見 [§6](#6-月度季度回顧實操流程)。
+
+---
+
+## 2. IDE 與代理平台配置建議
+
+### 2.1 ZeroSpec Repo 不需要常駐打開
+
+ZeroSpec 本體（`prompts/`、`templates/`、`GUIDE.md`）是「工具箱」，不是工作區。
+
+**建議做法**：
+
+| 方式         | 說明                                                          | 適合誰                         |
+| ------------ | ------------------------------------------------------------- | ------------------------------ |
+| **書籤式**   | 瀏覽器或 IDE 書籤 ZeroSpec 資料夾，需要時點開複製 Prompt      | 個人開發者                     |
+| **Snippet**  | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander | 頻繁使用者                     |
+| **Symlink**  | 在目標專案建一個 `.zerospec/` symlink 指向 ZeroSpec prompts/  | 多專案生態圈                   |
+| **複製貼上** | 最簡單——需要時開 ZeroSpec README，按連結找到 Prompt，複製貼入 | 所有人（Day-1 推薦的起步方式） |
+
+> **不建議**：把 ZeroSpec 整個資料夾加進目標專案的 workspace。這會讓 Agent 讀到不相關的 markdown，浪費 context。
+
+### 2.2 `.github/copilot-instructions.md` 與 `AGENTS.md` 的共存
+
+GitHub Copilot 同時支援兩種指引檔案：
+
+| 檔案                              | 讀取時機     | 適合放什麼                             |
+| --------------------------------- | ------------ | -------------------------------------- |
+| `.github/copilot-instructions.md` | 每次對話自動 | 個人偏好、語言、回覆格式（跨專案通用） |
+| `AGENTS.md`                       | 每次任務自動 | 專案特有約束（架構、命名、技術棧）     |
+
+**最佳實踐**：
+
+- `.github/copilot-instructions.md` 放「你是誰、怎麼回覆」（等同你現在的 personal profile sync）
+- `AGENTS.md` 放「這個專案怎麼寫 code」（ZeroSpec 產出）
+- 兩者互補不衝突，不需要合併
+
+### 2.3 Plan 模式 vs Agent 模式的選用時機
+
+| 情境                          | 建議模式     | 原因                                          |
+| ----------------------------- | ------------ | --------------------------------------------- |
+| **INIT-SCAN（分析階段）**     | 兩者皆可     | SCAN 不寫檔，Plan 模式也能完成分析            |
+| **INIT-BUILD（建置階段）**    | Agent        | 需要寫入 `AGENTS.md` 和 `docs/README.md`      |
+| **SPEC / ADR / SA 產生**      | Agent        | 需要讀程式碼 + 寫檔                           |
+| **UPDATE 回顧**               | Plan → Agent | 先用 Plan 看差異報告，確認後轉 Agent 寫入     |
+| **日常寫 code**               | Agent        | 需要讀寫程式碼                                |
+| **PR Review 前的文件檢查**    | Plan         | 只需判斷「是否需要補 SPEC」，不需要寫任何東西 |
+| **架構討論 / 技術選型前研究** | Plan / Chat  | 純粹蒐集資訊與比較，不需要動文件              |
+
+**實務建議**：UPDATE Prompt 最適合「Plan 先看、Agent 再改」的兩段式操作。先在 Plan 模式貼入 UPDATE Prompt 看差異報告，確認要改的地方後，再切 Agent 模式讓它實際寫入。
+
+### 2.4 Multi-root Workspace 注意事項
+
+如果你的 IDE 同時開多個專案（像 Corey 的 acpl-backend + acpl-frontend + acpl-communication-core），Agent 會看到所有專案的 `AGENTS.md`。
+
+**建議**：
+- 確保每個專案的 `AGENTS.md` 開頭都有明確的專案名稱（ZeroSpec 的 INIT-BUILD 已保證這點）
+- 任務指令中明確指出「在 {專案名} 中...」，幫 Agent 鎖定 context
+- 如果 Agent 混淆兩個專案的規範，在任務開頭加一句「請先讀取 {專案}/AGENTS.md 作為本次任務的約束」
+
+---
+
+## 3. ZeroSpec 本體的定位：參考而非常駐
+
+### 需要開 ZeroSpec 的時刻
+
+| 時刻                     | 你需要的東西                  | 花費時間     |
+| ------------------------ | ----------------------------- | ------------ |
+| PR 涉及 API 變更         | `prompts/SPEC.md` 的 Prompt   | 複製 10 秒   |
+| 跨模組技術決策           | `prompts/ADR.md` 的 Prompt    | 複製 10 秒   |
+| 月度回顧                 | `prompts/UPDATE.md` 的 Prompt | 複製 10 秒   |
+| 忘記某個模板長怎樣       | `templates/` 目錄             | 瀏覽 30 秒   |
+| 想查某個反模式的修正方法 | `anti-patterns.md`            | 瀏覽 1 分鐘  |
+| 新人加入想了解這套方法論 | `GUIDE.md`                    | 閱讀 15 分鐘 |
+
+### 不需要開 ZeroSpec 的時刻
+
+- 日常寫程式碼（Agent 自動讀 `AGENTS.md`）
+- Commit / Push / PR Review（只看專案內的 SPEC 和 AGENTS.md）
+- Debug / 測試（與文件治理無關）
+
+---
+
+## 4. 典型情境劇本
+
+### 劇本 A：新增一支 REST API
+
+```
+timeline:
+  1. 你開始寫新 API → Agent 自動讀 AGENTS.md → 遵守架構規範產 code
+  2. 寫完後 → 你想到「AGENTS.md 說 PR 涉及 API 變更要更新 SPEC」
+  3. 開 ZeroSpec → 複製 SPEC Prompt → 貼入 Agent
+  4. Agent 讀現有 SPEC → 產出更新草稿 → 你審核 → 一起進 PR
+  5. 總額外時間：~8 分鐘
+```
+
+### 劇本 B：升級 Spring Boot 3.5 → 4.0
+
+```
+timeline:
+  1. 完成框架升版 + 程式碼調整
+  2. 開 ZeroSpec → 複製 UPDATE Prompt → 貼入 Agent（Plan 模式）
+  3. Agent 偵測到 build.gradle 版本變更 → 列出 AGENTS.md 差異
+  4. 確認 → 切 Agent 模式 → 寫入更新
+  5. 如果升版涉及架構決策（如 Virtual Threads 全面啟用）→ 接著複製 ADR Prompt
+  6. 總額外時間：~15 分鐘
+```
+
+### 劇本 C：新成員加入
+
+```
+timeline:
+  1. 新人 clone repo → 開 IDE → Agent 自動讀 AGENTS.md
+  2. 新人問「這個專案架構是什麼？」→ Agent 根據 AGENTS.md 精準回答
+  3. 新人接到任務 → Agent 幫他寫的 code 自動遵守規範
+  4. 如果需要深入了解 → AGENTS.md 導航表指向 SA / SPEC / ADR
+  5. 新人不需要讀 ZeroSpec 本身 — 他只需要專案內的 AGENTS.md
+```
+
+### 劇本 D：月度回顧
+
+```
+timeline:
+  1. 月底 → 你花 2 分鐘打開 GUIDE.md §7 的快速回顧 Checklist 掃一遍
+  2. 發現上個月新增了 3 個 Service 但對照表沒更新
+  3. 複製 UPDATE Prompt → Agent 自動偵測差異 → 建議更新
+  4. 確認 → 寫入 → commit
+  5. 總時間：~15 分鐘
+```
+
+### 劇本 E：PR Review 時判斷是否需要補文件
+
+```
+timeline:
+  1. Review 別人的 PR → 看到 Controller 新增了兩支 API
+  2. 打開 AGENTS.md → 文件維護提醒寫「PR 涉及 API 變更需更新 SPEC」
+  3. 在 PR 留言：「這個變更需要用 SPEC Prompt 補一份 SPEC 草稿」
+  4. 你不需要自己動手 — 只需要提醒
+```
+
+---
+
+## 5. 長期維護會遇到的真實問題
+
+### 5.1 「我忘了要更新 SPEC」
+
+**根因**：事件觸發依賴人的自覺，沒有自動提醒。
+
+**緩解策略**：
+- **最低成本**：在 PR template 加一行 Checklist：`- [ ] 若涉及 API 變更，是否已用 SPEC Prompt 更新 SPEC？`
+- **中等成本**：PR Review 時養成習慣——看到 Controller 變更就問「SPEC 有更新嗎？」
+- **高成本**：CI 腳本自動偵測 Controller 檔案變更但 `docs/spec/` 無對應修改，發出警告
+
+### 5.2 「AGENTS.md 領域對照表慢慢過時了」
+
+**根因**：新增模組時沒有同步更新，UPDATE Prompt 不是自動跑的。
+
+**緩解策略**：
+- 行事曆設定每月固定 15 分鐘「SDD 快速回顧」事件
+- UPDATE Prompt 的差異報告會自動偵測新增/移除的 Controller / Service
+- 如果對照表落後超過 3 個模組，Agent 寫出來的 code 通常還是正確的——因為它靠 `AGENTS.md` 的架構規範（C 類）而非對照表（B 類）做決策。對照表主要幫 Agent「更快找到對的檔案」，不影響正確性。
+
+### 5.3 「團隊其他人不買單」
+
+**根因**：SDD 對個人有即時回報（Agent 寫的 code 品質變好），但對團隊的價值需要累積才看得到。
+
+**漸進擴散策略**：見 [§7](#7-從個人到團隊的漸進擴散)。
+
+### 5.4 「Prompt Pack 用久了想客製化」
+
+**完全正常且被鼓勵。** ZeroSpec 是起點不是終點。
+
+**可客製化的方向**：
+- 在 SPEC Prompt 中加入專案特有的 DTO 命名慣例
+- 在 ADR Prompt 中加入團隊必須評估的維度（如成本、合規性）
+- 在 UPDATE Prompt 中加入額外檢查項（如 i18n 翻譯 Key 同步）
+
+**客製化原則**：修改你專案中的 Prompt 副本，不要改 ZeroSpec 本體。這樣 ZeroSpec 升版時不會衝突。
+
+### 5.5 「docs/ 目錄文件越來越多，不確定該不該停」
+
+**判斷標準**：文件是否有明確的消費者。
+
+| 消費者       | 文件類型 | 持續產出                                 |
+| ------------ | -------- | ---------------------------------------- |
+| AI Agent     | SPEC     | ✅ 每次 API 變更就更新（Source of Truth） |
+| 新成員 / AI  | SA       | ⚠️ 只在里程碑或需要系統快照時產出         |
+| 團隊決策記錄 | ADR      | ⚠️ 只在有 either/or 決策時                |
+| DevOps / AI  | INFRA    | ⚠️ 只在部署變更時                         |
+
+如果一份文件寫完後從沒被引用過，它可能不需要存在。
+
+---
+
+## 6. 月度/季度回顧實操流程
+
+### 月度快速回顧（15 分鐘）
+
+```
+實際操作步驟：
+1. 開終端機 → `git log --since="1 month ago" --oneline -- '*.java' '*.ts' '*.cs' | wc -l`
+   → 大致感受這個月的變更量
+
+2. 打開 AGENTS.md → 快速掃過領域對照表
+   → 有沒有上個月新增的 Controller / Service 沒列進來？
+
+3. 打開 docs/README.md → 看文件清單
+   → docs/ 目錄下有沒有新檔案沒收錄？
+
+4. 如果有落差 → 複製 UPDATE Prompt → 貼入 Agent → 讓它產差異報告
+5. 確認 → 寫入 → commit → done
+```
+
+### 季度完整回顧（30 分鐘）
+
+除上述步驟外：
+
+```
+額外步驟：
+6. 回顧這一季 Agent 寫出來的 PR → 有沒有反覆違反同一條規則？
+   → 若有，調整 AGENTS.md 中該規則的描述清晰度
+
+7. 檢查 AGENTS.md 的行數 → 是否超過 300 行？
+   → 若超過，考慮把低頻使用的段落移到 docs/ 子文件
+
+8. 與團隊成員確認架構硬規則是否仍然適用
+   → 有沒有「大家都默認違反但沒人改文件」的規則？
+
+9. 如果這一季有重大架構變更 → 考慮跑一次 SA Prompt 產新的系統快照
+```
+
+---
+
+## 7. 從個人到團隊的漸進擴散
+
+### Phase 1：個人先行（Week 1-4）
+
+- 你自己跑 INIT-SCAN + INIT-BUILD
+- 用產出的 `AGENTS.md` 開發，體感 Agent 品質提升
+- 偷偷在 PR 裡帶上 SPEC 更新，讓隊友看到文件自然產出
+
+### Phase 2：消極擴散（Month 2-3）
+
+- 團隊成員使用 Agent 開發時，自動受益於 `AGENTS.md` 的規範
+- 他們不需要知道 ZeroSpec 存在——他們只知道「Agent 懂我們的架構了」
+- PR Review 時偶爾提醒「API 變更需要補 SPEC」
+
+### Phase 3：主動引入（Quarter 2）
+
+當團隊已經習慣 AGENTS.md 的存在後：
+
+- 在團隊會議中簡短介紹 SPEC Prompt + UPDATE Prompt（5 分鐘）
+- 在 PR template 加入 SDD Checklist
+- 指定一位「SDD 守門人」（不一定是你）負責月度回顧
+
+### Phase 4：自運轉（Quarter 3+）
+
+- 每個人都知道 API 變更要跑 SPEC Prompt
+- 月度回顧變成固定例行
+- 你只需要在季度回顧時介入
+
+---
+
+## 附錄：常見問題
+
+### Q：ZeroSpec 的 README.md 需要常駐打開嗎？
+
+**不需要。** ZeroSpec 的 README 是「使用手冊」，不是運行時依賴。就像你不會每天翻 React 官方文件一樣——你把它學會後，需要時再查。
+
+### Q：ZeroSpec 應該加進 `.github/copilot-instructions.md` 嗎？
+
+**不應該。** `copilot-instructions.md` 是給個人偏好用的（語言、格式、角色）。專案級約束由 `AGENTS.md` 負責。兩者職責分離。
+
+但你可以在 `copilot-instructions.md` 中加一句提醒：
+
+```markdown
+## ⚡ Protocol: SDD
+處理 PR 涉及 API 新增或行為變更時，主動提醒是否需要更新 SPEC。
+```
+
+### Q：我能不能讓 Agent 在每次對話開始時自動讀 ZeroSpec？
+
+**不建議。** ZeroSpec 本體（prompts/ + templates/ + GUIDE.md）加起來約 2000+ 行，會嚴重消耗 context window。Agent 只需要讀你專案中的 `AGENTS.md`（100-200 行）就夠了。
+
+### Q：多人團隊中，誰負責跑 UPDATE Prompt？
+
+**建議由最熟悉專案架構的人負責**——通常是 Tech Lead 或主要維護者。月度回顧可以輪班，但審核結果需要有架構判斷力的人把關。
+
+### Q：文件越來越多，會不會回到「文件太多沒人看」的老問題？
+
+ZeroSpec 的設計本身就在對抗這個問題：
+- **Lazy Evaluation**：不預建空殼，觸發才建
+- **SPEC 是唯一強制文件**：其他都是「值得有」但非必要
+- **每份文件都有消費者**：SA 給新人和 Agent、ADR 給未來的決策者、SPEC 給日常開發的 Agent
+- 如果一份文件三個月沒被引用，它可能可以歸檔
+
+---
+
+*本文件隨 ZeroSpec v0.1 發布。建議在導入滿一個月後再來閱讀，Day-1 不需要看這份。*
