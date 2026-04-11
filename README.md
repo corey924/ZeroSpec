@@ -1,6 +1,6 @@
 # ZeroSpec
 
-> **Layer 0 for AI-readable repositories.**
+> **ZeroSpec is a zero-dependency Markdown framework that helps AI agents understand your repository structure, rules, and source of truth before coding.**
 > 不裝框架、不跑 CLI，用結構化 Markdown 建立 AI 可讀的專案基線。
 
 **版本**：v0.1

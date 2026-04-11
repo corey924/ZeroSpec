@@ -26,6 +26,7 @@
 - INIT-BUILD / SPEC / UPDATE Prompt 壓縮冗餘指令，降低 Token 消耗
 - 驗收腳本補強 SPEC/ADR/SA 首行標題檢查與缺漏模板存在性檢查（60 → 65 assertions）
 - README / GUIDE / DAILY-USAGE 已整理為對外發布可直接閱讀的導覽結構
+- README 首段英文定位已調整為可直接對應 GitHub Description 的簡潔描述
 - LICENSE 採 MIT License，並調整為 `Corey and contributors`
 
 ### 驗證
