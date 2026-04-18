@@ -50,6 +50,8 @@ ZeroSpec 是 **Layer 0（Context Readiness）**，不是執行引擎：
 | **Layer 0** | 讓專案「可被 AI 讀懂」— 架構約束、導航、SoT | **ZeroSpec**      |
 | **Layer 1** | 讓 AI「照流程執行任務」— 工作流、phase gate | OpenSpec, SpecKit |
 
+**與 Layer 1 工具並行使用**：ZeroSpec 產出的 SPEC 是「AI 可讀的介面契約與業務脈絡」，用途是讓 Agent 在任務開始前正確理解邊界；Layer 1 工具（如 OpenSpec、SpecKit）的 SPEC 則是「執行流程規格」，驅動 phase gate 或 workflow engine。兩者服務目的不同，可以並行存在而不互相覆蓋。常見的銜接方式是：以 ZeroSpec SPEC 作為 Layer 1 工具的人類可讀輸入基礎，由 Layer 1 工具在其之上定義執行步驟與驗收條件。
+
 ### 內容產生三層分流
 
 ZeroSpec 的核心設計之一，是先分清楚哪些內容應由 AI 產生、哪些內容必須由人確認。詳見 [GUIDE.md §0](GUIDE.md#0-什麼是-zerospec)。

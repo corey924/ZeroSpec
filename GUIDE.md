@@ -37,6 +37,20 @@ ZeroSpec 是一套零依賴、純 Markdown 的專案 AI 可讀性框架，定位
 
 ZeroSpec 不綁定任何 IDE、代理平台或程式語言。它只做一件事：**確保 AI 在開始任何任務前，已擁有精準的專案脈絡。**
 
+#### 與 Layer 1 工具的長期整合路徑
+
+ZeroSpec 可以獨立運作，也可以隨團隊成熟度逐步銜接 Layer 1 工具。以下是市場主流 SDD 實務（API-First、Contract-First、phase gate）推導出的自然演進路徑，供長期評估參考：
+
+| 階段                      | 時程參考   | 做法                                                                                               | Layer 1 工具       |
+| ------------------------- | ---------- | -------------------------------------------------------------------------------------------------- | ------------------ |
+| **Stage 1：建立習慣**     | Month 1–3  | AGENTS.md + 事件觸發 SPEC 更新（PR 時人工確認）；目標是讓 Agent 產出品質穩定                       | 不需要             |
+| **Stage 2：加入 CI 閘門** | Month 3–6  | PR template 加 SPEC Checklist；簡單 CI script 偵測 Controller 變更但 `docs/spec/` 無異動時發出警告 | 不需要             |
+| **Stage 3：Layer 1 整合** | 6 個月以上 | ZeroSpec SPEC 作為 Layer 1 工具的輸入基礎；Layer 1 在其之上疊加執行階段與核准閘門                  | OpenSpec / SpecKit |
+
+**Stage 3 的觸發信號**：需要跨團隊 spec 核准流程、強制 phase gate、或 AI 生成管線需要自動化驗收條件。多數中小型團隊在 Stage 2 就已足夠。
+
+**兩層文件的職責分工不重疊**：ZeroSpec SPEC（`docs/spec/SPEC-xxx.md`）= 介面契約與業務脈絡（給 Agent 讀）；Layer 1 spec = 執行流程規格（驅動 workflow engine）。導入 Stage 3 後，兩份文件並行存在，不需要合併。
+
 ### 內容產生三層分流模型
 
 ZeroSpec 的核心創新是區分「誰來寫」，而非「要不要寫」：

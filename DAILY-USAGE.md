@@ -96,12 +96,48 @@ GitHub Copilot 同時支援兩種指引檔案：
 
 ### 2.4 Multi-root Workspace 注意事項
 
-如果你的 IDE 同時開多個專案（像 Corey 的 acpl-backend + acpl-frontend + acpl-communication-core），Agent 會看到所有專案的 `AGENTS.md`。
+如果你的 IDE 同時開多個專案（例如 my-backend + my-frontend + shared-lib），Agent 會看到所有專案的 `AGENTS.md`。
 
-**建議**：
-- 確保每個專案的 `AGENTS.md` 開頭都有明確的專案名稱（ZeroSpec 的 INIT-BUILD 已保證這點）
-- 任務指令中明確指出「在 {專案名} 中...」，幫 Agent 鎖定 context
-- 如果 Agent 混淆兩個專案的規範，在任務開頭加一句「請先讀取 {專案}/AGENTS.md 作為本次任務的約束」
+#### 核心問題：Agent 怎麼知道你在對哪個專案下指令？
+
+多數 IDE Agent 會以**當前開啟檔案所在的 workspace folder**作為主要 context。善用這個機制，再加上一句專案前綴，就能穩定鎖定目標專案。
+
+#### 四種做法比較
+
+| 做法 | 操作方式 | 適合情境 | 優缺點 |
+| ---- | -------- | -------- | ------ |
+| **Active File 錨定**（推薦） | 貼 Prompt 前，先點開目標專案中的任一檔案（如 `AGENTS.md`） | 所有 IDE Agent | 零額外成本，Agent 會優先以該專案內容推論 |
+| **專案名前綴** | Prompt 開頭加「目標專案：{AGENTS.md 中的專案名}」 | 任務指令型對話 | 簡潔明確；專案名需與 AGENTS.md 標題一致 |
+| **明確引用 AGENTS.md** | 「請先讀取 `my-backend/AGENTS.md` 作為本次任務的約束」 | Agent 發生跨專案混淆時 | 最強制，但略繁瑣 |
+| **貼完整路徑** | 在 Prompt 中貼入 `/Users/xxx/Projects/my-project` | 專案名重複或路徑歧義時 | 明確但冗長，不利團隊共享與跨環境複用 |
+
+> **推薦組合**：Active File 錨定 + 專案名前綴。日常 90% 情境只需要 Active File 錨定就足夠。
+
+#### 實務範例
+
+```
+# 推薦：先開目標專案的檔案，再貼 Prompt
+# （此時 Agent 已從 active file 知道你在 my-backend）
+目標專案：my-backend
+請為本次 API 變更產生 SPEC 文件。
+
+# Agent 混淆時的修正
+請先讀取 my-backend/AGENTS.md 作為本次任務的約束，
+再為 Customer API 產生 SPEC。
+```
+
+#### 各平台行為差異（摘要）
+
+| 平台 | 鎖定方式重點 | 補充說明 |
+| ---- | ------------ | -------- |
+| GitHub Copilot (VS Code) | 以 active editor 所在 workspace folder 為主 | Multi-root 下每個資料夾規範都可見，active file 會影響優先序 |
+| Cursor | Composer Agent 以 active file 專案為主要 context | 可用 `@file` 進一步指定檔案 |
+| Claude Code | 以 `cwd` 為 context 起點 | 啟動前先 `cd` 到目標專案目錄 |
+| Windsurf | Cascade 以 active file 推斷 context | 行為接近 Copilot |
+
+#### 開源範例命名原則
+
+為避免洩露內部資訊，公開文件中的示例請優先使用 `my-*`、`sample-*`、`shared-*` 命名，不使用真實專案名、個人路徑或可識別線索。
 
 ---
 
