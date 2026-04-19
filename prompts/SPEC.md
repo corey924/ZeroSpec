@@ -18,6 +18,19 @@
 2. 複製下方 Prompt 貼入 Agent
 3. Agent 產出 SPEC 草稿後，審核內容並存檔至 `docs/spec/`
 
+> **Multi-root Workspace 提示**
+>
+> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+>
+> ```
+> 目標專案：my-backend
+> 請為本次 API 變更產生 SPEC 文件。
+> ```
+>
+> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
+> 若偵測到欲寫入的檔案不在目標專案範圍內，請先停止並回報，不要直接寫入。
+> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+
 ---
 
 ````

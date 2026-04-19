@@ -44,6 +44,10 @@ function Assert-NotContains([string]$Path, [string]$Pattern) {
 }
 
 function Assert-FirstLineStartsWithHeader([string]$Path) {
+    if (-not (Test-Path -Path $Path -PathType Leaf)) {
+        Fail "檔案不存在（跳過首行檢查）：$Path"
+        return
+    }
     $firstLine = Get-Content -Path $Path -TotalCount 1
     if ($null -ne $firstLine -and $firstLine.StartsWith('#')) {
         Pass "首行為標題：$Path"
@@ -61,6 +65,23 @@ function Assert-MatchCount([string]$Path, [string]$Pattern, [int]$ExpectedCount)
     }
     else {
         Fail "數量不符：$Path / $Pattern，預期 $ExpectedCount，實際 $actualCount"
+    }
+}
+
+function Assert-LineOrder([string]$Path, [string]$FirstPattern, [string]$SecondPattern, [string]$RuleName) {
+    $firstMatch = Select-String -Path $Path -Pattern $FirstPattern | Select-Object -First 1
+    $secondMatch = Select-String -Path $Path -Pattern $SecondPattern | Select-Object -First 1
+
+    if ($null -eq $firstMatch -or $null -eq $secondMatch) {
+        Fail "順序檢查失敗（缺少匹配）：$RuleName"
+        return
+    }
+
+    if ($firstMatch.LineNumber -lt $secondMatch.LineNumber) {
+        Pass "順序符合：$RuleName"
+    }
+    else {
+        Fail "順序不符：$RuleName"
     }
 }
 
@@ -105,6 +126,23 @@ Assert-Contains 'prompts/INIT-SCAN.md' 'Plan 模式可讀取 codebase'
 
 Assert-Contains 'README.md' 'DAILY-USAGE\.md'
 Assert-Contains 'GUIDE.md' 'DAILY-USAGE\.md'
+
+Assert-Contains 'README.md' '## 關鍵約束（Quick Constraints）'
+Assert-Contains 'README.md' '流程編排、驗證與交易邏輯放在 Service'
+Assert-Contains 'README.md' '資料存取統一走 Repository/Service 抽象'
+Assert-Contains 'README.md' '避免動詞式路徑與多版本混用'
+
+Assert-Contains 'GUIDE.md' '責任定義'
+Assert-Contains 'GUIDE.md' '決策來源屬於 C3（人決策）'
+
+Assert-Contains 'DAILY-USAGE.md' '128K–200K context 模型為基準'
+Assert-Contains 'DAILY-USAGE.md' '10–15 輪'
+
+Assert-Contains 'prompts/UPDATE.md' 'Quick Constraints 視為 C3 決策的置頂投影'
+Assert-Contains 'prompts/UPDATE.md' '僅在使用者確認後寫入'
+
+Assert-LineOrder 'prompts/INIT-BUILD.md' '^## 關鍵約束（Quick Constraints）$' '^## 領域/模組 ↔ 程式碼對照表$' 'INIT-BUILD：Quick Constraints 置於對照表前'
+Assert-LineOrder 'prompts/INIT-BUILD.md' '^## 領域/模組 ↔ 程式碼對照表$' '^## GenAI 文件導航$' 'INIT-BUILD：對照表置於導航前'
 
 Assert-FileExists 'examples/dotnet-dual-api/docs/README.md'
 Assert-FileExists 'examples/java-library/docs/README.md'

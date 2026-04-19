@@ -13,6 +13,19 @@
 5. 你確認分析結果、回答待確認問題（約 5–10 分鐘）
 6. 確認完成後，接續使用 [`INIT-BUILD.md`](INIT-BUILD.md) 產生 `AGENTS.md` + `docs/README.md`
 
+> **Multi-root Workspace 提示**
+>
+> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+>
+> ```
+> 目標專案：my-backend
+> 請掃描本專案現況並產出分析報告。
+> ```
+>
+> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
+> 若偵測到目前工作目錄不在目標專案範圍內，請先停止並回報，不要直接執行。
+> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+
 ---
 
 ````

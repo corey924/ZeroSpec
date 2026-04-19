@@ -4,6 +4,22 @@
 
 ---
 
+## v0.2 — 2026-04-19
+
+> 模型分流推薦 + Multi-root 防誤改 + Re-anchor 穩定性強化。
+
+### 新增
+
+- `docs:` README.md 新增「情境 × 模型推薦表」，依任務類型建議適合的 LLM 模型系列（不綁版號）
+- `docs:` GUIDE.md §2.1 新增「模型選用建議」與「模型切換策略」段落
+- `prompts:` 6 個 Prompt Pack（INIT-SCAN / INIT-BUILD / SPEC / ADR / SA / UPDATE）統一加入 Multi-root Workspace 提示區塊，含可複製的專案鎖定前綴範例與防誤改保險句
+- `docs:` GUIDE.md §3.5 新增「段落排序與注意力權重」，提供 AGENTS.md 段落優先級表與 Quick Constraints 設計要點
+- `docs:` DAILY-USAGE.md §2.5 新增「長對話 Re-anchor 策略」，含三種 re-anchor 範例與頻率建議
+- `prompts:` INIT-BUILD Prompt 本體新增「關鍵約束（Quick Constraints）」區塊，置於專案定位之後、導航表之前
+- `prompts:` UPDATE Prompt 新增 Quick Constraints 比對與同步規則，避免長期維運時與詳細規範漂移
+
+---
+
 ## v0.1 — 2026-04-11
 
 > 首次對外發布版本。

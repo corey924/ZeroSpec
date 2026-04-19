@@ -49,6 +49,10 @@ assert_no_grep() {
 
 assert_first_line_starts_with_header() {
   local file="$1"
+  if [[ ! -f "$file" ]]; then
+    fail "檔案不存在（跳過首行檢查）：$file"
+    return
+  fi
   local first_line
   first_line="$(head -n 1 "$file" || true)"
   if [[ "$first_line" == \#* ]]; then
@@ -68,6 +72,29 @@ assert_count_eq() {
     pass "數量符合：$file / $pattern = $expected"
   else
     fail "數量不符：$file / $pattern，預期 $expected，實際 $actual"
+  fi
+}
+
+assert_order() {
+  local first_pattern="$1"
+  local second_pattern="$2"
+  local file="$3"
+  local rule_name="$4"
+  local first_line
+  local second_line
+
+  first_line="$(grep -nEm1 "$first_pattern" "$file" | cut -d: -f1 || true)"
+  second_line="$(grep -nEm1 "$second_pattern" "$file" | cut -d: -f1 || true)"
+
+  if [[ -z "$first_line" || -z "$second_line" ]]; then
+    fail "順序檢查失敗（缺少匹配）：$rule_name"
+    return
+  fi
+
+  if (( first_line < second_line )); then
+    pass "順序符合：$rule_name"
+  else
+    fail "順序不符：$rule_name"
   fi
 }
 
@@ -112,6 +139,23 @@ assert_grep "Plan 模式可讀取 codebase" "prompts/INIT-SCAN.md"
 
 assert_grep "DAILY-USAGE\.md" "README.md"
 assert_grep "DAILY-USAGE\.md" "GUIDE.md"
+
+assert_grep "## 關鍵約束（Quick Constraints）" "README.md"
+assert_grep "流程編排、驗證與交易邏輯放在 Service" "README.md"
+assert_grep "資料存取統一走 Repository/Service 抽象" "README.md"
+assert_grep "避免動詞式路徑與多版本混用" "README.md"
+
+assert_grep "責任定義" "GUIDE.md"
+assert_grep "決策來源屬於 C3（人決策）" "GUIDE.md"
+
+assert_grep "128K–200K context 模型為基準" "DAILY-USAGE.md"
+assert_grep "10–15 輪" "DAILY-USAGE.md"
+
+assert_grep "Quick Constraints 視為 C3 決策的置頂投影" "prompts/UPDATE.md"
+assert_grep "僅在使用者確認後寫入" "prompts/UPDATE.md"
+
+assert_order "^## 關鍵約束（Quick Constraints）$" "^## 領域/模組 ↔ 程式碼對照表$" "prompts/INIT-BUILD.md" "INIT-BUILD：Quick Constraints 置於對照表前"
+assert_order "^## 領域/模組 ↔ 程式碼對照表$" "^## GenAI 文件導航$" "prompts/INIT-BUILD.md" "INIT-BUILD：對照表置於導航前"
 
 assert_file_exists "examples/dotnet-dual-api/docs/README.md"
 assert_file_exists "examples/java-library/docs/README.md"

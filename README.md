@@ -3,8 +3,8 @@
 > **ZeroSpec is a zero-dependency Markdown framework that helps AI agents understand your repository structure, rules, and source of truth before coding.**
 > 不裝框架、不跑 CLI，用結構化 Markdown 建立 AI 可讀的專案基線。
 
-**版本**：v0.1
-**狀態**：Initial Release
+**版本**：v0.2
+**狀態**：Active
 
 ---
 
@@ -76,6 +76,11 @@ ZeroSpec 的核心設計之一，是先分清楚哪些內容應由 AI 產生、�
 Base Namespace：`MyApp.Api`、`MyApp.Service`（以 Solution 結構為準）
 版本真相來源：套件版本以各 `.csproj` 為準，.NET SDK 以 `global.json` 為準
 
+## 關鍵約束（Quick Constraints）
+1. Controller 只處理 HTTP 請求/回應，不含業務邏輯
+2. 不可在 Controller 直接操作 DbContext
+3. 新 API 路徑格式：`/api/v1/{resource}`
+
 ## 領域/模組 ↔ 程式碼對照表
 | 業務領域 | Controller          | 核心 Service      |
 | -------- | ------------------- | ----------------- |
@@ -83,9 +88,9 @@ Base Namespace：`MyApp.Api`、`MyApp.Service`（以 Solution 結構為準）
 | 認證     | `AuthController`    | `IAuthService`    |
 
 ## 程式碼產生規範
-- Controller 只處理 HTTP 請求/回應，不含業務邏輯（違者 PR 退件）
-- 不可在 Controller 直接操作 DbContext
-- 新 API 路徑格式：`/api/v1/{resource}`
+- Controller 只處理 HTTP 請求/回應；流程編排、驗證與交易邏輯放在 Service（違者 PR 退件）
+- 不可在 Controller 直接操作 DbContext；資料存取統一走 Repository/Service 抽象
+- 新 API 路徑格式：`/api/v1/{resource}`，避免動詞式路徑與多版本混用
 
 ## 常用指令
 | 指令           | 說明     |
@@ -120,6 +125,17 @@ Base Namespace：`MyApp.Api`、`MyApp.Service`（以 Solution 結構為準）
 > 不適用：ChatGPT / Claude.ai 網頁版（無法讀取本機 Repo）
 >
 > 若需要實際寫入檔案，請避免使用純 Plan 模式；`INIT-SCAN` 這類只做分析、不寫檔的步驟，則可視平台能力使用。
+
+**推薦 LLM 模型**（依方案自選版本，只列系列名）
+
+| 任務情境 | 推薦模型系列 | 說明 |
+| -------- | ------------ | ---- |
+| 日常編碼（CRUD、重構、bug fix） | Claude Sonnet / GPT / Gemini Pro | 速度與品質平衡，日常首選 |
+| 架構分析、系統掃描（INIT-SCAN / SA） | Claude Opus / o-series | 長 context 深度推理，適合全局分析 |
+| 大量程式碼生成（INIT-BUILD / SPEC） | Claude Sonnet / GPT-Codex | 程式碼產出導向，支援 Repo 讀寫 |
+| 快速查詢、輕量任務 | Gemini Flash | 低延遲快速回應 |
+
+> 版本依個人方案與額度自行選擇。建議選用具備長 context window 且支援 Repo 讀寫的模型。
 
 ---
 
