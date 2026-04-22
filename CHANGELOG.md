@@ -4,6 +4,72 @@
 
 ---
 
+## v0.3 — 2026-04-22
+
+> Greenfield / Brownfield 導入路徑分叉 + 既有專案 SPEC 補登策略成形。
+
+### 新增
+
+- `docs:` GUIDE.md §7 新增「Step 3.5：依專案類型選擇下一步」，區分 Greenfield（全新專案）與 Brownfield（既有專案）兩條導入路徑，含補登優先序（4 層）、As-Is 原則、SDD 最低門檻、正規化不完整說明
+- `docs:` README.md 快速開始 Step 3 後新增 Brownfield 提示區塊，指向 GUIDE.md §7 完整策略
+- `prompts:` INIT-BUILD.md 第四步「現況評估與下一步建議」新增 Greenfield/Brownfield 自動偵測與對應的下一步建議
+- `docs:` DAILY-USAGE.md §4 新增「劇本 F：既有專案（Brownfield）首次導入後的第一個月」，含 Week 1 SA + 第一份 SPEC、Week 2–4 雙軌並行、月底回顧
+- `docs:` anti-patterns.md 新增反模式 #19：一次補齊所有既有 API 的 SPEC（Brownfield 補登應依優先序，Dead Zone 可接受無 SPEC）
+- `scripts:` 驗收腳本補強 Greenfield/Brownfield 相關段落的存在性檢查
+
+### 設計補強
+
+- **As-Is 原則**：補 SPEC 的目標是讓 AI 理解「現在的程式碼行為」，不是記錄理想架構；To-Be 改善記在 TODO 欄，不混入 As-Is SPEC
+- **正規化不完整**：Dead Zone API（長期未動、無 Consumer）可接受永遠沒有 SPEC，文件存在的前提是有消費者
+- **Brownfield 建議順序**：先 SA（全局理解）→ 再補高優先 SPEC（依優先序）→ 開發軌正常觸發 SPEC
+
+### 主流 SDD 做法借鏡
+
+參考 SpecKit / OpenSpec / Kiro / AGENTS.md 官方標準後補入以下增強（維持零依賴精神）：
+
+- `prompts:` SPEC.md 新增「Bugfix 變體」段落，借鏡 Kiro Bugfix Spec 的 Current / Expected / Unchanged 結構，以 Changelog 形式融入既有 SPEC，不另建 Bugfix 專檔
+- `docs:` DAILY-USAGE.md §2.5 新增 Context Hygiene 段落（進入實作前清場、一次任務一條 session、跨 session 用 150 字結論銜接），借鏡 OpenSpec 官方 usage notes
+- `docs:` GUIDE.md §3.6 新增 Nested AGENTS.md 指引（monorepo 子 package 層級導航），對齊 AGENTS.md 官方標準的最近檔案優先原則
+- `docs:` README.md 核心特性新增「對齊 AGENTS.md 官方開放格式」一項，明確標示 ZeroSpec 在 AGENTS.md（Agentic AI Foundation / Linux Foundation）之上加入 SDD 治理
+
+### Claude Code 官方實踐借鏡
+
+參考 Anthropic 對 CLAUDE.md 的官方最佳實踐後補入以下增強：
+
+- `docs:` README.md 修復核心特性兩則 bullet 被合併的換行問題
+- `docs:` GUIDE.md §3.4 長度建議由 300 行收緊為 200 行主線（上限仍保留 300），補入「該寫 vs 不該寫」對照表、每行自檢法則金句、強調語法節制使用原則、HTML 註解作為維護者備忘的技巧
+- `docs:` anti-patterns.md 新增反模式 #21 AGENTS.md 臃腫失焦、#22 AI 反覆違規就加更多規則（惡性循環）
+- `docs:` DAILY-USAGE.md §2.2 新增「Claude Code 相容寫法：`CLAUDE.md` + `@AGENTS.md` import」，讓 Claude Code 使用者零成本相容 ZeroSpec 產出
+- `docs:` DAILY-USAGE.md §5.6 新增診斷清單「AI 反覆違反同一條規則」，按「AGENTS.md 太長 → 規則有歧義 → 對話太長」優先順序排查
+- `docs:` DAILY-USAGE.md §4 新增劇本 G「Explore → Plan → Implement 實作節奏」，對應 Anthropic 推薦的分段工作流程
+- `prompts:` INIT-BUILD.md「常用開發指令」段落強制要求 Agent 補齊建置、測試、Lint、型別檢查四類驗證指令，呼應「給 AI 一個驗證自己工作的方法」原則
+
+### 其他小補強
+
+- `docs:` GUIDE.md §3.5 Quick Constraints 補入「強調語法使用注意」段落，引用 DAILY-USAGE §5.6 診斷流程作為前置條件
+- `docs:` DAILY-USAGE.md 劇本 A 尾端補一行指向劇本 G 的連結，提示跨多檔任務建議採 Explore→Plan→Implement 節奏
+
+### 範圍收斂與持續運作補強
+
+- `docs:` README.md 新增「不適合的情境」區塊；GUIDE.md §0 新增「何時不該用 ZeroSpec」對照表，誠實標示一次性腳本 / POC / 探索期 / 已導入 Layer 1 等四類不建議採用的情境
+- `.github:` pull_request_template.md 新增「SDD 同步檢查項」區塊，強制 PR 描述需引用 `SPEC-xxx` / `ADR-xxx` 或勾選「未觸發」
+- `prompts:` 新增 `prompts/AUDIT.md`，提供 AGENTS.md 本體自檢 Prompt，結構化報告含長度 / 規則具體度 / 重複衝突 / 可刪除候選 / 必備欄位 / 注意力權重 / Token 佔用共 7 個維度（不寫檔）
+- `docs:` GUIDE.md §3.3 新增「語意搜尋時代的導航表定位調整」小節，說明 Agent 具備 semantic search 時對照表應把篇幅移向 Quick Constraints 與 Don't 反例
+- `docs:` DAILY-USAGE.md §5.4 補入「具體做法」小節，建議 `.zerospec/prompts/` 目錄 + `-custom` 後綴約定 + diff 對比升版流程
+- `docs:` GUIDE.md §3.6 新增「Compaction 生存策略」小節，說明 Root vs Nested AGENTS.md 在長對話壓縮後的存活率差異，建議核心硬規則集中於 Root
+- `scripts:` 驗收腳本補入 `prompts/AUDIT.md` 檔案存在與首行標題檢查
+
+### 文字修繕與外部案例借鏡
+
+- `docs:` README.md 與 GUIDE.md 版本號同步為 v0.3；修正 README「不適合的情境」區塊之錯字與段落空行
+- `docs:` README.md 新增「30 秒起步」簡短卡片（精華步驟版），並在「AI Agent 外掛」下方補入 GitHub Copilot 不自動讀 AGENTS.md 的相容性提示
+- `docs:` DAILY-USAGE.md §5.7 新增「Agent Bootstrap Test」快速驗收法（導航題 / 規則題 / 反例辨識題），用短流程量化驗收 AGENTS.md 是否真的有效
+- `prompts:` AUDIT.md 第 4 維度（可刪除候選）新增「領域對照表在小型專案的必要性」條款——專案規模較小且 Agent 支援語意搜尋時，可考慮移除或大幅精簡
+- `prompts:` AUDIT.md 新增「Token 佔用觀察（選填）」維度，健康分數同步改為語意化分級判斷
+- `docs:` README.md、GUIDE.md、DAILY-USAGE.md、AUDIT.md 再修一輪錯字、重複句與殘留硬數字，將「前 500 tokens / 超過 200 行 / 回答 5–8 題」等描述改為較低維護的語意化寫法
+
+---
+
 ## v0.2 — 2026-04-19
 
 > 模型分流推薦 + Multi-root 防誤改 + Re-anchor 穩定性強化。

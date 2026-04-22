@@ -4,6 +4,11 @@
 ## 變更內容
 -
 
+## SDD 同步檢查項
+- [ ] 如本 PR 涉及 API 新增或行為變更 → PR 描述已引用對應 `SPEC-xxx`（例：`closes SPEC-003 Changelog entry`）
+- [ ] 如涉及架構層級 either/or 決策 → PR 描述已引用 `ADR-xxx`
+- [ ] 本次變更未觸發上述條件（可留白或勾選此項）
+
 ## 影響範圍
 - [ ] README
 - [ ] GUIDE

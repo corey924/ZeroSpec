@@ -93,6 +93,7 @@ Assert-FileExists 'prompts/UPDATE.md'
 Assert-FileExists 'prompts/SPEC.md'
 Assert-FileExists 'prompts/ADR.md'
 Assert-FileExists 'prompts/SA.md'
+Assert-FileExists 'prompts/AUDIT.md'
 
 Assert-FileExists 'templates/DOCS-README-TEMPLATE.md'
 Assert-FileExists 'templates/SPEC-TEMPLATE.md'
@@ -109,6 +110,7 @@ Assert-FirstLineStartsWithHeader 'prompts/UPDATE.md'
 Assert-FirstLineStartsWithHeader 'prompts/SPEC.md'
 Assert-FirstLineStartsWithHeader 'prompts/ADR.md'
 Assert-FirstLineStartsWithHeader 'prompts/SA.md'
+Assert-FirstLineStartsWithHeader 'prompts/AUDIT.md'
 Assert-FirstLineStartsWithHeader 'templates/DOCS-README-TEMPLATE.md'
 Assert-FirstLineStartsWithHeader 'templates/SA-TEMPLATE.md'
 Assert-FirstLineStartsWithHeader 'examples/minimal-day1/AGENTS.md'
@@ -183,6 +185,16 @@ Assert-MatchCount 'prompts/SA.md' '^````$' 2
 Assert-NotContains 'prompts/SPEC.md' 'templates/DOCS-README-TEMPLATE\.md'
 Assert-NotContains 'prompts/ADR.md' 'templates/DOCS-README-TEMPLATE\.md'
 Assert-NotContains 'prompts/SA.md' 'templates/DOCS-README-TEMPLATE\.md'
+
+# Greenfield / Brownfield 導入路徑（v0.3）
+Assert-Contains 'GUIDE.md' 'Step 3\.5：依專案類型選擇下一步'
+Assert-Contains 'GUIDE.md' 'Greenfield'
+Assert-Contains 'GUIDE.md' 'Brownfield'
+Assert-Contains 'GUIDE.md' 'As-Is'
+Assert-Contains 'README.md' 'Brownfield'
+Assert-Contains 'DAILY-USAGE.md' '劇本 F'
+Assert-Contains 'prompts/INIT-BUILD.md' 'Greenfield|Brownfield'
+Assert-Contains 'anti-patterns.md' '一次補齊所有既有 API'
 
 Write-Host "=== 驗收摘要 ==="
 Write-Host "PASS: $script:PassCount"

@@ -9,6 +9,7 @@
 - 新增對外 API 端點
 - 修改既有 API 的 Request / Response 結構
 - 變更 API 的權限需求或業務規則
+- **Bug fix 造成對外行為變更**（這时 SPEC 應紀錄修復前後的行為差異，見下方「Bugfix 變體」）
 
 ---
 
@@ -17,6 +18,19 @@
 1. 確認觸發條件已滿足
 2. 複製下方 Prompt 貼入 Agent
 3. Agent 產出 SPEC 草稿後，審核內容並存檔至 `docs/spec/`
+
+### Bugfix 變體（當觸發條件為對外行為變更的 bug fix）
+
+若本次是修復 bug 而非新功能，SPEC 更新建議以「差異變更」形式記錄，而非重寫整份介面定義：
+
+- **Current Behavior**：修復前的實際行為（從修復前的 SPEC 或 Git log 推導）
+- **Expected Behavior**：修復後的正確行為
+- **Unchanged Behavior**：未受本次修復影響的行為（避免回歸誤解）
+- **影響範圍**：相關 Consumer / 下游系統
+
+將以上資訊以 `## Changelog` 的新条目寫入，經典範例：`- YYYY-MM-DD Bugfix: {摘要}（Before: … → After: …）`。
+
+> **來源參考**：Kiro Bugfix Spec 的 current/expected/unchanged 結構對避免震盪有幫助；ZeroSpec 以輕量化方式融入既有 SPEC，不另建正式 Bugfix 檔。
 
 > **Multi-root Workspace 提示**
 >

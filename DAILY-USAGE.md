@@ -3,7 +3,7 @@
 > 本文件描述 ZeroSpec 在 Day-1 初始化之後，工程師日常開發中如何「自然地」與 SDD 機制共存。
 > 適合已完成 INIT-SCAN + INIT-BUILD、手邊有 `AGENTS.md` + `docs/README.md` 的團隊。
 
-**版本**：v0.1 — 2026-04-11
+**版本**：v0.3 — 2026-04-22
 **對象**：已導入 ZeroSpec 的個人開發者或小型團隊
 
 ---
@@ -80,6 +80,23 @@ GitHub Copilot 同時支援兩種指引檔案：
 - `AGENTS.md` 放「這個專案怎麼寫 code」（ZeroSpec 產出）
 - 兩者互補不衝突，不需要合併
 
+#### Claude Code 的相容寫法（`CLAUDE.md` + `@AGENTS.md`）
+
+Claude Code 預設只讀 `CLAUDE.md`，不會讀 `AGENTS.md`。若你希望同時保留 ZeroSpec 的 AGENTS.md 成果，又讓 Claude Code 使用者零成本相容，在 repo 根目錄建立以下 `CLAUDE.md` 即可：
+
+```markdown
+@AGENTS.md
+
+## Claude Code 專屬補充
+
+（如無特殊需求，此段可留空）
+```
+
+- `@AGENTS.md` 是 Claude Code 的 import 語法，啟動時會展開 AGENTS.md 內容
+- 不需要複製一份 AGENTS.md → CLAUDE.md，避免兩處維護的漂移風險
+- 其他 Agent（Copilot / Cursor / Codex / Windsurf）仍照常讀 AGENTS.md
+- 若有只適用 Claude Code 的規則（例如 Plan 模式觸發條件），放在 import 之後即可
+
 ### 2.3 Plan 模式 vs Agent 模式的選用時機
 
 | 情境                          | 建議模式     | 原因                                          |
@@ -104,12 +121,12 @@ GitHub Copilot 同時支援兩種指引檔案：
 
 #### 四種做法比較
 
-| 做法 | 操作方式 | 適合情境 | 優缺點 |
-| ---- | -------- | -------- | ------ |
-| **Active File 錨定**（推薦） | 貼 Prompt 前，先點開目標專案中的任一檔案（如 `AGENTS.md`） | 所有 IDE Agent | 零額外成本，Agent 會優先以該專案內容推論 |
-| **專案名前綴** | Prompt 開頭加「目標專案：{AGENTS.md 中的專案名}」 | 任務指令型對話 | 簡潔明確；專案名需與 AGENTS.md 標題一致 |
-| **明確引用 AGENTS.md** | 「請先讀取 `my-backend/AGENTS.md` 作為本次任務的約束」 | Agent 發生跨專案混淆時 | 最強制，但略繁瑣 |
-| **貼完整路徑** | 在 Prompt 中貼入 `/Users/xxx/Projects/my-project` | 專案名重複或路徑歧義時 | 明確但冗長，不利團隊共享與跨環境複用 |
+| 做法                         | 操作方式                                                   | 適合情境               | 優缺點                                   |
+| ---------------------------- | ---------------------------------------------------------- | ---------------------- | ---------------------------------------- |
+| **Active File 錨定**（推薦） | 貼 Prompt 前，先點開目標專案中的任一檔案（如 `AGENTS.md`） | 所有 IDE Agent         | 零額外成本，Agent 會優先以該專案內容推論 |
+| **專案名前綴**               | Prompt 開頭加「目標專案：{AGENTS.md 中的專案名}」          | 任務指令型對話         | 簡潔明確；專案名需與 AGENTS.md 標題一致  |
+| **明確引用 AGENTS.md**       | 「請先讀取 `my-backend/AGENTS.md` 作為本次任務的約束」     | Agent 發生跨專案混淆時 | 最強制，但略繁瑣                         |
+| **貼完整路徑**               | 在 Prompt 中貼入 `/Users/xxx/Projects/my-project`          | 專案名重複或路徑歧義時 | 明確但冗長，不利團隊共享與跨環境複用     |
 
 > **推薦組合**：Active File 錨定 + 專案名前綴。日常 90% 情境只需要 Active File 錨定就足夠。
 
@@ -128,12 +145,12 @@ GitHub Copilot 同時支援兩種指引檔案：
 
 #### 各平台行為差異（摘要）
 
-| 平台 | 鎖定方式重點 | 補充說明 |
-| ---- | ------------ | -------- |
-| GitHub Copilot (VS Code) | 以 active editor 所在 workspace folder 為主 | Multi-root 下每個資料夾規範都可見，active file 會影響優先序 |
-| Cursor | Composer Agent 以 active file 專案為主要 context | 可用 `@file` 進一步指定檔案 |
-| Claude Code | 以 `cwd` 為 context 起點 | 啟動前先 `cd` 到目標專案目錄 |
-| Windsurf | Cascade 以 active file 推斷 context | 行為接近 Copilot |
+| 平台                     | 鎖定方式重點                                     | 補充說明                                                    |
+| ------------------------ | ------------------------------------------------ | ----------------------------------------------------------- |
+| GitHub Copilot (VS Code) | 以 active editor 所在 workspace folder 為主      | Multi-root 下每個資料夾規範都可見，active file 會影響優先序 |
+| Cursor                   | Composer Agent 以 active file 專案為主要 context | 可用 `@file` 進一步指定檔案                                 |
+| Claude Code              | 以 `cwd` 為 context 起點                         | 啟動前先 `cd` 到目標專案目錄                                |
+| Windsurf                 | Cascade 以 active file 推斷 context              | 行為接近 Copilot                                            |
 
 #### 開源範例命名原則
 
@@ -172,15 +189,25 @@ AI Agent 在長對話中（約 15–20 輪後）可能逐漸偏離 AGENTS.md 的
 
 #### re-anchor 頻率建議
 
-| 對話輪數 | 建議動作 |
-| -------- | -------- |
-| 1–15 輪  | 正常操作，無需 re-anchor |
+| 對話輪數 | 建議動作                         |
+| -------- | -------------------------------- |
+| 1–15 輪  | 正常操作，無需 re-anchor         |
 | 15–25 輪 | 若涉及架構敏感操作，貼一次輕量版 |
-| 25+ 輪   | 建議開新對話重新開始 |
+| 25+ 輪   | 建議開新對話重新開始             |
 
 > 上述輪數以 128K–200K context 模型為基準。較小 context window 的模型可能在 10–15 輪就進入稀釋區，建議提前 re-anchor。
 
 > **為什麼不用更複雜的自動化機制？** ZeroSpec 是 Layer 0 框架，不依賴 CLI 或 runtime。re-anchor 靠使用者在正確時機貼一句提醒即可，無需額外工具。
+
+#### Context Hygiene（進入實作前的清場原則）
+
+除了 re-anchor 之外，另一個維持 Agent 品質的關鍵是 context hygiene：
+
+- **進入實作前清空不相關 context**：審核 SPEC / 討論架構 → 實際寫 code 是兩種任務，建議不同 session。若上一輪已是長討論，開新對話再下實作指令
+- **一次任務一條 session**：Bugfix / 新功能 / 重構 分開對話，避免上一個任務的 tool output 干擾下一個判斷
+- **長討論輸出「討論總結」再換 session**：若需跨 session 延續，請 AI 產出結論約 150 字的重點，下一個 session 貼入為起點，不要帶整段 history
+
+> 參考來源：OpenSpec 官方 usage notes 明確建議「clear your context before starting implementation」。ZeroSpec 在 Prompt 層沒有自動清場機制，但使用者可以透過這三條原則達到類似效果。
 
 ---
 
@@ -217,6 +244,8 @@ timeline:
   4. Agent 讀現有 SPEC → 產出更新草稿 → 你審核 → 一起進 PR
   5. 總額外時間：~8 分鐘
 ```
+
+> 若新 API 涉及跨多檔重構或新增多個資源，建議按劇本 G（Explore → Plan → Implement）分段進行，Agent 品質通常會更穩定。
 
 ### 劇本 B：升級 Spring Boot 3.5 → 4.0
 
@@ -262,6 +291,63 @@ timeline:
   4. 你不需要自己動手 — 只需要提醒
 ```
 
+### 劇本 F：既有專案（Brownfield）首次導入的第一個月
+
+```
+情境：你的專案已有中量/大量 API，INIT-BUILD 剛完成，
+      AGENTS.md 和 docs/README.md 已到位。
+
+Week 1：建立全局理解
+  1. 跑一次 SA Prompt → 讓 Agent 產出系統架構快照（docs/analysis/SA-001.md）
+  2. 選出「最近 30 天有程式碼異動」的 API → 這是你的補登 Tier 1 清單
+     （完整補登優先序：最近有異動 > 跨系統/跨團隊依賴 > 業務邏輯複雜，見 GUIDE.md §7 Step 3.5）
+  3. 對 Tier 1 最重要的一支 API 跑 SPEC Prompt → 建立第一份 SPEC
+  4. 把 SA + SPEC 一起進 commit → 宣告 ZeroSpec 正式啟動
+
+Week 2–4：並行兩條軌道
+  開發軌：所有新 API 或有變更的 API → 正常觸發 SPEC（這條軌道是必須的）
+  補登軌：每週挑 1–2 支 Tier 1 API 補 SPEC（維持節奏，不要一次衝太多）
+
+  補 SPEC 時的 As-Is 原則：
+  - 目標是描述「現在的程式碼行為」，不是理想架構
+  - 發現問題先記在 SPEC 的 TODO 欄，不混入 As-Is 描述
+
+月底回顧：
+  - 清點補了幾份 SPEC → 確認 Tier 1 是否大致覆蓋
+  - 有無 Dead Zone API（長期未動、無 Consumer）→ 標記「無需補登」，不要浪費時間
+  - 開發軌運作是否正常 → 有沒有 API 變更但漏掉 SPEC？
+
+總額外時間：Week 1 約 45–60 分鐘（SA + 第一份 SPEC）；Week 2–4 每週 10–20 分鐘
+```
+
+### 劇本 G：Explore → Plan → Implement 的實作節奏（推薦用於中等以上任務）
+
+多數 Agent 平台（Claude Code Plan 模式、Copilot Chat、Cursor Composer）都支援「先分析、再實作」的分段操作。對於跨多檔的任務，先分段走一輪通常比讓 Agent 直接動手品質更高：
+
+```
+任務：在 my-backend 新增 OAuth 登入流程（跨 AuthController、SecurityConfig、User entity）
+
+Step 1 — Explore（Plan 模式）
+  貼入：「請讀 src/auth/ 了解現行 session 管理，讀 SecurityConfig 看過濾器鏈，不要寫任何檔案」
+  產出：結構化摘要 + 影響範圍清單
+
+Step 2 — Plan（同 Plan 模式）
+  貼入：「基於上述理解，請提出加入 Google OAuth 的實作計畫，列出每個檔案的改動」
+  產出：檔案層級的變更計畫
+  → 人審核計畫，直接在計畫上修改或打回重來
+
+Step 3 — Implement（切 Agent 模式 / 新對話）
+  貼入：「依上面計畫實作，並執行 make test 驗證結果」
+  → Agent 寫 code + 跑驗證指令
+
+Step 4 — Commit & SPEC（同對話）
+  貼入：「本次變更涉及 Auth API，請用 SPEC Prompt 產對應 SPEC，再一起 commit」
+```
+
+**何時可跳過這節奏**：單檔 typo、單行 log 新增、單純 rename 這類「一句話描述得完的 diff」。計畫階段的成本只在任務複雜時才划算。
+
+**為什麼值得做**：AGENTS.md 能提供結構約束，但無法替代任務層級的計畫；Explore 階段能讓 Agent 在動手前認清本次任務的邊界，是防止「生出貌似正確但遺漏 edge case」的最有效手段。
+
 ---
 
 ## 5. 長期維護會遇到的真實問題
@@ -301,6 +387,32 @@ timeline:
 
 **客製化原則**：修改你專案中的 Prompt 副本，不要改 ZeroSpec 本體。這樣 ZeroSpec 升版時不會衝突。
 
+#### 具體做法（推薦約定）
+
+```
+<your-repo>/
+├── AGENTS.md
+├── docs/
+└── .zerospec/
+    └── prompts/
+        ├── SPEC-custom.md      ← 你客製化的副本，-custom 後綴表示已改
+        ├── ADR-custom.md
+        └── UPDATE-custom.md
+```
+
+- **命名規則**：原檔名 + `-custom` 後綴；同檔名無後綴代表未改，可跳過 diff
+- **位置**：放 `.zerospec/prompts/`（或 `docs/prompts/`），通過 git 追蹤客製化歷史
+- **升版比對**：升級 ZeroSpec 後跑一次：
+  ```
+  diff <新版>/prompts/SPEC.md .zerospec/prompts/SPEC-custom.md
+  ```
+  看官方版有什麼新增段落 → 手動正確移植到 `-custom` 副本
+
+#### 「何時該回饋上游」判斷
+
+- 若你的客製化改動在多個專案都在用 → 可考慮回 PR 給 ZeroSpec 本體（讓官方正式支援）
+- 若只是單一專案限定慣例 → 寫在 `-custom` 副本繼續維護即可，不需回流
+
 ### 5.5 「docs/ 目錄文件越來越多，不確定該不該停」
 
 **判斷標準**：文件是否有明確的消費者。
@@ -313,6 +425,54 @@ timeline:
 | DevOps / AI  | INFRA    | ⚠️ 只在部署變更時                         |
 
 如果一份文件寫完後從沒被引用過，它可能不需要存在。
+
+### 5.6 「AI 反覆違反同一條 AGENTS.md 規則」
+
+**根因優先順序**（由高到低）：
+
+1. **AGENTS.md 過長 / 核心規則被噪音埋沒**：檔案明顯偏長且含大量 AI 本來就會的通用常識 → 核心規則落在注意力稀釋區
+2. **規則描述有歧義**：同一條規則在 AGENTS.md 兩處描述不一致，或語句抽象到 AI 無法驗證（如「寫乾淨程式碼」）
+3. **對話已過長 / context 稀釋**：超過 15–20 輪的長對話，AGENTS.md 的注意力權重被後續對話輸出稀釋
+
+**診斷流程**：
+
+```
+1. 計算 AGENTS.md 行數
+   wc -l AGENTS.md
+  → 若已明顯偏長：套用 GUIDE §3.4 每行自檢法則修剪，移除 AI 無需被提醒的通用常識
+
+2. 檢視被違反的規則本文
+   → 同一規則在檔案中是否重複出現但敘述不一致？
+   → 規則是否具體到可驗證（如「Controller 不寫 DbContext」），還是抽象（如「保持程式碼整潔」）？
+   → 具體化或統一敘述後再觀察
+
+3. 如果規則已經具體且 AGENTS.md 不長，檢查對話
+   → 若對話 > 15 輪：貼一次輕量 re-anchor（見 §2.5）
+   → 若對話 > 25 輪：開新對話重來
+
+4. 仍無效的最後手段：在該規則前加 IMPORTANT: 或 YOU MUST
+   → 但注意：若每條規則都加強調語，等於沒有強調
+```
+
+**不建議的反應**：再加一條新規則「禁止違反規則 X」。這只會讓 AGENTS.md 更長、問題更嚴重（詳見 [anti-patterns #22](anti-patterns.md)）。
+
+### 5.7 「想快速驗收 AGENTS.md 是否真的有效」
+
+寫完或大改 AGENTS.md 後，**用新對話跑一輪快速測試**（幾分鐘即可），比讀完整份文件更能反映 Agent 實際理解程度：
+
+| 測試題型   | 範例問法                                                             | 期望答對的訊號                          |
+| ---------- | -------------------------------------------------------------------- | --------------------------------------- |
+| 導航題     | 「認證邏輯在哪個 package / module？」                                | 指向對照表列出的實際路徑，不是通用推測  |
+| 規則題     | 「新增一支 API 的路徑與分層要求？」                                  | 引用 Quick Constraints 或程式碼產生規範 |
+| 反例辨識題 | 貼一段「在 Controller 直接操作 DbContext」的程式碼問「這違反什麼？」 | 準確點名被違反的硬規則並建議正確位置    |
+
+**結果判讀**：
+
+- **大多答對**：AGENTS.md 健康，可正常使用
+- **少量答錯**：該領域的導航或規則需要補強，針對性修
+- **多數答錯**：跑 [AUDIT Prompt](../prompts/AUDIT.md) 做整體稽核
+
+> 每次 AGENTS.md 大改（例如 UPDATE Prompt 寫檔後、Brownfield 補 SPEC 後）建議都跑一次。
 
 ---
 
@@ -344,8 +504,8 @@ timeline:
 6. 回顧這一季 Agent 寫出來的 PR → 有沒有反覆違反同一條規則？
    → 若有，調整 AGENTS.md 中該規則的描述清晰度
 
-7. 檢查 AGENTS.md 的行數 → 是否超過 300 行？
-   → 若超過，考慮把低頻使用的段落移到 docs/ 子文件
+7. 檢查 AGENTS.md 的行數 → 是否已明顯偏長？
+  → 若是，考慮把低頻使用的段落移到 docs/ 子文件
 
 8. 與團隊成員確認架構硬規則是否仍然適用
    → 有沒有「大家都默認違反但沒人改文件」的規則？
@@ -404,7 +564,7 @@ timeline:
 
 ### Q：我能不能讓 Agent 在每次對話開始時自動讀 ZeroSpec？
 
-**不建議。** ZeroSpec 本體（prompts/ + templates/ + GUIDE.md）加起來約 2000+ 行，會嚴重消耗 context window。Agent 只需要讀你專案中的 `AGENTS.md`（100-200 行）就夠了。
+**不建議。** ZeroSpec 本體（prompts/ + templates/ + GUIDE.md）加起來已有數千行，會明顯消耗 context window。Agent 通常只需要讀你專案中的精簡 `AGENTS.md` 就夠了。
 
 ### Q：多人團隊中，誰負責跑 UPDATE Prompt？
 

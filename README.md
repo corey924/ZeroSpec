@@ -3,7 +3,7 @@
 > **ZeroSpec is a zero-dependency Markdown framework that helps AI agents understand your repository structure, rules, and source of truth before coding.**
 > 不裝框架、不跑 CLI，用結構化 Markdown 建立 AI 可讀的專案基線。
 
-**版本**：v0.2
+**版本**：v0.3
 **狀態**：Active
 
 ---
@@ -32,12 +32,20 @@ ZeroSpec 的目標很單純：**用低維護成本，讓 AI Agent 能快速讀�
 - 不想引入額外 CLI、框架或複雜平台綁定
 - 希望文件是「跟得上開發節奏的工作基線」，而不是一次性產物
 
+**不適合的情境**（請直接跳過 ZeroSpec）：
+
+- **一次性腳本 / POC / 教學範例**：沒有長期維護需求，設立 AGENTS.md 的成本超過收益
+- **純研究性筆記 Repo**（如 Jupyter notebook 樣本集）：內容型專案定位由 README 承擔即可
+- **專案結構連本人都沒確定的探索階段**：先讓架構穩定到能寫下 C 類硬規則再導入
+- **已導入 Layer 1 SDD 工具且不理會 Agent「先讀 AGENTS.md」的團隊**：ZeroSpec 的核心價值在於 Agent 自動讀取專案指引檔；若團隊已在其他機制中解決此問題，貿然導入反而增加維護負擔
+
 ### 核心特性
 
 - **零依賴**：不需要安裝工具、CLI 或額外 runtime
 - **低人工成本**：AI 掃描 Repo 產生初稿，人只需要審核關鍵決策
 - **可持續運作**：不是 Day-1 做完就放著，而是能支撐後續更新與回顧
 - **事件觸發擴張**：文件在真的需要時才建立，不預先堆一批空檔案
+- **對齊 AGENTS.md 官方開放格式**：基於 [AGENTS.md](https://agents.md/)（Agentic AI Foundation / Linux Foundation 監管，已被大量開源專案採用），在其之上加入 SDD 治理與 Lazy Evaluation
 - **跨代理相容**：可搭配 GitHub Copilot、Codex、Claude、Gemini、Cursor 等主流代理
 - **可銜接其他流程**：可作為更高層工作流或規格管理工具的 Layer 0
 
@@ -56,11 +64,11 @@ ZeroSpec 是 **Layer 0（Context Readiness）**，不是執行引擎：
 
 ZeroSpec 的核心設計之一，是先分清楚哪些內容應由 AI 產生、哪些內容必須由人確認。詳見 [GUIDE.md §0](GUIDE.md#0-什麼是-zerospec)。
 
-| 類別                    | 誰負責           | 人工投入    |
-| ----------------------- | ---------------- | ----------- |
-| **(A) AI 自動產生**     | AI 掃描 Repo     | 零          |
-| **(B) AI 草擬、人審核** | AI 歸納 + 人確認 | 審核 5 分鐘 |
-| **(C) 人必須提供**      | 無法從程式碼推導 | 回答 5–8 題 |
+| 類別                    | 誰負責           | 人工投入     |
+| ----------------------- | ---------------- | ------------ |
+| **(A) AI 自動產生**     | AI 掃描 Repo     | 零           |
+| **(B) AI 草擬、人審核** | AI 歸納 + 人確認 | 審核 5 分鐘  |
+| **(C) 人必須提供**      | 無法從程式碼推導 | 回答幾個問題 |
 
 ---
 
@@ -103,6 +111,18 @@ Base Namespace：`MyApp.Api`、`MyApp.Service`（以 Solution 結構為準）
 
 ---
 
+## 30 秒起步
+
+熟悉流程的使用者可照以下三步直接執行，詳細說明見「[快速開始](#快速開始30-分鐘內完成)」：
+
+1. 目標專案開 Agent 模式 → 貼 [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md) → 產現況盤點（不寫檔）
+2. 同一對話貼 [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) → 回答幾個團隊決策問題 → 產出 `AGENTS.md` + `docs/README.md`
+3. 跑一個真實小任務驗證 Agent 遵循新的架構約束
+
+> GitHub Copilot 用戶：Copilot 預設不會自動讀 `AGENTS.md`，需用 `@AGENTS.md` 引用或建立 `.github/copilot-instructions.md`，詳見 [DAILY-USAGE §2.2](DAILY-USAGE.md#22-githubcopilot-instructionsmd-與-agentsmd-的共存)。
+
+---
+
 ## 開始前
 
 **目標專案**
@@ -128,12 +148,12 @@ Base Namespace：`MyApp.Api`、`MyApp.Service`（以 Solution 結構為準）
 
 **推薦 LLM 模型**（依方案自選版本，只列系列名）
 
-| 任務情境 | 推薦模型系列 | 說明 |
-| -------- | ------------ | ---- |
-| 日常編碼（CRUD、重構、bug fix） | Claude Sonnet / GPT / Gemini Pro | 速度與品質平衡，日常首選 |
-| 架構分析、系統掃描（INIT-SCAN / SA） | Claude Opus / o-series | 長 context 深度推理，適合全局分析 |
-| 大量程式碼生成（INIT-BUILD / SPEC） | Claude Sonnet / GPT-Codex | 程式碼產出導向，支援 Repo 讀寫 |
-| 快速查詢、輕量任務 | Gemini Flash | 低延遲快速回應 |
+| 任務情境                             | 推薦模型系列                     | 說明                              |
+| ------------------------------------ | -------------------------------- | --------------------------------- |
+| 日常編碼（CRUD、重構、bug fix）      | Claude Sonnet / GPT / Gemini Pro | 速度與品質平衡，日常首選          |
+| 架構分析、系統掃描（INIT-SCAN / SA） | Claude Opus / o-series           | 長 context 深度推理，適合全局分析 |
+| 大量程式碼生成（INIT-BUILD / SPEC）  | Claude Sonnet / GPT-Codex        | 程式碼產出導向，支援 Repo 讀寫    |
+| 快速查詢、輕量任務                   | Gemini Flash                     | 低延遲快速回應                    |
 
 > 版本依個人方案與額度自行選擇。建議選用具備長 context window 且支援 Repo 讀寫的模型。
 
@@ -151,7 +171,7 @@ Base Namespace：`MyApp.Api`、`MyApp.Service`（以 Solution 結構為準）
 ### Step 2：建置文件（INIT-BUILD）
 
 1. 開啟 [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md)，複製 Prompt
-2. 在同一對話中貼入 → AI 詢問 5–8 個團隊決策問題（每題附預設建議）
+2. 在同一對話中貼入 → AI 詢問幾個團隊決策問題（每題附預設建議）
 3. 回答或確認後，AI 產出 `AGENTS.md` + `docs/README.md`
 4. 審核 AI 草擬的領域對照表與命名慣例 → 確認寫入
 5. AI 額外提供**現況評估與建議**（掃描摘要 + 建議第一份 SPEC + 下一步行動）
@@ -159,6 +179,9 @@ Base Namespace：`MyApp.Api`、`MyApp.Service`（以 Solution 結構為準）
 ### Step 3：驗證
 
 以新的 `AGENTS.md` 跑一個真實小任務（例如新增一支 API），確認 Agent 使用正確的 Namespace / Package 並遵守架構約束。
+
+> **若你的專案已有大量既有 API（Brownfield）**，建議在進入 Step 4 前先跑 **SA Prompt** 產出系統架構快照，再以「最近有異動」的 API 優先補第一份 SPEC。
+> 新/既有 API 並行的補登策略（含 Step 3.5 的補登優先序與 As-Is 原則）詳見 [GUIDE.md §7](GUIDE.md#7-導入與持續運作流程)。
 
 ### Step 4：建立第一份 SPEC
 
@@ -217,6 +240,7 @@ zerospec/
 │   ├── SPEC.md                  ← 觸發：API 變更 → 產 SPEC
 │   ├── ADR.md                   ← 觸發：架構決策 → 產 ADR
 │   ├── SA.md                    ← 觸發：系統快照 → 產 SA
+│   ├── AUDIT.md                 ← 觸發：稽核 AGENTS.md 品質（不寫檔）
 │   └── UPDATE.md                ← 持續：更新 AGENTS.md + docs/README.md
 ├── templates/
 │   ├── ADR-TEMPLATE.md          ← 直接可用的 ADR 模板
