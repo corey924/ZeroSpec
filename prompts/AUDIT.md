@@ -1,200 +1,202 @@
 # ZeroSpec — AUDIT Prompt Pack
 
-> 當你想**量化檢查自己 AGENTS.md 的品質**時使用。將以下 Prompt 貼入 AI Agent，它會產出結構化的自檢報告（**不寫檔**），供你決定要不要修剪、重寫或維持現狀。
+> Use when you want to **quantitatively assess your AGENTS.md quality**. Paste the Prompt below into your AI Agent. It produces a structured self-check report (**no files written**) for you to decide whether to trim, rewrite, or keep the current state.
 
 ---
 
-## 觸發條件
+## Trigger Conditions
 
-- 月度／季度回顧（[GUIDE.md §7](../GUIDE.md#7-導入與持續運作流程)）
-- Agent 開始反覆違反規則（[DAILY-USAGE §5.6](../DAILY-USAGE.md#56-ai-反覆違反同一條-agentsmd-規則)）
-- AGENTS.md 主線偏長，想評估是否需要修剪
-- 新成員接手後想驗證文件是否容易被理解
+- Monthly / quarterly review ([GUIDE.md Section 7](../GUIDE.md#7-adoption-and-continuous-operation))
+- Agent repeatedly violates the same rule ([DAILY-USAGE Section 5.6](../DAILY-USAGE.md#56-ai-repeatedly-violates-the-same-agentsmd-rule))
+- AGENTS.md mainline is getting long — evaluate whether trimming is needed
+- New team member wants to verify the document is comprehensible
 
-本 Prompt 不寫檔、不改程式碼，只產生評估報告。
+This Prompt does not write files or modify code — it only produces an assessment report.
 
 ---
 
-## 使用方式
+## How to Use
 
-1. 在目標專案根目錄開 Agent（可用 Plan 模式）
-2. 複製下方 Prompt 貼入
-3. Agent 產出自檢報告，你自行決定是否依報告調整 AGENTS.md
+1. Open the Agent at the target project root (Plan mode is acceptable)
+2. Copy the Prompt below and paste in
+3. The Agent outputs a self-check report — decide whether to adjust AGENTS.md accordingly
 
-> **Multi-root Workspace 提示**
+> **Multi-root Workspace Tip**
 >
-> 工作區含多個專案時，建議在指令開頭指定目標專案：
+> When your workspace contains multiple projects, specify the target at the start:
 >
 > ```
-> 目標專案：my-backend
-> 請稽核本專案的 AGENTS.md。
+> Target project: my-backend
+> Audit this project's AGENTS.md.
 > ```
 >
-> 或先點開目標專案中的任一檔案（Active File 錨定）。
-> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+> Or open any file within the target project (Active File anchoring).
+> See [DAILY-USAGE Section 2.4](../DAILY-USAGE.md#24-multi-root-workspace-notes).
 
 ---
 
 ````
 ---BEGIN PROMPT---
 
-請稽核本專案的 `AGENTS.md`，針對以下維度產出結構化報告。**本次任務只讀取與分析，不寫入任何檔案。**
+Audit this project's `AGENTS.md` and produce a structured report across the dimensions below. **This task is read-only — DO NOT write any files.**
 
-## 前置條件
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
 
-- `AGENTS.md` 已存在（若無，請提示使用者先跑 INIT-SCAN + INIT-BUILD）
-- 本次分析以當前 repo root 的 AGENTS.md 為主；若存在 nested AGENTS.md，分別稽核並於報告中標示
+## Prerequisites
 
-## 分析維度
+- `AGENTS.md` exists (if not, prompt the user to run INIT-SCAN + INIT-BUILD first)
+- This analysis targets the repo root's AGENTS.md; if nested AGENTS.md files exist, audit each separately and label them in the report
 
-### 1. 長度與結構
+## Analysis Dimensions
 
-- 實際行數
-- 字元數（粗估 token 消耗）
-- 段落分佈（條列各 `##` / `###` 的行數佔比）
-- 是否超過 ZeroSpec 建議的主線長度與上限
+### 1. Length & Structure
 
-### 2. 規則具體度
+- Actual line count
+- Character count (rough token estimate)
+- Section distribution (list line-count share per `##` / `###` heading)
+- Whether it exceeds ZeroSpec's recommended mainline length and upper limit
 
-針對 `## 程式碼產生規範` 與 `## 關鍵約束（Quick Constraints）` 段落的每條規則，評估：
+### 2. Rule Specificity
 
-- **可驗證**（如「Controller 不直接操作 DbContext」）
-- **部分可驗證**（如「遵守 REST 慣例」）
-- **不可驗證**（如「保持程式碼整潔」「寫清楚的 commit message」）
+For each rule in `## Code Generation Rules` and `## Quick Constraints`, assess:
 
-列出所有「不可驗證」規則並建議改寫方向。
+- **Verifiable** (e.g., "Controllers MUST NOT directly access DbContext")
+- **Partially verifiable** (e.g., "Follow REST conventions")
+- **Not verifiable** (e.g., "Keep code clean", "Write clear commit messages")
 
-### 3. 規則重複與衝突
+List all "Not verifiable" rules and suggest rewrite directions.
 
-- 同一條規則是否在檔案中重複出現但敘述不一致
-- 兩條規則是否互相矛盾
-- Quick Constraints 與「程式碼產生規範」段落的一致性
+### 3. Rule Duplication & Conflicts
 
-### 4. AI 自動能推導的內容（浪費 context 的訊號）
+- Whether the same rule appears multiple times with inconsistent wording
+- Whether two rules contradict each other
+- Consistency between Quick Constraints and Code Generation Rules sections
 
-列出檔案中**可能被刪除**的內容，包含：
+### 4. Content AI Can Infer (Wasted context signals)
 
-- AI 語言內建慣例（如「Python 用 snake_case」「TypeScript 用 camelCase」）
-- 可從 `.csproj` / `package.json` / `build.gradle` 推導的版本號
-- 通用程式碼品質建議（「寫乾淨程式碼」「適當加註解」）
-- 已由 `常用指令` 涵蓋的建置／測試流程重述
-- **領域對照表在小型專案的必要性**：若專案規模較小、且 Agent 支援語意搜尋（`#codebase` / Cursor indexing / Claude Code），領域對照表的資訊價值低於 Agent 現場掃描，可考慮移除或大幅精簡
+List content that **could be removed**, including:
 
-套用原則：**「移除此行會讓 AI 在下一個任務犯錯嗎？」若不會，就是刪除候選。**
+- Language-built-in conventions (e.g., "Python uses snake_case", "TypeScript uses camelCase")
+- Version numbers derivable from `.csproj` / `package.json` / `build.gradle`
+- Generic code quality advice ("write clean code", "add appropriate comments")
+- Build/test process already covered by Common Commands
+- **Domain-to-code map necessity in small projects**: If the project is small AND the Agent supports semantic search (`#codebase` / Cursor indexing / Claude Code), the domain-to-code map's value is lower than the Agent's on-the-fly scanning — consider removing or heavily trimming
 
-### 5. 缺少的 ZeroSpec 必備欄位
+Apply this principle: **"Would removing this line cause the AI to make an error on its next task?" If not, it's a removal candidate.**
 
-檢查是否涵蓋必備段落（[GUIDE §3.1](../GUIDE.md#31-必備段落與產生分類)）：
+### 5. Missing ZeroSpec Required Fields
 
-- 專案定位
-- 定錨資訊（Base Package / Alias / 版本真相）
-- 關鍵約束（Quick Constraints）
-- 領域/模組對照表
-- 程式碼產生規範
-- 文件同步條件
+Check coverage of required sections ([GUIDE Section 3.1](../GUIDE.md#31-required-sections-and-generation-tiers)):
 
-### 6. 注意力權重診斷
+- Project Summary
+- Anchor Information (Base Package / Alias / Version Source of Truth)
+- Quick Constraints
+- Domain-to-Code Map
+- Code Generation Rules
+- Docs Sync Triggers
 
-評估 AGENTS.md 前段是否放了真正重要的資訊：
+### 6. Attention Weight Diagnosis
 
-- 前段是否包含「專案定位 + 定錨資訊 + Quick Constraints」
-- 若前段被人類入職教學、長篇背景故事佔據，標記為高優先修剪點
+Assess whether the top section of AGENTS.md contains the most important information:
 
-### 7. Token 佔用觀察（選填）
+- Does the top section include "Project Summary + Anchor Information + Quick Constraints"?
+- If the top section is occupied by onboarding narratives or lengthy background stories, flag as a high-priority trim target
 
-AGENTS.md 會注入每次 Agent 對話的 system context；內容越長，越容易稀釋其他檔案的注意力。此維度不要求精算，先做語意化判斷：
+### 7. Token Usage Observation (Optional)
 
-- **偏低**：不太影響其他檔案注意力
-- **中等**：有感但可接受，建議檢視維度 4 的可刪除候選
-- **偏高**：已明顯影響上下文，應優先修剪與去重
+AGENTS.md is injected into every Agent conversation's system context; longer content dilutes attention for other files. This dimension does not require precise calculation — provide a semantic judgment:
 
-## 輸出格式
+- **Low**: Minimal impact on other file attention
+- **Moderate**: Noticeable but acceptable — review removal candidates from Dimension 4
+- **High**: Clearly impacting context — prioritize trimming and deduplication
 
-報告以 Markdown 產出，結構如下：
+## Output Format
+
+Produce the report in Markdown:
 
 ```markdown
-# AGENTS.md 稽核報告 — {專案名}
+# AGENTS.md Audit Report — {project name}
 
-掃描時間：{YYYY-MM-DD}
-檔案路徑：{AGENTS.md 實際路徑}
-總行數：{n}
+Scan date: {YYYY-MM-DD}
+File path: {AGENTS.md actual path}
+Total lines: {n}
 
-## 摘要
+## Summary
 
-- 健康分數：{PASS / WARN / FAIL}（任一 FAIL 條件成立即整體 FAIL）
-- 關鍵發現：
+- Health score: {PASS / WARN / FAIL} (any single FAIL condition triggers overall FAIL)
+- Key findings:
   - …
   - …
   - …
 
-## 詳細分析
+## Detailed Analysis
 
-### 1. 長度與結構
-...（條列式）
+### 1. Length & Structure
+... (bullet points)
 
-### 2. 規則具體度
-| 規則 | 分級 | 建議改寫 |
-| ---- | ---- | -------- |
-| ...  | ...  | ...      |
+### 2. Rule Specificity
+| Rule | Grade | Suggested Rewrite |
+| ---- | ----- | ----------------- |
+| ...  | ...   | ...               |
 
-### 3. 規則重複與衝突
+### 3. Rule Duplication & Conflicts
 ...
 
-### 4. 可刪除候選
+### 4. Removal Candidates
 ...
 
-### 5. 必備欄位缺漏
+### 5. Missing Required Fields
 ...
 
-### 6. 注意力權重診斷
+### 6. Attention Weight Diagnosis
 ...
 
-### 7. Token 佔用觀察（選填）
-- 判定：{偏低 / 中等 / 偏高}
-- 說明：{簡短說明}
+### 7. Token Usage Observation (Optional)
+- Assessment: {Low / Moderate / High}
+- Notes: {brief explanation}
 
-## 建議修剪清單（按優先序）
+## Suggested Trim List (by priority)
 
-1. **必改**（FAIL 級）：...
-2. **建議改**（WARN 級）：...
-3. **可不改**（INFO）：...
+1. **Must fix** (FAIL-level): ...
+2. **Should fix** (WARN-level): ...
+3. **Optional** (INFO): ...
 
-## 不建議的修改
+## Not Recommended to Change
 
-明確列出「看似該改但其實不該改」的項目，避免使用者過度修剪。
+Explicitly list items that "look like they should change but actually shouldn't" to prevent over-trimming.
 ```
 
-## 健康分數評估標準
+## Health Score Criteria
 
-- **PASS**：主線長度在建議範圍內；不可驗證規則少且無明顯衝突；前段以核心資訊為主
-- **WARN**：主線偏長，或不可驗證規則/重複內容開始增加；前段出現部分非核心資訊
-- **FAIL**：內容明顯過長，或不可驗證規則偏多/互相衝突；前段被非核心內容佔據，已影響任務理解
+- **PASS**: Mainline length within recommended range; few unverifiable rules and no obvious conflicts; top section dominated by core information
+- **WARN**: Mainline slightly long, or unverifiable rules / duplicates starting to accumulate; top section has some non-core content
+- **FAIL**: Content clearly too long, or many unverifiable rules / mutual conflicts; top section dominated by non-core content, already impacting task comprehension
 
 ---END PROMPT---
 ````
 
 ---
 
-## 稽核報告的後續動作
+## Post-Audit Actions
 
-AUDIT 只產出報告，不動檔案。若報告為 WARN 或 FAIL，建議流程：
+AUDIT only produces a report — no files are modified. If the report is WARN or FAIL, the recommended workflow:
 
-1. **先修剪可刪除候選**（維度 4）——最容易見效
-2. **再改寫不可驗證規則**（維度 2）——提升 Agent 遵從率
-3. **最後補齊必備欄位**（維度 5）——如缺 Quick Constraints 可跑 UPDATE Prompt 讓 AI 從程式碼規範萃取
+1. **First, trim removal candidates** (Dimension 4) — highest impact for effort
+2. **Then, rewrite unverifiable rules** (Dimension 2) — improves Agent compliance rate
+3. **Finally, fill missing required fields** (Dimension 5) — if Quick Constraints are missing, run UPDATE Prompt to extract them from Code Generation Rules
 
-若這些動作涉及寫檔，請改用 [UPDATE Prompt](UPDATE.md)，將稽核報告作為輸入 context，讓 UPDATE 依報告建議實際修改 AGENTS.md。
+If these actions involve file writes, use [UPDATE Prompt](UPDATE.md) with the audit report as input context, so UPDATE applies the report's recommendations to the actual AGENTS.md.
 
 ---
 
-## 與其他 Prompt 的關係
+## Relationship to Other Prompts
 
-| Prompt     | 行為      | 本 Prompt 的角色                                     |
-| ---------- | --------- | ---------------------------------------------------- |
-| INIT-SCAN  | 讀 + 分析 | 類似，但 SCAN 掃整個 repo；AUDIT 只盯 AGENTS.md 本身 |
-| INIT-BUILD | 寫檔      | AUDIT 不寫檔，只建議                                 |
-| UPDATE     | 寫檔      | AUDIT 輸出可作為 UPDATE 的輸入                       |
-| SPEC / ADR | 寫檔      | 無關                                                 |
+| Prompt     | Action         | This Prompt's Role                                                  |
+| ---------- | -------------- | ------------------------------------------------------------------- |
+| INIT-SCAN  | Read + Analyze | Similar, but SCAN covers the whole repo; AUDIT focuses on AGENTS.md |
+| INIT-BUILD | Write files    | AUDIT does not write — only recommends                              |
+| UPDATE     | Write files    | AUDIT output can serve as input for UPDATE                          |
+| SPEC / ADR | Write files    | Unrelated                                                           |
 
 ---
 

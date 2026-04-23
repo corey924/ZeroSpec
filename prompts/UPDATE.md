@@ -1,108 +1,110 @@
 # ZeroSpec — UPDATE Prompt Pack
 
-> 當 **專案演進導致 AGENTS.md 或 docs/README.md 與現況脫節** 時使用。將以下 Prompt 貼入 AI Agent，自動比對現況並更新文件。
+> Use when **project evolution causes AGENTS.md or docs/README.md to drift from the current codebase**. Paste the Prompt below into your AI Agent to compare the current state and update documents.
 
 ---
 
-## 觸發條件
+## Trigger Conditions
 
-- 專案新增或移除業務模組
-- 技術棧升版（框架 Major/Minor 變更）
-- 架構層級變更（新增分層、合併模組）
-- 領域/模組對照表明顯過時
-- 新增/移除關聯專案
-- docs/ 中有新文件但 docs/README.md 未收錄
+- Project adds or removes a business module
+- Tech stack version change (framework Major/Minor bump)
+- Architecture layer change (new layer added, modules merged)
+- Domain-to-code map is visibly outdated
+- Related projects added or removed
+- docs/ has new files not indexed in docs/README.md
 
 ---
 
-## 使用方式
+## How to Use
 
-1. 確認觸發條件已滿足
-2. 複製下方 Prompt 貼入 Agent
-3. Agent 產出差異報告與建議修改，你確認後寫入
+1. Confirm a trigger condition is met
+2. Copy the Prompt below and paste into the Agent
+3. The Agent outputs a diff report and proposed changes — confirm before writing
 
-> **Multi-root Workspace 提示**
+> **Multi-root Workspace Tip**
 >
-> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+> When your workspace contains multiple projects, specify the target at the start to prevent the AI from modifying other projects:
 >
 > ```
-> 目標專案：my-backend
-> 請回顧本專案文件是否與現況脫節。
+> Target project: my-backend
+> Review whether this project's documentation has drifted from the current state.
 > ```
 >
-> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
-> 若偵測到欲修改的檔案不在目標專案範圍內，請先停止並回報，不要直接修改。
-> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+> Or open any file within the target project (Active File anchoring) so the Agent prioritizes that project's context.
+> If the target file path falls outside the target project scope, stop and report — do not modify.
+> See [DAILY-USAGE Section 2.4](../DAILY-USAGE.md#24-multi-root-workspace-notes).
 
 ---
 
 ````
 ---BEGIN PROMPT---
 
-請檢查並更新本專案的 AGENTS.md 與 docs/README.md，使其與程式碼現況保持同步。
+Check and update this project's AGENTS.md and docs/README.md to keep them in sync with the codebase.
 
-## 執行步驟
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
 
-### 第一步：重新掃描 A 類資訊
+## Steps
 
-掃描專案並萃取最新的：
-1. **技術棧**：讀取設定檔，萃取語言版本、框架版本（Major.Minor）
-2. **Base Namespace / Package / Alias**：掃描 src/ 結構推斷
-3. **版本真相來源**：確認設定檔是否有變更
-4. **常用指令**：掃描 Makefile / package.json scripts / gradlew 等
-5. **目錄結構**：列出新增或移除的關鍵目錄
+### Step 1: Re-scan A-class Information
 
-### 第二步：比對現有 AGENTS.md
+Scan the project and extract the latest:
+1. **Tech stack**: Read config files, extract language and framework versions (Major.Minor)
+2. **Base Namespace / Package / Alias**: Infer from src/ structure
+3. **Version source of truth**: Confirm whether config files have changed
+4. **Common commands**: Scan Makefile / package.json scripts / gradlew etc.
+5. **Directory structure**: List newly added or removed key directories
 
-逐段比對以下內容，標出差異：
+### Step 2: Diff Against Current AGENTS.md
 
-1. **專案定位**：技術棧版本是否需要更新
-2. **關鍵約束（Quick Constraints）**：是否仍與程式碼產生規範一致，且反映最致命的 5–8 條硬規則
-3. **領域/模組對照表**：是否有新增/移除/改名的 Controller / Service / Component
-4. **程式碼產生規範**：是否有新的命名慣例或架構變更
-5. **文件導航表**：是否有新的 docs/ 文件未被導航
-6. **常用指令**：是否有新增/移除的 scripts
-7. **關聯專案**：是否有新的跨專案相依
-8. **文件維護提醒**：觸發條件是否需要調整
+Compare section by section and flag differences:
 
-### 第三步：比對 docs/README.md
+1. **Project Summary**: Does the tech stack version need updating?
+2. **Quick Constraints**: Still consistent with Code Generation Rules? Still reflects the top 5–8 hard rules?
+3. **Domain-to-Code Map**: Any Controllers / Services / Components added, removed, or renamed?
+4. **Code Generation Rules**: Any new naming conventions or architecture changes?
+5. **Docs Navigation**: Any new docs/ files not yet in the navigation table?
+6. **Common Commands**: Any scripts added or removed?
+7. **Related Projects**: Any new cross-project dependencies?
+8. **Docs Maintenance Reminders**: Do trigger conditions need adjustment?
 
-1. **文件清單**：掃描 docs/ 目錄，確認所有 .md 文件都已收錄在文件清單表
-2. **候選文件**：已建立的候選文件應從候選表移至文件清單
-3. **四層分類**：確認是否有新文件類型需要補充
+### Step 3: Diff Against docs/README.md
 
-### 第四步：輸出差異報告
+1. **Document Index**: Scan docs/ directory — confirm all .md files are listed
+2. **Candidate Documents**: Move established candidates from the candidate table to the document index
+3. **Classification**: Confirm whether new document types need to be added
 
-在對話中以表格呈現差異（不直接寫入檔案），分兩份：
+### Step 4: Output Diff Report
 
-- **AGENTS.md 差異**：逐段列出（專案定位、Quick Constraints、對照表、規範、導航表、指令、關聯專案、文件維護提醒），每段標註「更新/新增/無」+ 說明
-- **docs/README.md 差異**：列出文件清單與候選文件的變更
+Present differences as tables in the conversation (DO NOT write to files directly). Produce two reports:
 
-### 第五步：確認後寫入
+- **AGENTS.md diff**: Section-by-section (Project Summary, Quick Constraints, Domain-to-Code Map, Code Generation Rules, Docs Navigation, Common Commands, Related Projects, Docs Maintenance Reminders). Mark each as "Update / Add / No change" + explanation
+- **docs/README.md diff**: List document index and candidate document changes
 
-收到使用者確認後，執行以下修改：
-- 只修改有差異的段落，保留使用者手動調整過的 C 類內容（架構硬規則、專案定位描述等）
-- 新增的 B 類內容標註 `[待審核]`
-- 若存在 Quick Constraints，需由「程式碼產生規範」重新萃取同步，避免兩段規則不一致
-- Quick Constraints 視為 C3 決策的置頂投影：同步時需保留原決策意圖，且僅在使用者確認後寫入
-- 更新 docs/README.md 的文件清單
+### Step 5: Write After Confirmation
 
-## 規則
+After receiving user confirmation, apply the following changes:
+- Modify only sections with differences; preserve user-edited C-class content (hard rules, project summary, etc.)
+- Mark new B-class content with `[needs review]`
+- If Quick Constraints exist, re-extract from Code Generation Rules to keep both sections consistent
+- Treat Quick Constraints as a pinned projection of C3 decisions: preserve original decision intent during sync, and write only after user confirmation
+- Update docs/README.md document index
 
-- **不可刪除或修改 C 類人工決策**（架構硬規則、專案定位、部署策略、權限格式等），只能建議修改並等使用者確認
-- A 類資訊直接更新（技術棧版本、指令列表等）
-- B 類資訊更新後標註 `[待審核]`
-- 遵循防漂移規則：版本只寫 Major.Minor、不列精確數量、不得猜測
+## Rules
+
+- MUST NOT delete or modify C-class human decisions (hard rules, project summary, deployment strategy, permission format, etc.) — propose changes only and wait for user confirmation
+- A-class information: update directly (tech stack versions, command lists, etc.)
+- B-class information: mark `[needs review]` after update
+- Follow drift prevention rules: Major.Minor versions only, no exact counts, DO NOT guess
 
 ---END PROMPT---
 ````
 
 ---
 
-## 建議使用頻率
+## Recommended Frequency
 
-- **專案快速演進期**：每月或每個 Sprint 結束時執行一次
-- **穩定維護期**：每季執行一次
-- **重大變更後**：立即執行（如框架升版、模組重構）
+- **Rapid evolution phase**: Run once per month or at each Sprint end
+- **Stable maintenance phase**: Run once per quarter
+- **After major changes**: Run immediately (e.g., framework upgrade, module refactor)
 
-建議搭配回顧 Checklist 使用（見 [GUIDE.md](../GUIDE.md) §7「持續運作與定期回顧」）。
+Pair with the review checklist in [GUIDE.md Section 7](../GUIDE.md#7-adoption-and-continuous-operation).

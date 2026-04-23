@@ -1,127 +1,129 @@
 # ZeroSpec — INIT-SCAN Prompt Pack
 
-> **第一步：分析現況＋建立共識。** 將以下 Prompt 貼入 AI Agent，AI 會掃描專案後產出結構化現況盤點，**不寫入任何檔案**。
+> **Step 1: Analyze current state and build consensus.** Paste the Prompt below into your AI Agent. The agent scans the repository and produces a structured status report. **No files are written.**
 
 ---
 
-## 使用方式
+## How to Use
 
-1. 在你的專案根目錄開啟 AI 對話（優先 Agent 模式；若平台的 Plan 模式可讀取 codebase，也可用於本掃描步驟）
-2. 複製下方 `---BEGIN PROMPT---` 到 `---END PROMPT---` 之間的全部內容
-3. 貼入 Agent 並送出
-4. Agent 掃描 Repo 後產出現況分析報告
-5. 你確認分析結果、回答待確認問題（約 5–10 分鐘）
-6. 確認完成後，接續使用 [`INIT-BUILD.md`](INIT-BUILD.md) 產生 `AGENTS.md` + `docs/README.md`
+1. Open an AI conversation at your project root (prefer Agent mode; if the platform's Plan mode can read the codebase, it also works for this scan step)
+2. Copy everything between `---BEGIN PROMPT---` and `---END PROMPT---`
+3. Paste into the Agent and send
+4. The Agent scans the repo and outputs a structured analysis report
+5. Review the results and answer clarification questions (~5–10 min)
+6. Once confirmed, proceed with [`INIT-BUILD.md`](INIT-BUILD.md) to generate `AGENTS.md` + `docs/README.md`
 
-> **Multi-root Workspace 提示**
+> **Multi-root Workspace Tip**
 >
-> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+> When your workspace contains multiple projects, specify the target at the start to prevent the AI from modifying other projects:
 >
 > ```
-> 目標專案：my-backend
-> 請掃描本專案現況並產出分析報告。
+> Target project: my-backend
+> Scan this project and produce an analysis report.
 > ```
 >
-> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
-> 若偵測到目前工作目錄不在目標專案範圍內，請先停止並回報，不要直接執行。
-> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+> Or open any file within the target project (Active File anchoring) so the Agent prioritizes that project's context.
+> If the current working directory is outside the target project scope, stop and report — do not proceed.
+> See [DAILY-USAGE Section 2.4](../DAILY-USAGE.md#24-multi-root-workspace-notes).
 
 ---
 
 ````
 ---BEGIN PROMPT---
 
-## 角色
+## Role
 
-你是一位專案系統分析師。
-本次任務只做分析與建議，不做實作、不產生程式碼、不直接寫入任何檔案。
+Act as a project system analyst.
+This task is analysis-only. Do not generate code or write files.
 
-## 目標
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
 
-為這個專案產出一份結構化的現況盤點，並判斷如果要用最小成本導入 SDD（Specification-Driven Development），最先應該補哪些文件。
+## Goal
 
-## 名詞定義
+Produce a structured status report for this repository. Determine which documents should be created first to adopt SDD (Specification-Driven Development) at minimal cost.
 
-以下是 SDD 精簡模式中的四種文件類型，請依此定義進行分析：
-- **SA**（System Analysis）：里程碑式分析快照，記錄規格與現狀的落差
-- **ADR**（Architecture Decision Record）：單一架構決策的背景、選項與結論；不可回改，只能被新 ADR 取代
-- **SPEC**（Interface Specification）：對外介面的行為契約，是開發的主要依據（Source of Truth），含 Changelog
-- **INFRA**（Infrastructure）：基礎設施選型與拓撲；Library 專案可用 INTEGRATION 替代
+## Definitions
 
-## 分析框架
+The following are the four document types in SDD lean mode. Use these definitions throughout the analysis:
+- **SA** (System Analysis): Milestone-level analysis snapshot recording gaps between specs and actual state
+- **ADR** (Architecture Decision Record): Single architecture decision with context, options, and conclusion; append-only — supersede with a new ADR, never edit
+- **SPEC** (Interface Specification): Behavioral contract for external interfaces; serves as the primary development reference (Source of Truth), includes Changelog
+- **INFRA** (Infrastructure): Infrastructure selection and topology; Library projects may use INTEGRATION instead
 
-### 核心分析（必做）
+## Analysis Framework
 
-1. **技術棧與執行型態**：
-   - 讀取 build.gradle / package.json / .csproj / pyproject.toml / go.mod / requirements.txt / Cargo.toml 等設定檔
-   - 萃取語言版本、框架版本（只寫 Major.Minor，不寫 Patch）、建置工具
-   - 判斷專案型態：library / API service / frontend SPA / monorepo / CLI tool 等
+### Core Analysis (Required)
 
-2. **對外介面與整合點**：
-   - API 端點、SDK、事件、排程、MQ、外部系統串接
-   - 哪些介面最值得先被規格化（複雜度高、變更頻繁、或多消費方依賴）
+1. **Tech stack and runtime type**:
+   - Read build.gradle / package.json / .csproj / pyproject.toml / go.mod / requirements.txt / Cargo.toml or equivalent config files
+   - Extract language version, framework version (Major.Minor only — omit Patch)
+   - Determine project type: library / API service / frontend SPA / monorepo / CLI tool / etc.
 
-3. **現有文件狀況**：
-   - 是否有 README、設計文件、API 文件、架構文件、規格文件
-   - 哪些可作為 Source of Truth
-   - 哪些可能過時或不足
+2. **External interfaces and integration points**:
+   - API endpoints, SDKs, events, scheduled jobs, MQ, external system integrations
+   - Which interfaces are most worth specifying first (high complexity, frequent changes, or multiple consumers)
 
-### 補充分析（有明確發現再寫）
+3. **Existing documentation status**:
+   - Identify README, design docs, API docs, architecture docs, spec files
+   - Which can serve as Source of Truth
+   - Which are likely outdated or insufficient
 
-4. **目錄與模組結構**：主要目錄的職責、是否有明確分層
-5. **架構決策與風險線索**：從程式碼推測的重要架構選擇、可能需要補 ADR 的地方
+### Supplementary Analysis (Include only when findings exist)
 
-### 分析起點
+4. **Directory and module structure**: Main directories' responsibilities, whether clear layering exists
+5. **Architecture decisions and risk signals**: Important architecture choices inferred from code, places where ADRs may be needed
 
-請依「根目錄設定檔（package.json / build.gradle / .csproj 等）→ 原始碼入口（src/）→ docs/ → CI/CD」的優先序掃描。
+### Scan Order
 
-## 輸出格式
+Scan in this priority: root config files (package.json / build.gradle / .csproj etc.) → source entry (src/) → docs/ → CI/CD.
 
-請依以下結構輸出，每個區塊控制在 5～15 行。分析過程中同步草擬 B 類內容，每段標註 `[待審核]`。
+## Output Format
 
-### 1. 專案現況摘要
-用 5～10 點條列說明目前理解到的專案樣貌。
+Use the structure below. Keep each section to 5–15 lines. Draft B-class content during analysis and mark each section `[needs review]`.
 
-### 2. 技術棧萃取（A 類）
-列出從設定檔自動偵測到的所有技術資訊。
+### 1. Project Status Summary
+List 5–10 bullet points describing the current state of the project.
 
-### 3. 核心模組與邊界
-列出主要模組、責任、上下游關係。
+### 2. Tech Stack Extraction (A-class)
+List all technical information auto-detected from config files.
 
-### 4. B 類草擬初稿
-依序呈現以下 5 項，每段標註 `[待審核]`：
-1. **文件導航表**：掃描 docs/，用「意圖驅動」格式（左欄「你想做什麼」，右欄路徑）
-2. **領域/模組 ↔ 程式碼對照表**：掃描核心類別，依命名關聯分群
-3. **架構層級描述**：從既有程式碼推斷分層模式或資料流向
-4. **命名慣例**：統計既有命名模式
-5. **關聯專案**：偵測 build 設定或相對路徑中的跨專案相依
+### 3. Core Modules and Boundaries
+List main modules, their responsibilities, and upstream/downstream relationships.
 
-### 5. 最優先應規格化的主題（1～3 個）
-列出最該先建立 Source of Truth 的主題，並說明原因。
+### 4. B-class Draft
+Present these 5 items in order, each marked `[needs review]`:
+1. **Docs navigation table**: Scan docs/, use intent-driven format (left column: "What you want to do", right column: path)
+2. **Domain-to-code map**: Scan core classes, group by naming correlation
+3. **Architecture layers**: Infer layering pattern or data flow from existing code
+4. **Naming conventions**: Identify existing naming patterns from statistics
+5. **Related projects**: Detect cross-project dependencies from build config or relative paths
 
-### 6. 建議的最小 SDD 文件集合
-直接給建議，格式如下：
-- `SA-001`：應分析什麼
-- `ADR-001`：應記錄什麼決策（若無明確需求可省略）
-- `SPEC-001`：應描述什麼介面或行為
-- `INTEGRATION.md`：應記錄哪些整合流程（如不需要可省略）
+### 5. Top Priorities for Specification (1–3 items)
+List the topics most urgently needing a Source of Truth. Explain why.
 
-### 7. 待確認問題（最多 5 題）
-如果有無法從現況判斷的地方，列出最關鍵的問題。這些問題將在你確認後帶入下一步（INIT-BUILD）。
+### 6. Recommended Minimal SDD Document Set
+Give direct recommendations in this format:
+- `SA-001`: What to analyze
+- `ADR-001`: What decision to record (omit if no clear need)
+- `SPEC-001`: What interface or behavior to describe
+- `INTEGRATION.md`: What integration flow to document (omit if not needed)
 
-## 規則
+### 7. Open Questions (max 5)
+List the most critical questions that cannot be determined from the current state. These will be carried into the next step (INIT-BUILD).
 
-- **本 Prompt 不寫入任何檔案**，僅在對話中輸出分析結果
-- 以理解現況、建立最小共識為優先，不導入過重流程
-- 版本只寫 Major.Minor，不寫 Patch
-- 不列舉精確檔案數量，用結構模式描述（如「多支 Controller」而非「19 支 Controller」）
-- 任何欄位若缺乏程式碼或設定檔證據，標註 `[待確認]`，不得猜測
+## Rules
+
+- **This Prompt MUST NOT write any files** — output analysis in the conversation only
+- Prioritize understanding the current state and building minimal consensus; DO NOT introduce heavy processes
+- Write versions as Major.Minor only — omit Patch
+- DO NOT list exact file counts; describe structural patterns (e.g., "multiple Controllers" not "19 Controllers")
+- If any field lacks code or config evidence, mark `[unverified]` — DO NOT guess
 
 ---END PROMPT---
 ````
 
 ---
 
-## 下一步
+## Next Step
 
-確認分析結果後 → 使用 [`INIT-BUILD.md`](INIT-BUILD.md) 產生 `AGENTS.md` + `docs/README.md`。
+After confirming the analysis → use [`INIT-BUILD.md`](INIT-BUILD.md) to generate `AGENTS.md` + `docs/README.md`.

@@ -1,37 +1,37 @@
-# ADR-xxx: 標題
+# ADR-xxx: Title
 
-> 複製本模板並依序編號，例如 `ADR-001_my-decision.md`。
-> 命名正規式：`^ADR-\d{3}_[a-z0-9-]+\.md$`
+> Copy this template and assign a sequential number, e.g., `ADR-001_my-decision.md`.
+> Naming regex: `^ADR-\d{3}_[a-z0-9-]+\.md$`
 
-| 欄位     | 值                               |
-| -------- | -------------------------------- |
-| 決策日期 | YYYY-MM-DD                       |
-| 狀態     | Accepted / Superseded by ADR-yyy |
-| 關聯     | SA-xxx, ADR-yyy, SPEC-xxx        |
-| 影響範圍 | （受影響的模組或領域）           |
+| Field         | Value                            |
+| ------------- | -------------------------------- |
+| Decision Date | YYYY-MM-DD                       |
+| Status        | Accepted / Superseded by ADR-yyy |
+| Related       | SA-xxx, ADR-yyy, SPEC-xxx        |
+| Impact Scope  | (Affected modules or domains)    |
 
-## 背景
+## Context
 
-描述觸發本決策的背景脈絡與問題。
+Describe the background context and problem that triggered this decision.
 
-## 考慮選項
+## Options Considered
 
-### 選項 A — （名稱）
+### Option A — (Name)
 
-- 優點：...
-- 缺點：...
+- Pros: ...
+- Cons: ...
 
-### 選項 B — （名稱）
+### Option B — (Name)
 
-- 優點：...
-- 缺點：...
+- Pros: ...
+- Cons: ...
 
-## 決策
+## Decision
 
-選擇選項 X，理由是...
+Chose Option X because...
 
-## 後果
+## Consequences
 
-- 正面影響：...
-- 負面影響 / 風險：...
-- 後續行動：...
+- Positive impact: ...
+- Negative impact / risks: ...
+- Follow-up actions: ...

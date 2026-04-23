@@ -1,393 +1,384 @@
-# ZeroSpec 長期使用者指南（Day-2+）
+# ZeroSpec Day-2+ User Guide
 
-> 本文件描述 ZeroSpec 在 Day-1 初始化之後，工程師日常開發中如何「自然地」與 SDD 機制共存。
-> 適合已完成 INIT-SCAN + INIT-BUILD、手邊有 `AGENTS.md` + `docs/README.md` 的團隊。
+> This guide describes how engineers integrate ZeroSpec's SDD practices into daily development after Day-1 initialization.
+> For teams that have completed INIT-SCAN + INIT-BUILD and have `AGENTS.md` + `docs/README.md` in place.
 
-**版本**：v0.3 — 2026-04-22
-**對象**：已導入 ZeroSpec 的個人開發者或小型團隊
+> Derived from: [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-23
 
----
+> **🌐 [台灣正體中文版](DAILY-USAGE.zh-TW.md)**
 
-## 目錄
-
-1. [日常開發中的三種操作模式](#1-日常開發中的三種操作模式)
-2. [IDE 與代理平台配置建議](#2-ide-與代理平台配置建議)
-3. [ZeroSpec 本體的定位：參考而非常駐](#3-zerospec-本體的定位參考而非常駐)
-4. [典型情境劇本](#4-典型情境劇本)
-5. [長期維護會遇到的真實問題](#5-長期維護會遇到的真實問題)
-6. [月度/季度回顧實操流程](#6-月度季度回顧實操流程)
-7. [從個人到團隊的漸進擴散](#7-從個人到團隊的漸進擴散)
+**Version**: v0.4 — 2026-04-23
+**Audience**: Individual developers or small teams that have adopted ZeroSpec
 
 ---
 
-## 1. 日常開發中的三種操作模式
+## Table of Contents
 
-ZeroSpec 導入後，日常開發不需要每次都翻 ZeroSpec 的 Prompt Pack。大部分時間，AI Agent 會**自動讀取你專案裡的 `AGENTS.md`**——這就是 ZeroSpec 設計的運作方式。
-
-### 模式 A：純寫程式碼（90% 時間）
-
-你照常開 Agent 模式寫 code。Agent 啟動時自動讀取 `AGENTS.md`，遵守你的架構規範。
-
-**你不需要做任何 ZeroSpec 相關動作。**
-
-> 這正是 ZeroSpec 的目標：Day-1 之後，它應該是「隱形基礎設施」。
-
-### 模式 B：事件觸發文件更新（~8% 時間）
-
-當 PR 涉及 API 新增、架構決策、或重大變更時，切回「文件模式」：
-
-1. 開新分頁或新對話
-2. 從 ZeroSpec 複製對應 Prompt Pack（SPEC / ADR / SA）
-3. 貼入 Agent → 產出草稿 → 審核 → 合併進 PR
-
-**關鍵認知**：文件更新是 PR 的一部分，不是獨立任務。養成習慣後，這步驟約 5-10 分鐘。
-
-### 模式 C：定期回顧（~2% 時間）
-
-每月或每季，用 UPDATE Prompt 做一次健檢。詳見 [§6](#6-月度季度回顧實操流程)。
+1. [Three Daily Operation Modes](#1-three-daily-operation-modes)
+2. [IDE and Agent Platform Configuration](#2-ide-and-agent-platform-configuration)
+3. [ZeroSpec Itself: Reference, Not Resident](#3-zerospec-itself-reference-not-resident)
+4. [Scenario Playbooks](#4-scenario-playbooks)
+5. [Real Problems in Long-Term Maintenance](#5-real-problems-in-long-term-maintenance)
+6. [Monthly / Quarterly Review Process](#6-monthly--quarterly-review-process)
+7. [Scaling from Individual to Team](#7-scaling-from-individual-to-team)
 
 ---
 
-## 2. IDE 與代理平台配置建議
+## 1. Three Daily Operation Modes
 
-### 2.1 ZeroSpec Repo 不需要常駐打開
+After ZeroSpec adoption, daily work is just Agent mode with your project's `AGENTS.md` in place. The AI Agent **auto-reads `AGENTS.md`** on startup — that is how ZeroSpec is designed to work. You rarely need to open ZeroSpec's Prompt Packs.
 
-ZeroSpec 本體（`prompts/`、`templates/`、`GUIDE.md`）是「工具箱」，不是工作區。
+### Mode A: Pure Coding (90% of the time)
 
-**建議做法**：
+Write code normally in Agent mode. The Agent reads `AGENTS.md` on startup and follows your architecture rules.
 
-| 方式         | 說明                                                          | 適合誰                         |
-| ------------ | ------------------------------------------------------------- | ------------------------------ |
-| **書籤式**   | 瀏覽器或 IDE 書籤 ZeroSpec 資料夾，需要時點開複製 Prompt      | 個人開發者                     |
-| **Snippet**  | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander | 頻繁使用者                     |
-| **Symlink**  | 在目標專案建一個 `.zerospec/` symlink 指向 ZeroSpec prompts/  | 多專案生態圈                   |
-| **複製貼上** | 最簡單——需要時開 ZeroSpec README，按連結找到 Prompt，複製貼入 | 所有人（Day-1 推薦的起步方式） |
+**No ZeroSpec action required.**
 
-> **不建議**：把 ZeroSpec 整個資料夾加進目標專案的 workspace。這會讓 Agent 讀到不相關的 markdown，浪費 context。
+> This is ZeroSpec's goal: after Day-1, it becomes "invisible infrastructure."
 
-### 2.2 `.github/copilot-instructions.md` 與 `AGENTS.md` 的共存
+### Mode B: Event-Triggered Doc Updates (~8%)
 
-GitHub Copilot 同時支援兩種指引檔案：
+When a PR involves API additions, architecture decisions, or major changes, switch to "docs mode":
 
-| 檔案                              | 讀取時機     | 適合放什麼                             |
-| --------------------------------- | ------------ | -------------------------------------- |
-| `.github/copilot-instructions.md` | 每次對話自動 | 個人偏好、語言、回覆格式（跨專案通用） |
-| `AGENTS.md`                       | 每次任務自動 | 專案特有約束（架構、命名、技術棧）     |
+1. Open a new tab or conversation
+2. Copy the relevant Prompt Pack from ZeroSpec (SPEC / ADR / SA)
+3. Paste into Agent → draft generated → review → merge into PR
 
-**最佳實踐**：
+**Key insight**: Doc updates are part of the PR, not a separate task. Once habitual, this takes ~5–10 minutes.
 
-- `.github/copilot-instructions.md` 放「你是誰、怎麼回覆」（等同你現在的 personal profile sync）
-- `AGENTS.md` 放「這個專案怎麼寫 code」（ZeroSpec 產出）
-- 兩者互補不衝突，不需要合併
+### Mode C: Periodic Review (~2%)
 
-#### Claude Code 的相容寫法（`CLAUDE.md` + `@AGENTS.md`）
+Monthly or quarterly, run an UPDATE Prompt for a health check. See [Section 6](#6-monthly--quarterly-review-process).
 
-Claude Code 預設只讀 `CLAUDE.md`，不會讀 `AGENTS.md`。若你希望同時保留 ZeroSpec 的 AGENTS.md 成果，又讓 Claude Code 使用者零成本相容，在 repo 根目錄建立以下 `CLAUDE.md` 即可：
+---
+
+## 2. IDE and Agent Platform Configuration
+
+### 2.1 ZeroSpec Repo Does NOT Need to Stay Open
+
+ZeroSpec itself (`prompts/`, `templates/`, `GUIDE.md`) is a "toolbox," not a workspace dependency.
+
+**Recommended approaches**:
+
+| Approach       | Description                                                                   | Best For                                     |
+| -------------- | ----------------------------------------------------------------------------- | -------------------------------------------- |
+| **Bookmark**   | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed         | Individual developers                        |
+| **Snippet**    | Save frequently used Prompt Packs as IDE User Snippets or Text Expander       | Power users                                  |
+| **Symlink**    | Create a `.zerospec/` symlink in target project pointing to ZeroSpec prompts/ | Multi-project ecosystems                     |
+| **Copy-paste** | Simplest — open ZeroSpec README, follow the link, copy the Prompt             | Everyone (recommended Day-1 starting method) |
+
+> **Do not** add the entire ZeroSpec folder to your target project's workspace. This causes the Agent to read irrelevant Markdown and wastes context.
+
+### 2.2 Coexistence of `copilot-instructions.md` and `AGENTS.md`
+
+GitHub Copilot supports both guidance files:
+
+| File                              | Read Timing             | Best Content                                                    |
+| --------------------------------- | ----------------------- | --------------------------------------------------------------- |
+| `.github/copilot-instructions.md` | Every conversation auto | Personal preferences, language, response format (cross-project) |
+| `AGENTS.md`                       | Every task auto         | Project-specific constraints (architecture, naming, tech stack) |
+
+**Best practice**:
+
+- `.github/copilot-instructions.md` → "who you are, how to respond" (personal profile sync)
+- `AGENTS.md` → "how to write code in this project" (ZeroSpec output)
+- They complement each other; no need to merge
+
+#### Claude Code Compatibility (`CLAUDE.md` + `@AGENTS.md`)
+
+Claude Code reads `CLAUDE.md` by default, not `AGENTS.md`. To reuse ZeroSpec's AGENTS.md output with zero duplication, create this `CLAUDE.md` at the repo root:
 
 ```markdown
 @AGENTS.md
 
-## Claude Code 專屬補充
+## Claude Code Specific Notes
 
-（如無特殊需求，此段可留空）
+(Leave empty if no special requirements)
 ```
 
-- `@AGENTS.md` 是 Claude Code 的 import 語法，啟動時會展開 AGENTS.md 內容
-- 不需要複製一份 AGENTS.md → CLAUDE.md，避免兩處維護的漂移風險
-- 其他 Agent（Copilot / Cursor / Codex / Windsurf）仍照常讀 AGENTS.md
-- 若有只適用 Claude Code 的規則（例如 Plan 模式觸發條件），放在 import 之後即可
+- `@AGENTS.md` is Claude Code's import syntax — expanded at startup
+- No copy needed → avoids dual-maintenance drift
+- Other Agents (Copilot / Cursor / Codex / Windsurf) continue reading AGENTS.md
+- Put Claude Code–only rules (e.g. Plan mode triggers) after the import
 
-### 2.3 Plan 模式 vs Agent 模式的選用時機
+### 2.3 Plan Mode vs Agent Mode
 
-| 情境                          | 建議模式     | 原因                                          |
-| ----------------------------- | ------------ | --------------------------------------------- |
-| **INIT-SCAN（分析階段）**     | 兩者皆可     | SCAN 不寫檔，Plan 模式也能完成分析            |
-| **INIT-BUILD（建置階段）**    | Agent        | 需要寫入 `AGENTS.md` 和 `docs/README.md`      |
-| **SPEC / ADR / SA 產生**      | Agent        | 需要讀程式碼 + 寫檔                           |
-| **UPDATE 回顧**               | Plan → Agent | 先用 Plan 看差異報告，確認後轉 Agent 寫入     |
-| **日常寫 code**               | Agent        | 需要讀寫程式碼                                |
-| **PR Review 前的文件檢查**    | Plan         | 只需判斷「是否需要補 SPEC」，不需要寫任何東西 |
-| **架構討論 / 技術選型前研究** | Plan / Chat  | 純粹蒐集資訊與比較，不需要動文件              |
+| Scenario                       | Recommended Mode | Reason                                          |
+| ------------------------------ | ---------------- | ----------------------------------------------- |
+| **INIT-SCAN (analysis)**       | Either           | SCAN writes no files; Plan mode works fine      |
+| **INIT-BUILD (build)**         | Agent            | Needs to write `AGENTS.md` and `docs/README.md` |
+| **SPEC / ADR / SA generation** | Agent            | Needs to read code + write files                |
+| **UPDATE review**              | Plan → Agent     | Plan to review diff report; Agent to write      |
+| **Daily coding**               | Agent            | Needs read/write access                         |
+| **Pre-PR doc check**           | Plan             | Only needs to judge "is a SPEC update needed?"  |
+| **Architecture research**      | Plan / Chat      | Information gathering only; no file changes     |
 
-**實務建議**：UPDATE Prompt 最適合「Plan 先看、Agent 再改」的兩段式操作。先在 Plan 模式貼入 UPDATE Prompt 看差異報告，確認要改的地方後，再切 Agent 模式讓它實際寫入。
+**Practical tip**: UPDATE Prompt works best in two stages — Plan mode first to see the diff report, then Agent mode to apply changes.
 
-### 2.4 Multi-root Workspace 注意事項
+### 2.4 Multi-Root Workspace Notes
 
-如果你的 IDE 同時開多個專案（例如 my-backend + my-frontend + shared-lib），Agent 會看到所有專案的 `AGENTS.md`。
+When your IDE has multiple projects open (e.g. my-backend + my-frontend + shared-lib), the Agent sees all `AGENTS.md` files.
 
-#### 核心問題：Agent 怎麼知道你在對哪個專案下指令？
+#### Core Problem: How does the Agent know which project your instruction targets?
 
-多數 IDE Agent 會以**當前開啟檔案所在的 workspace folder**作為主要 context。善用這個機制，再加上一句專案前綴，就能穩定鎖定目標專案。
+IDE Agents typically use the **workspace folder of the currently active file** as primary context. Leverage this, plus a project-name prefix, to reliably lock the target.
 
-#### 四種做法比較
+#### Four Approaches Compared
 
-| 做法                         | 操作方式                                                   | 適合情境               | 優缺點                                   |
-| ---------------------------- | ---------------------------------------------------------- | ---------------------- | ---------------------------------------- |
-| **Active File 錨定**（推薦） | 貼 Prompt 前，先點開目標專案中的任一檔案（如 `AGENTS.md`） | 所有 IDE Agent         | 零額外成本，Agent 會優先以該專案內容推論 |
-| **專案名前綴**               | Prompt 開頭加「目標專案：{AGENTS.md 中的專案名}」          | 任務指令型對話         | 簡潔明確；專案名需與 AGENTS.md 標題一致  |
-| **明確引用 AGENTS.md**       | 「請先讀取 `my-backend/AGENTS.md` 作為本次任務的約束」     | Agent 發生跨專案混淆時 | 最強制，但略繁瑣                         |
-| **貼完整路徑**               | 在 Prompt 中貼入 `/Users/xxx/Projects/my-project`          | 專案名重複或路徑歧義時 | 明確但冗長，不利團隊共享與跨環境複用     |
+| Approach                             | How                                                                   | Best For                            | Trade-offs                                         |
+| ------------------------------------ | --------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------- |
+| **Active File anchor** (recommended) | Before pasting the Prompt, click any file in the target project       | All IDE Agents                      | Zero cost; Agent infers from active context        |
+| **Project name prefix**              | Start the Prompt with "Target project: {project name from AGENTS.md}" | Task-oriented conversations         | Clear and concise; name must match AGENTS.md title |
+| **Explicit AGENTS.md reference**     | "Read `my-backend/AGENTS.md` as constraints for this task"            | When cross-project confusion occurs | Strongest anchor but verbose                       |
+| **Full path**                        | Paste `/Users/xxx/Projects/my-project` in the Prompt                  | Ambiguous project names             | Precise but long; not portable across environments |
 
-> **推薦組合**：Active File 錨定 + 專案名前綴。日常 90% 情境只需要 Active File 錨定就足夠。
+> **Recommended combo**: Active File anchor + project name prefix. Active File alone covers 90% of daily scenarios.
 
-#### 實務範例
+#### Platform Behavior Summary
 
-```
-# 推薦：先開目標專案的檔案，再貼 Prompt
-# （此時 Agent 已從 active file 知道你在 my-backend）
-目標專案：my-backend
-請為本次 API 變更產生 SPEC 文件。
+| Platform                 | Primary Signal                            | Notes                                                      |
+| ------------------------ | ----------------------------------------- | ---------------------------------------------------------- |
+| GitHub Copilot (VS Code) | Active editor's workspace folder          | Multi-root: all folders visible; active file sets priority |
+| Cursor                   | Composer Agent uses active file's project | Use `@file` to further specify                             |
+| Claude Code              | `cwd` is context starting point           | `cd` to target project before launching                    |
+| Windsurf                 | Cascade infers from active file           | Behavior similar to Copilot                                |
 
-# Agent 混淆時的修正
-請先讀取 my-backend/AGENTS.md 作為本次任務的約束，
-再為 Customer API 產生 SPEC。
-```
+#### Example Naming in Open-Source Docs
 
-#### 各平台行為差異（摘要）
+To avoid leaking internal information, use generic names in public examples: `my-*`, `sample-*`, `shared-*`. Do not use real project names, personal paths, or identifiable details.
 
-| 平台                     | 鎖定方式重點                                     | 補充說明                                                    |
-| ------------------------ | ------------------------------------------------ | ----------------------------------------------------------- |
-| GitHub Copilot (VS Code) | 以 active editor 所在 workspace folder 為主      | Multi-root 下每個資料夾規範都可見，active file 會影響優先序 |
-| Cursor                   | Composer Agent 以 active file 專案為主要 context | 可用 `@file` 進一步指定檔案                                 |
-| Claude Code              | 以 `cwd` 為 context 起點                         | 啟動前先 `cd` 到目標專案目錄                                |
-| Windsurf                 | Cascade 以 active file 推斷 context              | 行為接近 Copilot                                            |
+### 2.5 Long-Conversation Re-Anchor Strategy
 
-#### 開源範例命名原則
+AI Agents in long conversations (~15–20 rounds) may gradually drift from AGENTS.md constraints. The main cause is NOT that AGENTS.md is too long — it is that accumulated conversation history and tool outputs dilute the guidance file's attention weight. That said, keeping the file concise still improves re-anchor efficiency.
 
-為避免洩露內部資訊，公開文件中的示例請優先使用 `my-*`、`sample-*`、`shared-*` 命名，不使用真實專案名、個人路徑或可識別線索。
+#### When to Re-Anchor
 
-### 2.5 長對話 Re-anchor 策略
+- Agent starts violating architecture rules (e.g. business logic in Controller)
+- Conversation exceeds 15 rounds and next tasks involve core constraints
+- Switching to a different business module
 
-AI Agent 在長對話中（約 15–20 輪後）可能逐漸偏離 AGENTS.md 的約束。主要不是因為 AGENTS.md 太長，而是對話歷史與工具輸出累積後，稀釋了指引檔案的注意力權重；但控制文件長度仍有助於提升 re-anchor 效率。
+#### How to Re-Anchor
 
-#### 何時 re-anchor？
-
-- 發現 AI 開始違反架構規則（如在 Controller 寫業務邏輯）
-- 對話已超過 15 輪且接下來的任務涉及核心約束
-- 切換到不同業務模組的任務
-
-#### 怎麼 re-anchor？
-
-**輕量版**（推薦，適用多數場景）：
+**Lightweight** (recommended for most scenarios):
 
 ```
-請重新讀取 AGENTS.md，確認接下來的操作遵守所有架構約束。
+Please re-read AGENTS.md and confirm all architecture constraints are followed going forward.
 ```
 
-**精準版**（當你知道哪條規則被違反時）：
+**Precise** (when you know which rule was violated):
 
 ```
-你剛才在 Controller 裡寫了業務邏輯，這違反了 AGENTS.md 的架構約束。
-請重新讀取 AGENTS.md 的「關鍵約束」段落，然後修正。
+You just wrote business logic in the Controller, violating AGENTS.md architecture constraints.
+Re-read the "Quick Constraints" section of AGENTS.md, then fix.
 ```
 
-**完整重置版**（對話嚴重偏離時，建議開新對話）：
+**Full reset** (when conversation has drifted severely — start a new conversation):
 
 ```
-本次對話的 context 已過度膨脹，請開啟新對話，讓 Agent 重新載入 AGENTS.md 後繼續任務。
+This conversation's context is too bloated. Start a new conversation so the Agent reloads AGENTS.md fresh.
 ```
 
-#### re-anchor 頻率建議
+#### Re-Anchor Frequency Guide
 
-| 對話輪數 | 建議動作                         |
-| -------- | -------------------------------- |
-| 1–15 輪  | 正常操作，無需 re-anchor         |
-| 15–25 輪 | 若涉及架構敏感操作，貼一次輕量版 |
-| 25+ 輪   | 建議開新對話重新開始             |
+| Conversation Rounds | Recommended Action                                     |
+| ------------------- | ------------------------------------------------------ |
+| 1–15 rounds         | Normal operation, no re-anchor needed                  |
+| 15–25 rounds        | Lightweight re-anchor for architecture-sensitive tasks |
+| 25+ rounds          | Start a new conversation                               |
 
-> 上述輪數以 128K–200K context 模型為基準。較小 context window 的模型可能在 10–15 輪就進入稀釋區，建議提前 re-anchor。
+> Thresholds assume 128K–200K context models. Smaller context windows may enter the dilution zone at 10–15 rounds — re-anchor sooner.
 
-> **為什麼不用更複雜的自動化機制？** ZeroSpec 是 Layer 0 框架，不依賴 CLI 或 runtime。re-anchor 靠使用者在正確時機貼一句提醒即可，無需額外工具。
+> **Why no automated mechanism?** ZeroSpec is a Layer 0 framework with no CLI or runtime dependency. Re-anchoring requires only a one-line reminder at the right moment.
 
-#### Context Hygiene（進入實作前的清場原則）
+#### Context Hygiene (Clear Before Implementation)
 
-除了 re-anchor 之外，另一個維持 Agent 品質的關鍵是 context hygiene：
+Beyond re-anchoring, context hygiene is key to maintaining Agent quality:
 
-- **進入實作前清空不相關 context**：審核 SPEC / 討論架構 → 實際寫 code 是兩種任務，建議不同 session。若上一輪已是長討論，開新對話再下實作指令
-- **一次任務一條 session**：Bugfix / 新功能 / 重構 分開對話，避免上一個任務的 tool output 干擾下一個判斷
-- **長討論輸出「討論總結」再換 session**：若需跨 session 延續，請 AI 產出結論約 150 字的重點，下一個 session 貼入為起點，不要帶整段 history
+- **Clear irrelevant context before implementation**: Reviewing SPECs / discussing architecture → actually writing code are two different tasks. Use separate sessions. If the previous round was a long discussion, start a new conversation for implementation.
+- **One task, one session**: Bugfix / new feature / refactor in separate conversations. Previous task's tool output interferes with the next task's judgment.
+- **Export summary before switching sessions**: If continuity is needed across sessions, ask the AI to produce a ~150-word summary. Paste it as the starting point of the next session — do not carry full history.
 
-> 參考來源：OpenSpec 官方 usage notes 明確建議「clear your context before starting implementation」。ZeroSpec 在 Prompt 層沒有自動清場機制，但使用者可以透過這三條原則達到類似效果。
+> Reference: OpenSpec official usage notes explicitly recommend "clear your context before starting implementation." ZeroSpec has no automatic clearing mechanism at the Prompt layer, but these three principles achieve the same effect.
 
 ---
 
-## 3. ZeroSpec 本體的定位：參考而非常駐
+## 3. ZeroSpec Itself: Reference, Not Resident
 
-### 需要開 ZeroSpec 的時刻
+### When You Need ZeroSpec Open
 
-| 時刻                     | 你需要的東西                  | 花費時間     |
-| ------------------------ | ----------------------------- | ------------ |
-| PR 涉及 API 變更         | `prompts/SPEC.md` 的 Prompt   | 複製 10 秒   |
-| 跨模組技術決策           | `prompts/ADR.md` 的 Prompt    | 複製 10 秒   |
-| 月度回顧                 | `prompts/UPDATE.md` 的 Prompt | 複製 10 秒   |
-| 忘記某個模板長怎樣       | `templates/` 目錄             | 瀏覽 30 秒   |
-| 想查某個反模式的修正方法 | `anti-patterns.md`            | 瀏覽 1 分鐘  |
-| 新人加入想了解這套方法論 | `GUIDE.md`                    | 閱讀 15 分鐘 |
+| Moment                                   | What You Need              | Time Cost     |
+| ---------------------------------------- | -------------------------- | ------------- |
+| PR involves API changes                  | `prompts/SPEC.md` Prompt   | 10 sec copy   |
+| Cross-module technical decision          | `prompts/ADR.md` Prompt    | 10 sec copy   |
+| Monthly review                           | `prompts/UPDATE.md` Prompt | 10 sec copy   |
+| Forgot what a template looks like        | `templates/` directory     | 30 sec browse |
+| Looking up an anti-pattern fix           | `anti-patterns.md`         | 1 min browse  |
+| New team member learning the methodology | `GUIDE.md`                 | 15 min read   |
 
-### 不需要開 ZeroSpec 的時刻
+### When You Do NOT Need ZeroSpec Open
 
-- 日常寫程式碼（Agent 自動讀 `AGENTS.md`）
-- Commit / Push / PR Review（只看專案內的 SPEC 和 AGENTS.md）
-- Debug / 測試（與文件治理無關）
-
----
-
-## 4. 典型情境劇本
-
-### 劇本 A：新增一支 REST API
-
-```
-timeline:
-  1. 你開始寫新 API → Agent 自動讀 AGENTS.md → 遵守架構規範產 code
-  2. 寫完後 → 你想到「AGENTS.md 說 PR 涉及 API 變更要更新 SPEC」
-  3. 開 ZeroSpec → 複製 SPEC Prompt → 貼入 Agent
-  4. Agent 讀現有 SPEC → 產出更新草稿 → 你審核 → 一起進 PR
-  5. 總額外時間：~8 分鐘
-```
-
-> 若新 API 涉及跨多檔重構或新增多個資源，建議按劇本 G（Explore → Plan → Implement）分段進行，Agent 品質通常會更穩定。
-
-### 劇本 B：升級 Spring Boot 3.5 → 4.0
-
-```
-timeline:
-  1. 完成框架升版 + 程式碼調整
-  2. 開 ZeroSpec → 複製 UPDATE Prompt → 貼入 Agent（Plan 模式）
-  3. Agent 偵測到 build.gradle 版本變更 → 列出 AGENTS.md 差異
-  4. 確認 → 切 Agent 模式 → 寫入更新
-  5. 如果升版涉及架構決策（如 Virtual Threads 全面啟用）→ 接著複製 ADR Prompt
-  6. 總額外時間：~15 分鐘
-```
-
-### 劇本 C：新成員加入
-
-```
-timeline:
-  1. 新人 clone repo → 開 IDE → Agent 自動讀 AGENTS.md
-  2. 新人問「這個專案架構是什麼？」→ Agent 根據 AGENTS.md 精準回答
-  3. 新人接到任務 → Agent 幫他寫的 code 自動遵守規範
-  4. 如果需要深入了解 → AGENTS.md 導航表指向 SA / SPEC / ADR
-  5. 新人不需要讀 ZeroSpec 本身 — 他只需要專案內的 AGENTS.md
-```
-
-### 劇本 D：月度回顧
-
-```
-timeline:
-  1. 月底 → 你花 2 分鐘打開 GUIDE.md §7 的快速回顧 Checklist 掃一遍
-  2. 發現上個月新增了 3 個 Service 但對照表沒更新
-  3. 複製 UPDATE Prompt → Agent 自動偵測差異 → 建議更新
-  4. 確認 → 寫入 → commit
-  5. 總時間：~15 分鐘
-```
-
-### 劇本 E：PR Review 時判斷是否需要補文件
-
-```
-timeline:
-  1. Review 別人的 PR → 看到 Controller 新增了兩支 API
-  2. 打開 AGENTS.md → 文件維護提醒寫「PR 涉及 API 變更需更新 SPEC」
-  3. 在 PR 留言：「這個變更需要用 SPEC Prompt 補一份 SPEC 草稿」
-  4. 你不需要自己動手 — 只需要提醒
-```
-
-### 劇本 F：既有專案（Brownfield）首次導入的第一個月
-
-```
-情境：你的專案已有中量/大量 API，INIT-BUILD 剛完成，
-      AGENTS.md 和 docs/README.md 已到位。
-
-Week 1：建立全局理解
-  1. 跑一次 SA Prompt → 讓 Agent 產出系統架構快照（docs/analysis/SA-001.md）
-  2. 選出「最近 30 天有程式碼異動」的 API → 這是你的補登 Tier 1 清單
-     （完整補登優先序：最近有異動 > 跨系統/跨團隊依賴 > 業務邏輯複雜，見 GUIDE.md §7 Step 3.5）
-  3. 對 Tier 1 最重要的一支 API 跑 SPEC Prompt → 建立第一份 SPEC
-  4. 把 SA + SPEC 一起進 commit → 宣告 ZeroSpec 正式啟動
-
-Week 2–4：並行兩條軌道
-  開發軌：所有新 API 或有變更的 API → 正常觸發 SPEC（這條軌道是必須的）
-  補登軌：每週挑 1–2 支 Tier 1 API 補 SPEC（維持節奏，不要一次衝太多）
-
-  補 SPEC 時的 As-Is 原則：
-  - 目標是描述「現在的程式碼行為」，不是理想架構
-  - 發現問題先記在 SPEC 的 TODO 欄，不混入 As-Is 描述
-
-月底回顧：
-  - 清點補了幾份 SPEC → 確認 Tier 1 是否大致覆蓋
-  - 有無 Dead Zone API（長期未動、無 Consumer）→ 標記「無需補登」，不要浪費時間
-  - 開發軌運作是否正常 → 有沒有 API 變更但漏掉 SPEC？
-
-總額外時間：Week 1 約 45–60 分鐘（SA + 第一份 SPEC）；Week 2–4 每週 10–20 分鐘
-```
-
-### 劇本 G：Explore → Plan → Implement 的實作節奏（推薦用於中等以上任務）
-
-多數 Agent 平台（Claude Code Plan 模式、Copilot Chat、Cursor Composer）都支援「先分析、再實作」的分段操作。對於跨多檔的任務，先分段走一輪通常比讓 Agent 直接動手品質更高：
-
-```
-任務：在 my-backend 新增 OAuth 登入流程（跨 AuthController、SecurityConfig、User entity）
-
-Step 1 — Explore（Plan 模式）
-  貼入：「請讀 src/auth/ 了解現行 session 管理，讀 SecurityConfig 看過濾器鏈，不要寫任何檔案」
-  產出：結構化摘要 + 影響範圍清單
-
-Step 2 — Plan（同 Plan 模式）
-  貼入：「基於上述理解，請提出加入 Google OAuth 的實作計畫，列出每個檔案的改動」
-  產出：檔案層級的變更計畫
-  → 人審核計畫，直接在計畫上修改或打回重來
-
-Step 3 — Implement（切 Agent 模式 / 新對話）
-  貼入：「依上面計畫實作，並執行 make test 驗證結果」
-  → Agent 寫 code + 跑驗證指令
-
-Step 4 — Commit & SPEC（同對話）
-  貼入：「本次變更涉及 Auth API，請用 SPEC Prompt 產對應 SPEC，再一起 commit」
-```
-
-**何時可跳過這節奏**：單檔 typo、單行 log 新增、單純 rename 這類「一句話描述得完的 diff」。計畫階段的成本只在任務複雜時才划算。
-
-**為什麼值得做**：AGENTS.md 能提供結構約束，但無法替代任務層級的計畫；Explore 階段能讓 Agent 在動手前認清本次任務的邊界，是防止「生出貌似正確但遺漏 edge case」的最有效手段。
+- Daily coding (Agent auto-reads `AGENTS.md`)
+- Commit / Push / PR Review (only check project's SPEC and AGENTS.md)
+- Debug / testing (unrelated to docs governance)
 
 ---
 
-## 5. 長期維護會遇到的真實問題
+## 4. Scenario Playbooks
 
-### 5.1 「我忘了要更新 SPEC」
+### Scenario A: Adding a New REST API
 
-**根因**：事件觸發依賴人的自覺，沒有自動提醒。
+```
+Timeline:
+  1. Start writing the new API → Agent auto-reads AGENTS.md → generates code following rules
+  2. After writing → you recall "AGENTS.md says API changes require SPEC update"
+  3. Open ZeroSpec → copy SPEC Prompt → paste into Agent
+  4. Agent reads existing SPEC → generates update draft → you review → include in PR
+  5. Extra time: ~8 minutes
+```
 
-**緩解策略**：
-- **最低成本**：在 PR template 加一行 Checklist：`- [ ] 若涉及 API 變更，是否已用 SPEC Prompt 更新 SPEC？`
-- **中等成本**：PR Review 時養成習慣——看到 Controller 變更就問「SPEC 有更新嗎？」
-- **高成本**：CI 腳本自動偵測 Controller 檔案變更但 `docs/spec/` 無對應修改，發出警告
+> For multi-file refactors or multiple new resources, follow Scenario G (Explore → Plan → Implement) for better Agent quality.
 
-### 5.2 「AGENTS.md 領域對照表慢慢過時了」
+### Scenario B: Upgrading Spring Boot 3.5 → 4.0
 
-**根因**：新增模組時沒有同步更新，UPDATE Prompt 不是自動跑的。
+```
+Timeline:
+  1. Complete framework upgrade + code adjustments
+  2. Open ZeroSpec → copy UPDATE Prompt → paste into Agent (Plan mode)
+  3. Agent detects build.gradle version change → lists AGENTS.md diffs
+  4. Confirm → switch to Agent mode → write updates
+  5. If upgrade involves architecture decisions (e.g. enabling Virtual Threads) → copy ADR Prompt next
+  6. Extra time: ~15 minutes
+```
 
-**緩解策略**：
-- 行事曆設定每月固定 15 分鐘「SDD 快速回顧」事件
-- UPDATE Prompt 的差異報告會自動偵測新增/移除的 Controller / Service
-- 如果對照表落後超過 3 個模組，Agent 寫出來的 code 通常還是正確的——因為它靠 `AGENTS.md` 的架構規範（C 類）而非對照表（B 類）做決策。對照表主要幫 Agent「更快找到對的檔案」，不影響正確性。
+### Scenario C: New Team Member Joins
 
-### 5.3 「團隊其他人不買單」
+```
+Timeline:
+  1. New member clones repo → opens IDE → Agent auto-reads AGENTS.md
+  2. Asks "What's this project's architecture?" → Agent answers precisely from AGENTS.md
+  3. Gets assigned a task → Agent-generated code automatically follows conventions
+  4. For deeper understanding → AGENTS.md navigation table points to SA / SPEC / ADR
+  5. New member does NOT need to know about ZeroSpec — just the project's AGENTS.md
+```
 
-**根因**：SDD 對個人有即時回報（Agent 寫的 code 品質變好），但對團隊的價值需要累積才看得到。
+### Scenario D: Monthly Review
 
-**漸進擴散策略**：見 [§7](#7-從個人到團隊的漸進擴散)。
+```
+Timeline:
+  1. End of month → spend 2 minutes scanning GUIDE.md Section 7 quick review checklist
+  2. Discover 3 new Services added last month but not in the domain-to-code map
+  3. Copy UPDATE Prompt → Agent auto-detects diffs → suggests updates
+  4. Confirm → write → commit
+  5. Total time: ~15 minutes
+```
 
-### 5.4 「Prompt Pack 用久了想客製化」
+### Scenario E: Judging SPEC Need During PR Review
 
-**完全正常且被鼓勵。** ZeroSpec 是起點不是終點。
+```
+Timeline:
+  1. Reviewing someone's PR → see Controller with 2 new APIs
+  2. Open AGENTS.md → docs sync triggers say "API changes require SPEC update"
+  3. Comment on PR: "This change needs a SPEC draft via the SPEC Prompt"
+  4. You don't do it yourself — just flag it
+```
 
-**可客製化的方向**：
-- 在 SPEC Prompt 中加入專案特有的 DTO 命名慣例
-- 在 ADR Prompt 中加入團隊必須評估的維度（如成本、合規性）
-- 在 UPDATE Prompt 中加入額外檢查項（如 i18n 翻譯 Key 同步）
+### Scenario F: First Month After Brownfield Adoption
 
-**客製化原則**：修改你專案中的 Prompt 副本，不要改 ZeroSpec 本體。這樣 ZeroSpec 升版時不會衝突。
+```
+Context: Your project has moderate-to-large API surface. INIT-BUILD just completed.
+         AGENTS.md and docs/README.md are in place.
 
-#### 具體做法（推薦約定）
+Week 1: Build Global Understanding
+  1. Run SA Prompt → Agent produces system architecture snapshot (docs/analysis/SA-001.md)
+  2. Identify APIs with code changes in the last 30 days → this is your Tier 1 backfill list
+     (Full priority: recent changes > cross-system dependencies > complex logic — see GUIDE.md Section 7 Step 3.5)
+  3. Run SPEC Prompt on the most important Tier 1 API → first SPEC created
+  4. Commit SA + SPEC together → ZeroSpec officially launched
+
+Week 2–4: Two Parallel Tracks
+  Development track: All new/changed APIs → trigger SPEC normally (mandatory)
+  Backfill track: Pick 1–2 Tier 1 APIs per week for SPEC (maintain pace; do not rush)
+
+  As-Is principle for backfill SPECs:
+  - Describe current code behavior, not ideal architecture
+  - Record discovered issues in SPEC's TODO section; do not mix To-Be into As-Is
+
+End-of-Month Review:
+  - Count backfilled SPECs → check Tier 1 coverage
+  - Any Dead Zone APIs (long idle, no consumers)? → mark "no backfill needed"
+  - Is the development track running smoothly? → any API changes missing SPEC?
+
+Extra time: Week 1 ~45–60 min (SA + first SPEC); Weeks 2–4 ~10–20 min/week
+```
+
+### Scenario G: Explore → Plan → Implement Rhythm (Recommended for Medium+ Tasks)
+
+Most Agent platforms (Claude Code Plan mode, Copilot Chat, Cursor Composer) support "analyze first, implement later." For multi-file tasks, staged execution typically yields higher quality:
+
+```
+Task: Add OAuth login flow to my-backend (spans AuthController, SecurityConfig, User entity)
+
+Step 1 — Explore (Plan mode)
+  Paste: "Read src/auth/ for current session management, read SecurityConfig for filter chain. Write nothing."
+  Output: Structured summary + impact scope list
+
+Step 2 — Plan (same Plan mode)
+  Paste: "Based on the above, propose an implementation plan for Google OAuth. List changes per file."
+  Output: File-level change plan
+  → Human reviews; edit or reject
+
+Step 3 — Implement (switch to Agent mode / new conversation)
+  Paste: "Implement per the plan above. Run make test to verify."
+  → Agent writes code + runs verification
+
+Step 4 — Commit & SPEC (same conversation)
+  Paste: "This change affects Auth API. Generate SPEC via SPEC Prompt, then commit together."
+```
+
+**When to skip this rhythm**: Single-file typos, single-line log additions, simple renames — "diffs describable in one sentence." The planning overhead only pays off for complex tasks.
+
+**Why it matters**: AGENTS.md provides structural constraints but cannot replace task-level planning. The Explore phase lets the Agent understand the task boundary before acting — the most effective guard against "plausible-looking code that misses edge cases."
+
+---
+
+## 5. Real Problems in Long-Term Maintenance
+
+### 5.1 "I Forgot to Update the SPEC"
+
+**Root cause**: Event triggers depend on human discipline; no automatic reminders.
+
+**Mitigation strategies**:
+- **Lowest cost**: Add a checklist line to PR template: `- [ ] If API changed, did you run the SPEC Prompt?`
+- **Medium cost**: During PR Review, build the habit — see Controller changes → ask "SPEC updated?"
+- **Higher cost**: CI script detects Controller file changes without corresponding `docs/spec/` modifications; emits a warning
+
+### 5.2 "Domain-to-Code Map Is Getting Stale"
+
+**Root cause**: New modules added without updating the map; UPDATE Prompt is not auto-run.
+
+**Mitigation strategies**:
+- Set a monthly 15-minute "SDD Quick Review" calendar event
+- UPDATE Prompt's diff report auto-detects added/removed Controllers and Services
+- If the map lags by 3+ modules, Agent-generated code is usually still correct — it relies on architecture rules (Tier C) not the map (Tier B) for decisions. The map helps the Agent "find the right file faster" but does not affect correctness.
+
+### 5.3 "Team Members Don't Buy In"
+
+**Root cause**: SDD gives immediate payoff to individuals (better Agent code quality), but team value requires accumulation.
+
+**Gradual adoption strategy**: See [Section 7](#7-scaling-from-individual-to-team).
+
+### 5.4 "I Want to Customize Prompt Packs"
+
+**Perfectly normal and encouraged.** ZeroSpec is a starting point, not an endpoint.
+
+**Customizable directions**:
+- Add project-specific DTO naming conventions to SPEC Prompt
+- Add team-required evaluation dimensions (cost, compliance) to ADR Prompt
+- Add extra checks (e.g. i18n key sync) to UPDATE Prompt
+
+**Customization principle**: Modify your project's Prompt copy, not ZeroSpec itself. This avoids conflicts when upgrading ZeroSpec.
+
+#### Recommended Convention
 
 ```
 <your-repo>/
@@ -395,189 +386,189 @@ Step 4 — Commit & SPEC（同對話）
 ├── docs/
 └── .zerospec/
     └── prompts/
-        ├── SPEC-custom.md      ← 你客製化的副本，-custom 後綴表示已改
+        ├── SPEC-custom.md      ← Your customized copy; -custom suffix signals modification
         ├── ADR-custom.md
         └── UPDATE-custom.md
 ```
 
-- **命名規則**：原檔名 + `-custom` 後綴；同檔名無後綴代表未改，可跳過 diff
-- **位置**：放 `.zerospec/prompts/`（或 `docs/prompts/`），通過 git 追蹤客製化歷史
-- **升版比對**：升級 ZeroSpec 後跑一次：
+- **Naming**: Original filename + `-custom` suffix; no suffix = unmodified, skip during diff
+- **Location**: `.zerospec/prompts/` (or `docs/prompts/`); tracked by git
+- **Upgrade comparison**: After upgrading ZeroSpec:
   ```
-  diff <新版>/prompts/SPEC.md .zerospec/prompts/SPEC-custom.md
+  diff <new-version>/prompts/SPEC.md .zerospec/prompts/SPEC-custom.md
   ```
-  看官方版有什麼新增段落 → 手動正確移植到 `-custom` 副本
+  Review new sections in the official version → manually port them to the `-custom` copy.
 
-#### 「何時該回饋上游」判斷
+#### When to Contribute Upstream
 
-- 若你的客製化改動在多個專案都在用 → 可考慮回 PR 給 ZeroSpec 本體（讓官方正式支援）
-- 若只是單一專案限定慣例 → 寫在 `-custom` 副本繼續維護即可，不需回流
+- Customization is used across multiple projects → consider PRing to ZeroSpec (make it officially supported)
+- Single-project convention only → keep in the `-custom` copy; no need to contribute back
 
-### 5.5 「docs/ 目錄文件越來越多，不確定該不該停」
+### 5.5 "docs/ Directory Keeps Growing — Should I Stop?"
 
-**判斷標準**：文件是否有明確的消費者。
+**Decision criterion**: Does the document have a clear consumer?
 
-| 消費者       | 文件類型 | 持續產出                                 |
-| ------------ | -------- | ---------------------------------------- |
-| AI Agent     | SPEC     | ✅ 每次 API 變更就更新（Source of Truth） |
-| 新成員 / AI  | SA       | ⚠️ 只在里程碑或需要系統快照時產出         |
-| 團隊決策記錄 | ADR      | ⚠️ 只在有 either/or 決策時                |
-| DevOps / AI  | INFRA    | ⚠️ 只在部署變更時                         |
+| Consumer         | Doc Type | Keep Producing                                      |
+| ---------------- | -------- | --------------------------------------------------- |
+| AI Agent         | SPEC     | ✅ Update on every API change (Source of Truth)      |
+| New members / AI | SA       | ⚠️ Only at milestones or when system snapshot needed |
+| Team decisions   | ADR      | ⚠️ Only for either/or architectural decisions        |
+| DevOps / AI      | INFRA    | ⚠️ Only on deployment changes                        |
 
-如果一份文件寫完後從沒被引用過，它可能不需要存在。
+If a document has never been referenced since creation, it probably should not exist.
 
-### 5.6 「AI 反覆違反同一條 AGENTS.md 規則」
+### 5.6 AI Repeatedly Violates the Same AGENTS.md Rule
 
-**根因優先順序**（由高到低）：
+**Root cause priority** (high → low):
 
-1. **AGENTS.md 過長 / 核心規則被噪音埋沒**：檔案明顯偏長且含大量 AI 本來就會的通用常識 → 核心規則落在注意力稀釋區
-2. **規則描述有歧義**：同一條規則在 AGENTS.md 兩處描述不一致，或語句抽象到 AI 無法驗證（如「寫乾淨程式碼」）
-3. **對話已過長 / context 稀釋**：超過 15–20 輪的長對話，AGENTS.md 的注意力權重被後續對話輸出稀釋
+1. **AGENTS.md too long / core rules buried in noise**: File is noticeably long with generic knowledge the AI already has → core rules fall into the attention dilution zone
+2. **Rule description is ambiguous**: Same rule described inconsistently in two places, or wording too abstract to verify (e.g. "write clean code")
+3. **Conversation too long / context diluted**: Beyond 15–20 rounds, AGENTS.md attention weight is diluted by subsequent conversation output
 
-**診斷流程**：
+**Diagnostic flow**:
 
 ```
-1. 計算 AGENTS.md 行數
+1. Count AGENTS.md lines
    wc -l AGENTS.md
-  → 若已明顯偏長：套用 GUIDE §3.4 每行自檢法則修剪，移除 AI 無需被提醒的通用常識
+   → If noticeably long: apply GUIDE Section 3.4 per-line self-check; remove generic knowledge AI doesn't need reminding of
 
-2. 檢視被違反的規則本文
-   → 同一規則在檔案中是否重複出現但敘述不一致？
-   → 規則是否具體到可驗證（如「Controller 不寫 DbContext」），還是抽象（如「保持程式碼整潔」）？
-   → 具體化或統一敘述後再觀察
+2. Inspect the violated rule's text
+   → Is the same rule duplicated with inconsistent wording?
+   → Is the rule verifiable (e.g. "Controller MUST NOT access DbContext") or abstract ("keep code clean")?
+   → Make it specific or unify wording, then observe
 
-3. 如果規則已經具體且 AGENTS.md 不長，檢查對話
-   → 若對話 > 15 輪：貼一次輕量 re-anchor（見 §2.5）
-   → 若對話 > 25 輪：開新對話重來
+3. If rule is already specific and AGENTS.md is not long, check conversation length
+   → If > 15 rounds: use lightweight re-anchor (see Section 2.5)
+   → If > 25 rounds: start a new conversation
 
-4. 仍無效的最後手段：在該規則前加 IMPORTANT: 或 YOU MUST
-   → 但注意：若每條規則都加強調語，等於沒有強調
+4. Last resort: prefix the rule with IMPORTANT: or YOU MUST
+   → But note: if every rule has emphasis, none does
 ```
 
-**不建議的反應**：再加一條新規則「禁止違反規則 X」。這只會讓 AGENTS.md 更長、問題更嚴重（詳見 [anti-patterns #22](anti-patterns.md)）。
+**Do NOT**: Add a new rule "don't violate rule X." This only makes AGENTS.md longer and the problem worse (see [anti-patterns #22](anti-patterns.md)).
 
-### 5.7 「想快速驗收 AGENTS.md 是否真的有效」
+### 5.7 "Quick Validation That AGENTS.md Actually Works"
 
-寫完或大改 AGENTS.md 後，**用新對話跑一輪快速測試**（幾分鐘即可），比讀完整份文件更能反映 Agent 實際理解程度：
+After writing or major updates to AGENTS.md, **run a quick test in a new conversation** (a few minutes) — more revealing than reading the whole file:
 
-| 測試題型   | 範例問法                                                             | 期望答對的訊號                          |
-| ---------- | -------------------------------------------------------------------- | --------------------------------------- |
-| 導航題     | 「認證邏輯在哪個 package / module？」                                | 指向對照表列出的實際路徑，不是通用推測  |
-| 規則題     | 「新增一支 API 的路徑與分層要求？」                                  | 引用 Quick Constraints 或程式碼產生規範 |
-| 反例辨識題 | 貼一段「在 Controller 直接操作 DbContext」的程式碼問「這違反什麼？」 | 準確點名被違反的硬規則並建議正確位置    |
+| Test Type       | Example Question                                                  | Expected Signal                                                       |
+| --------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Navigation      | "Where is auth logic in this project?"                            | Points to actual paths from domain-to-code map, not generic guesses   |
+| Rules           | "What are the path format and layer requirements for a new API?"  | Cites Quick Constraints or Code Generation Rules                      |
+| Counter-example | Paste code with "DbContext in Controller" and ask "what's wrong?" | Accurately names the violated hard rule and suggests correct location |
 
-**結果判讀**：
+**Interpreting results**:
 
-- **大多答對**：AGENTS.md 健康，可正常使用
-- **少量答錯**：該領域的導航或規則需要補強，針對性修
-- **多數答錯**：跑 [AUDIT Prompt](../prompts/AUDIT.md) 做整體稽核
+- **Most correct**: AGENTS.md is healthy; proceed normally
+- **Few wrong**: Strengthen navigation or rules for that specific domain
+- **Mostly wrong**: Run [AUDIT Prompt](prompts/AUDIT.md) for a full audit
 
-> 每次 AGENTS.md 大改（例如 UPDATE Prompt 寫檔後、Brownfield 補 SPEC 後）建議都跑一次。
+> Run this test after every major AGENTS.md change (e.g. after UPDATE Prompt writes, after Brownfield SPEC backfill).
 
 ---
 
-## 6. 月度/季度回顧實操流程
+## 6. Monthly / Quarterly Review Process
 
-### 月度快速回顧（15 分鐘）
-
-```
-實際操作步驟：
-1. 開終端機 → `git log --since="1 month ago" --oneline -- '*.java' '*.ts' '*.cs' | wc -l`
-   → 大致感受這個月的變更量
-
-2. 打開 AGENTS.md → 快速掃過領域對照表
-   → 有沒有上個月新增的 Controller / Service 沒列進來？
-
-3. 打開 docs/README.md → 看文件清單
-   → docs/ 目錄下有沒有新檔案沒收錄？
-
-4. 如果有落差 → 複製 UPDATE Prompt → 貼入 Agent → 讓它產差異報告
-5. 確認 → 寫入 → commit → done
-```
-
-### 季度完整回顧（30 分鐘）
-
-除上述步驟外：
+### Monthly Quick Review (15 minutes)
 
 ```
-額外步驟：
-6. 回顧這一季 Agent 寫出來的 PR → 有沒有反覆違反同一條規則？
-   → 若有，調整 AGENTS.md 中該規則的描述清晰度
+Steps:
+1. Terminal → `git log --since="1 month ago" --oneline -- '*.java' '*.ts' '*.cs' | wc -l`
+   → Sense this month's change volume
 
-7. 檢查 AGENTS.md 的行數 → 是否已明顯偏長？
-  → 若是，考慮把低頻使用的段落移到 docs/ 子文件
+2. Open AGENTS.md → scan domain-to-code map
+   → Any new Controllers / Services not listed?
 
-8. 與團隊成員確認架構硬規則是否仍然適用
-   → 有沒有「大家都默認違反但沒人改文件」的規則？
+3. Open docs/README.md → check document inventory
+   → Any new files in docs/ not cataloged?
 
-9. 如果這一季有重大架構變更 → 考慮跑一次 SA Prompt 產新的系統快照
+4. If gaps found → copy UPDATE Prompt → paste into Agent → get diff report
+5. Confirm → write → commit → done
+```
+
+### Quarterly Full Review (30 minutes)
+
+All monthly steps, plus:
+
+```
+Additional steps:
+6. Review this quarter's Agent-generated PRs → repeated violations of the same rule?
+   → If yes, improve that rule's clarity in AGENTS.md
+
+7. Check AGENTS.md line count → noticeably long?
+   → If yes, move low-frequency sections to docs/ sub-files
+
+8. Confirm with team: are hard rules still valid?
+   → Any rules "everyone silently violates but nobody updates the doc?"
+
+9. If major architecture changes this quarter → consider running SA Prompt for a new system snapshot
 ```
 
 ---
 
-## 7. 從個人到團隊的漸進擴散
+## 7. Scaling from Individual to Team
 
-### Phase 1：個人先行（Week 1-4）
+### Phase 1: Individual Pioneer (Week 1–4)
 
-- 你自己跑 INIT-SCAN + INIT-BUILD
-- 用產出的 `AGENTS.md` 開發，體感 Agent 品質提升
-- 偷偷在 PR 裡帶上 SPEC 更新，讓隊友看到文件自然產出
+- Run INIT-SCAN + INIT-BUILD yourself
+- Use the generated `AGENTS.md` for development; feel the Agent quality improvement
+- Quietly include SPEC updates in your PRs — let teammates see docs appearing naturally
 
-### Phase 2：消極擴散（Month 2-3）
+### Phase 2: Passive Adoption (Month 2–3)
 
-- 團隊成員使用 Agent 開發時，自動受益於 `AGENTS.md` 的規範
-- 他們不需要知道 ZeroSpec 存在——他們只知道「Agent 懂我們的架構了」
-- PR Review 時偶爾提醒「API 變更需要補 SPEC」
+- Team members using Agent mode automatically benefit from `AGENTS.md` rules
+- They don't need to know ZeroSpec exists — they just notice "the Agent understands our architecture now"
+- Occasionally remind during PR Review: "API changes need a SPEC"
 
-### Phase 3：主動引入（Quarter 2）
+### Phase 3: Active Introduction (Quarter 2)
 
-當團隊已經習慣 AGENTS.md 的存在後：
+Once the team is used to AGENTS.md:
 
-- 在團隊會議中簡短介紹 SPEC Prompt + UPDATE Prompt（5 分鐘）
-- 在 PR template 加入 SDD Checklist
-- 指定一位「SDD 守門人」（不一定是你）負責月度回顧
+- Brief intro of SPEC Prompt + UPDATE Prompt in a team meeting (5 minutes)
+- Add SDD Checklist to PR template
+- Designate an "SDD gatekeeper" (not necessarily you) for monthly reviews
 
-### Phase 4：自運轉（Quarter 3+）
+### Phase 4: Self-Sustaining (Quarter 3+)
 
-- 每個人都知道 API 變更要跑 SPEC Prompt
-- 月度回顧變成固定例行
-- 你只需要在季度回顧時介入
+- Everyone knows API changes require SPEC Prompt
+- Monthly review becomes routine
+- You only intervene at quarterly reviews
 
 ---
 
-## 附錄：常見問題
+## Appendix: Common Questions
 
-### Q：ZeroSpec 的 README.md 需要常駐打開嗎？
+### Q: Do I need to keep ZeroSpec's README open all the time?
 
-**不需要。** ZeroSpec 的 README 是「使用手冊」，不是運行時依賴。就像你不會每天翻 React 官方文件一樣——你把它學會後，需要時再查。
+**No.** ZeroSpec's README is a "user manual," not a runtime dependency. Like React docs — you learn it, then look things up when needed.
 
-### Q：ZeroSpec 應該加進 `.github/copilot-instructions.md` 嗎？
+### Q: Should ZeroSpec be added to `.github/copilot-instructions.md`?
 
-**不應該。** `copilot-instructions.md` 是給個人偏好用的（語言、格式、角色）。專案級約束由 `AGENTS.md` 負責。兩者職責分離。
+**No.** `copilot-instructions.md` is for personal preferences (language, format, role). Project-level constraints belong in `AGENTS.md`. Separate responsibilities.
 
-但你可以在 `copilot-instructions.md` 中加一句提醒：
+You CAN add a one-line reminder to `copilot-instructions.md`:
 
 ```markdown
 ## ⚡ Protocol: SDD
-處理 PR 涉及 API 新增或行為變更時，主動提醒是否需要更新 SPEC。
+When handling PRs with API additions or behavior changes, proactively ask if SPEC needs updating.
 ```
 
-### Q：我能不能讓 Agent 在每次對話開始時自動讀 ZeroSpec？
+### Q: Can I have the Agent auto-read ZeroSpec at every conversation start?
 
-**不建議。** ZeroSpec 本體（prompts/ + templates/ + GUIDE.md）加起來已有數千行，會明顯消耗 context window。Agent 通常只需要讀你專案中的精簡 `AGENTS.md` 就夠了。
+**Not recommended.** ZeroSpec itself (prompts/ + templates/ + GUIDE.md) totals thousands of lines and would significantly consume context window. The Agent only needs your project's concise `AGENTS.md`.
 
-### Q：多人團隊中，誰負責跑 UPDATE Prompt？
+### Q: In a multi-person team, who runs the UPDATE Prompt?
 
-**建議由最熟悉專案架構的人負責**——通常是 Tech Lead 或主要維護者。月度回顧可以輪班，但審核結果需要有架構判斷力的人把關。
+**The person most familiar with the project architecture** — usually the Tech Lead or primary maintainer. Monthly reviews can rotate, but results need someone with architecture judgment to approve.
 
-### Q：文件越來越多，會不會回到「文件太多沒人看」的老問題？
+### Q: Documents keep growing — won't we end up with "too many docs nobody reads"?
 
-ZeroSpec 的設計本身就在對抗這個問題：
-- **Lazy Evaluation**：不預建空殼，觸發才建
-- **SPEC 是唯一強制文件**：其他都是「值得有」但非必要
-- **每份文件都有消費者**：SA 給新人和 Agent、ADR 給未來的決策者、SPEC 給日常開發的 Agent
-- 如果一份文件三個月沒被引用，它可能可以歸檔
+ZeroSpec's design explicitly combats this:
+- **Lazy Evaluation**: No pre-created empty shells; create on trigger only
+- **SPEC is the only mandatory document**: Others are "nice to have," not required
+- **Every document has a consumer**: SA for new members and Agents, ADR for future decision-makers, SPEC for daily Agent use
+- If a document goes unreferenced for 3 months, consider archiving it
 
 ---
 
-*本文件隨 ZeroSpec v0.1 發布。建議在導入滿一個月後再來閱讀，Day-1 不需要看這份。*
+*This guide ships with ZeroSpec. Read it after one month of adoption — not needed on Day-1.*

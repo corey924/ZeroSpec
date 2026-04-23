@@ -1,203 +1,206 @@
 # ZeroSpec — INIT-BUILD Prompt Pack
 
-> **第二步：產生 AGENTS.md + docs/README.md。** 在完成 [INIT-SCAN](INIT-SCAN.md) 分析確認後，使用本 Prompt 讓 AI 建立專案的 AI 導航文件。
+> **Step 2: Generate AGENTS.md + docs/README.md.** After completing [INIT-SCAN](INIT-SCAN.md) analysis, use this Prompt to create the project's AI navigation files.
 
 ---
 
-## 前置條件
+## Prerequisites
 
-- 已使用 [`INIT-SCAN.md`](INIT-SCAN.md) 完成現況分析
-- 已確認分析結果並回答待確認問題
+- Completed [`INIT-SCAN.md`](INIT-SCAN.md) analysis
+- Confirmed analysis results and answered clarification questions
 
 ---
 
-## 使用方式
+## How to Use
 
-1. 在同一對話中（或新對話中），確認 INIT-SCAN 的分析結果已被接受
-2. 複製下方 Prompt 貼入 Agent
-3. Agent 詢問 C 類問題（5–8 題），每題附預設建議
-4. 你回答或確認後，Agent 產出 `AGENTS.md` + `docs/README.md`
-5. 審核兩份文件後，若環境支援檔案寫入功能，請 Agent 自動建立實體檔案
+1. In the same conversation (or a new one), confirm the INIT-SCAN results have been accepted
+2. Copy the Prompt below and paste into the Agent
+3. The Agent asks C-class questions (5–8 items), each with a suggested default
+4. Answer or confirm, then the Agent outputs `AGENTS.md` + `docs/README.md`
+5. Review both files — if the environment supports file writing, ask the Agent to create the files
 
-> **Multi-root Workspace 提示**
+> **Multi-root Workspace Tip**
 >
-> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+> When your workspace contains multiple projects, specify the target at the start to prevent the AI from modifying other projects:
 >
 > ```
-> 目標專案：my-backend
-> 請為本專案產生 AGENTS.md 與 docs/README.md。
+> Target project: my-backend
+> Generate AGENTS.md and docs/README.md for this project.
 > ```
 >
-> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
-> 若偵測到欲寫入的檔案不在目標專案範圍內，請先停止並回報，不要直接寫入。
-> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+> Or open any file within the target project (Active File anchoring) so the Agent prioritizes that project's context.
+> If the target file path falls outside the target project scope, stop and report — do not write.
+> See [DAILY-USAGE Section 2.4](../DAILY-USAGE.md#24-multi-root-workspace-notes).
 
 ---
 
 ````
 ---BEGIN PROMPT---
 
-請基於先前的專案分析結果，建立兩份文件：`AGENTS.md` 與 `docs/README.md`。
-嚴格依照以下四個步驟依序執行：
+Based on the prior project analysis, create two files: `AGENTS.md` and `docs/README.md`.
+Follow these four steps in strict order:
 
-## 第一步：帶入 SCAN 結果
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
 
-讀取先前 INIT-SCAN 階段確認的以下內容（若在新對話中，請重新掃描專案取得等價資訊）：
+## Step 1: Import SCAN Results
 
-- **A 類（自動萃取）**：技術棧、版本 SoT、常用指令、目錄結構、Base Namespace/Package/Alias
-- **B 類（已審核草稿）**：文件導航表、領域/模組對照表、架構層級、命名慣例、關聯專案
+Read the following from the confirmed INIT-SCAN output (if in a new conversation, re-scan the project for equivalent information):
 
-## 第二步：詢問 C 類問題（只有人能回答的團隊決策）
+- **A-class (auto-extracted)**: Tech stack, version source of truth, common commands, directory structure, Base Namespace/Package/Alias
+- **B-class (reviewed drafts)**: Docs navigation table, domain-to-code map, architecture layers, naming conventions, related projects
 
-逐一詢問以下問題。每題附上你從 SCAN 階段推斷的預設建議（以 `建議：` 開頭），讓使用者可以直接確認或調整：
+## Step 2: Ask C-class Questions (Team decisions only humans can answer)
 
-1. **專案定位**：請用一句話描述這個專案的業務定位
-   > 建議：「{從 SCAN 推斷的定位描述}」
-2. **部署方式**：這個專案的部署方式是什麼？
-   > 建議：{從 CI/CD 設定或 Dockerfile 推斷}
-3. **架構硬規則**：有哪些架構硬規則（Do / Don't）是團隊必須遵守的？
-   > 建議：{從既有分層模式推斷，例如「Controller 不寫業務邏輯」}
-4. **路由慣例**：API 路由或頁面路徑有慣例嗎？
-   > 建議：{從既有路由推斷}
-5. **權限/狀態管理**：權限控制或狀態管理有特定模式嗎？
-   > 建議：{從既有程式碼推斷，若無明確模式標註 [待確認]}
-6. **資料存取規則**：資料存取或資料庫遷移有規則嗎？（若無資料庫此題可略過）
-   > 建議：{從 ORM/Migration 設定推斷}
-7. **文件同步觸發**：PR 涉及哪些變更時需要同步更新文件？
-   > 建議：API 新增或行為變更時更新 SPEC
-8. **其他硬規則**：有沒有其他團隊特有的硬規則？（可略過）
+Ask each question below. Provide a suggested default (prefixed with `Suggested:`) inferred from the SCAN phase, so the user can confirm or adjust:
 
-## 第三步：組裝輸出
+1. **Project summary**: Describe this project's business purpose in one sentence
+   > Suggested: "{inferred from SCAN}"
+2. **Deployment method**: How is this project deployed?
+   > Suggested: {inferred from CI/CD config or Dockerfile}
+3. **Hard rules**: What architecture hard rules (Do / Don't) MUST the team follow?
+   > Suggested: {inferred from layering patterns, e.g., "Controllers MUST NOT contain business logic"}
+4. **Routing conventions**: Are there conventions for API routes or page paths?
+   > Suggested: {inferred from existing routes}
+5. **Auth / state management**: Is there a specific pattern for access control or state management?
+   > Suggested: {inferred from code — mark `[unverified]` if no clear pattern}
+6. **Data access rules**: Are there rules for data access or database migrations? (Skip if no database)
+   > Suggested: {inferred from ORM/migration config}
+7. **Docs sync triggers**: Which PR changes require docs updates?
+   > Suggested: Update SPEC on any API addition or behavior change
+8. **Other hard rules**: Any other team-specific hard rules? (May skip)
 
-將所有內容組裝為兩份文件：
+## Step 3: Assemble Output
 
-### 文件一：AGENTS.md
+Combine all content into two files:
+
+### File 1: AGENTS.md
 
 ```markdown
-# AGENTS.md — {專案名稱} AI 導航指引
+# AGENTS.md — {project name} AI Navigation Guide
 
-> 本文件是 GenAI Agent 理解 {專案名稱} 專案的首要入口。請在處理任何程式碼任務前先讀完本文件。
+> This file is the primary entry point for GenAI Agents to understand the {project name} project. Read this file completely before performing any code task.
 
-## 專案定位
-{C1 回答 + A 類技術棧、架構模式、部署方式}
-{A 類 Base Namespace/Package/Alias}
-{A 類版本真相來源宣告}
+## Project Summary
+{C1 answer + A-class tech stack, architecture pattern, deployment method}
+{A-class Base Namespace/Package/Alias}
+{A-class version source of truth declaration}
 
-## 關鍵約束（Quick Constraints）
-從下方「程式碼產生規範」中提取 5–8 條最致命的硬規則（違反時會導致 PR 退件或系統錯誤），以精簡條列置頂。
-{C3 架構硬規則中最關鍵的 5–8 條，每條一行}
+## Quick Constraints
+Extract 5–8 hard rules from "Code Generation Rules" below (violations cause PR rejection or system errors). Place them here as concise bullet points.
+{Top 5–8 hard rules from C3, one per line}
 
-## 領域/模組 ↔ 程式碼對照表
-{B 類對照表}
+## Domain-to-Code Map
+{B-class domain-to-code map}
 
-## 程式碼產生規範
-{C3 架構硬規則 + C4 路由慣例 + C5 權限/狀態 + C6 資料存取 + B 類命名慣例}
-（Quick Constraints 已涵蓋的項目在此段可提供更詳細的說明與範例）
+## Code Generation Rules
+{C3 hard rules + C4 routing conventions + C5 auth/state + C6 data access + B-class naming conventions}
+(Items already in Quick Constraints may have expanded details and examples here)
 
-## GenAI 文件導航
-{B 類文件導航表（意圖驅動格式）}
+## GenAI Docs Navigation
+{B-class docs navigation table (intent-driven format)}
 
-## 常用開發指令
-{A 類自動萃取指令表 —— 務必包含「建置、測試、Lint、型別檢查」四類驗證指令，讓 Agent 在完成任務後能自行驗證成果。若任一類不存在，明確標註「尚未設定」以提醒團隊補齊。}
+## Common Commands
+{A-class auto-extracted commands — MUST include build, test, lint, and type-check categories so the Agent can self-verify after task completion. If any category does not exist, explicitly mark "Not configured" to prompt the team to set it up.}
 
-## 關聯專案
-{B 類關聯專案（若無可省略此段）}
+## Related Projects
+{B-class related projects (omit this section if none)}
 
-## 文件維護提醒
-{C7 文件同步觸發條件}
-- 文件治理規則詳見 `docs/README.md`
+## Docs Maintenance Reminders
+{C7 docs sync trigger conditions}
+- Docs governance rules: see `docs/README.md`
 ```
 
-> **長度指引**：AGENTS.md 建議控制在 150–300 行以內。超過 300 行時，將低頻段落移至 docs/ 子文件並在導航表引用。
+> **Length guideline**: Keep AGENTS.md within 150–300 lines. If it exceeds 300 lines, move low-frequency sections to docs/ sub-documents and reference them in the navigation table.
 
-### 文件二：docs/README.md
+### File 2: docs/README.md
 
 ```markdown
-# {專案名稱} — 文件治理中心
+# {project name} — Docs Governance Hub
 
-> 本文件定義專案文件的分層規則、命名規範與維護條件。GenAI Agent 在處理文件相關任務時應先讀取本文件。
+> This file defines the layering rules, naming conventions, and maintenance triggers for project documentation.
+> GenAI Agents MUST read this file before performing any documentation task.
 
-## SDD 文件四層分類
+## SDD Document Classification
 
-| 分類              | 目錄             | 命名格式                   | 觸發條件                   |
-| ----------------- | ---------------- | -------------------------- | -------------------------- |
-| SA（系統分析）    | `docs/analysis/` | `SA-{三位數}_{描述}.md`    | 里程碑或架構重大變更       |
-| ADR（架構決策）   | `docs/adr/`      | `ADR-{三位數}_{描述}.md`   | 跨模組技術二選一決策       |
-| SPEC（介面契約）  | `docs/spec/`     | `SPEC-{三位數}_{描述}.md`  | API 新增或行為變更（強制） |
-| INFRA（基礎設施） | `docs/infra/`    | `INFRA-{三位數}_{描述}.md` | 部署拓樸或 CI 變更         |
+| Category                    | Directory        | Naming Format               | Trigger                                         |
+| --------------------------- | ---------------- | --------------------------- | ----------------------------------------------- |
+| SA (System Analysis)        | `docs/analysis/` | `SA-{3-digit}_{desc}.md`    | Milestone or major architecture change          |
+| ADR (Architecture Decision) | `docs/adr/`      | `ADR-{3-digit}_{desc}.md`   | Cross-module either/or tech decision            |
+| SPEC (Interface Contract)   | `docs/spec/`     | `SPEC-{3-digit}_{desc}.md`  | API addition or behavior change (**mandatory**) |
+| INFRA (Infrastructure)      | `docs/infra/`    | `INFRA-{3-digit}_{desc}.md` | Deployment topology or CI change                |
 
-- 命名正規式：`^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$`
+- Naming regex: `^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$`
 
 ## Source of Truth
 
-SPEC 是開發與 GenAI 的主要參照檔案。每次介面新增或修改都直接更新 SPEC，並在 Changelog 追蹤變更歷程。
+SPEC is the primary reference for development and GenAI. Update SPEC directly on every interface addition or change, and track changes in the Changelog.
 
-**最低維護規則**：凡 PR 涉及介面或行為異動，必須同步更新 SPEC 內容與 Changelog。
+**Minimum maintenance rule**: Every PR involving interface or behavior changes MUST update the SPEC content and Changelog.
 
-## ADR 觸發條件
+## ADR Trigger Conditions
 
-- ✅ 需要 ADR：架構分層策略選型、認證方案設計（如 JWT 雙 Token）、技術方案二選一（如 Kafka vs Event Hubs）、跨模組共用元件的設計決策
-- ❌ 不需要 ADR：新增一支 CRUD API、修改快取 TTL 預設值、單純 bug fix
+- ✅ Needs ADR: architecture layering strategy, auth scheme design (e.g., JWT dual-token), either/or tech decision (e.g., Kafka vs Event Hubs), design decisions for cross-module shared components
+- ❌ No ADR needed: adding a CRUD API, changing cache TTL defaults, simple bug fix
 
-## 候選文件（Lazy Evaluation）
+## Candidate Documents (Lazy Evaluation)
 
-| 候選文件 | 觸發時機 |
-| -------- | -------- |
-{從 SCAN 分析的「建議最小 SDD 文件集合」填入}
+| Candidate | Trigger |
+| --------- | ------- |
+{From SCAN's "Recommended Minimal SDD Document Set"}
 
-## 文件清單
+## Document Index
 
-| 文件                     | 路徑 | 狀態 |
-| ------------------------ | ---- | ---- |
-| （隨文件新增時更新此表） |      |      |
+| Document                              | Path | Status |
+| ------------------------------------- | ---- | ------ |
+| (Update this table as docs are added) |      |        |
 ```
 
-## 第四步：現況評估與下一步建議
+## Step 4: Assessment and Next Steps
 
-完成兩份文件組裝後，額外輸出以下評估（不寫入檔案，直接在對話中呈現）：
+After assembling both files, output the following assessment in the conversation (DO NOT write to file):
 
-1. **掃描摘要**：列出偵測到的技術棧、模組數量級（少量/中等/大量）、既有 docs/ 文件數
-2. **專案類型判斷**：依偵測到的 Controller/endpoint 數量標註 **Greenfield**（< 10 個 endpoint 或為全新專案）或 **Brownfield**（已有中量/大量既有 API）
-3. **建議第一份 SPEC**：依專案類型調整推薦對象：
-   - Greenfield：建議第一支真實 API endpoint 完成時立即建 SPEC（跟著開發軌）
-   - Brownfield：建議從「最近 30 天有程式碼異動」的業務領域中挑一支補第一份 SPEC
-4. **建議最小文件集**：根據專案規模，建議初期需要哪些 SDD 文件（例如：「建議先建 1 份 SPEC + 1 份 SA，ADR 等有決策再建」）
-5. **下一步行動**：依偵測到的專案類型，分兩種情況輸出建議：
+1. **Scan summary**: List detected tech stack, module count scale (few/moderate/many), existing docs/ file count
+2. **Project type**: Based on detected Controller/endpoint count, mark **Greenfield** (< 10 endpoints or brand new) or **Brownfield** (existing moderate/large API surface)
+3. **Recommended first SPEC**: Adjust recommendation by project type:
+   - Greenfield: Create the first SPEC as soon as the first real API endpoint is complete (follow the development track)
+   - Brownfield: Pick one API from a domain with code changes in the last 30 days and create the first SPEC
+4. **Recommended minimal document set**: Based on project scale, suggest initial SDD documents (e.g., "Start with 1 SPEC + 1 SA; create ADR only when a decision arises")
+5. **Next steps**: Output recommendations based on detected project type:
 
-   **若為 Greenfield 路徑**：
-   - 直接進入事件驅動模式
-   - 建議：第一支真實 API endpoint 完成後立即跑 SPEC Prompt
-   - 優先順序：`SPEC → ADR（有決策時）→ SA（達里程碑時）`
+   **Greenfield path**:
+   - Enter event-driven mode directly
+   - Recommendation: Run SPEC Prompt as soon as the first real API endpoint is complete
+   - Priority: `SPEC → ADR (when decisions arise) → SA (at milestones)`
 
-   **若為 Brownfield 路徑**：
-   - 建議先跑 **SA Prompt**（產出系統架構快照，讓 AI 取得全局理解）
-   - 再以「最近 30 天有異動」的 API 為優先，補第一份 **SPEC**
-   - 提醒：補 SPEC 以 As-Is 為準（描述現在的程式碼行為，不混入 To-Be 改善）
-   - 優先順序：`SA → 高優先 SPEC（補登）→ 開發軌正常觸發 SPEC`
+   **Brownfield path**:
+   - Run **SA Prompt** first (produce a system architecture snapshot for AI to gain global understanding)
+   - Then pick an API with changes in the last 30 days as the priority for the first **SPEC**
+   - Reminder: Write SPEC as As-Is (describe current code behavior — DO NOT mix in To-Be improvements)
+   - Priority: `SA → High-priority SPEC (backfill) → Normal SPEC triggered by development`
 
-## 防漂移規則（套用於所有產出內容）
+## Drift Prevention Rules (Apply to all output)
 
-- 版本只寫 Major.Minor，不寫 Patch
-- 不列舉精確檔案數量，用結構模式描述
-- 同一版本號只在一處出現，第二處改用「見 X 宣告」引用
-- 宣告「版本真相來源」指向設定檔
-- 任何欄位若缺乏程式碼或設定檔證據，標註 `[待確認]`，不得猜測
-- 本 Prompt 只產生 `AGENTS.md` 和 `docs/README.md` 兩個檔案；不建立其他 docs 子文件
-- 若掃描到既有 docs/ 中的文件，在「GenAI 文件導航」表格中引用即可，不新增或修改它們
-- AGENTS.md 不嵌入文件治理規則（四層分類表、命名正規式），改由 docs/README.md 管理
+- Write versions as Major.Minor only — omit Patch
+- DO NOT list exact file counts; describe structural patterns
+- Each version number MUST appear only once; second references MUST use "see X declaration"
+- Declare "version source of truth" pointing to config files
+- If any field lacks code or config evidence, mark `[unverified]` — DO NOT guess
+- This Prompt produces ONLY `AGENTS.md` and `docs/README.md`; DO NOT create other docs/ sub-documents
+- If existing docs/ files are found, reference them in the "GenAI Docs Navigation" table — DO NOT create or modify them
+- AGENTS.md MUST NOT embed docs governance rules (classification table, naming regex); those belong in docs/README.md
 
 ---END PROMPT---
 ````
 
 ---
 
-## 下一步
+## Next Step
 
-Day-1 完成後，依事件觸發使用對應 Prompt Pack：
+After Day-1 completion, use the matching Prompt Pack per event:
 
-| 觸發事件           | 使用                     |
-| ------------------ | ------------------------ |
-| 新增/變更 API      | [`SPEC.md`](SPEC.md)     |
-| 架構決策           | [`ADR.md`](ADR.md)       |
-| 系統快照           | [`SA.md`](SA.md)         |
-| 專案演進需同步文件 | [`UPDATE.md`](UPDATE.md) |
+| Trigger Event          | Prompt Pack              |
+| ---------------------- | ------------------------ |
+| API addition/change    | [`SPEC.md`](SPEC.md)     |
+| Architecture decision  | [`ADR.md`](ADR.md)       |
+| System snapshot        | [`SA.md`](SA.md)         |
+| Project evolution sync | [`UPDATE.md`](UPDATE.md) |

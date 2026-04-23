@@ -18,42 +18,42 @@ function Fail([string]$Message) {
 
 function Assert-FileExists([string]$Path) {
     if (Test-Path -Path $Path -PathType Leaf) {
-        Pass "檔案存在：$Path"
+        Pass "File exists: $Path"
     }
     else {
-        Fail "檔案不存在：$Path"
+        Fail "File not found: $Path"
     }
 }
 
 function Assert-Contains([string]$Path, [string]$Pattern) {
     if (Select-String -Path $Path -Pattern $Pattern -Quiet) {
-        Pass "符合規則：$Path / $Pattern"
+        Pass "Rule matched: $Path / $Pattern"
     }
     else {
-        Fail "未符合規則：$Path / $Pattern"
+        Fail "Rule not matched: $Path / $Pattern"
     }
 }
 
 function Assert-NotContains([string]$Path, [string]$Pattern) {
     if (Select-String -Path $Path -Pattern $Pattern -Quiet) {
-        Fail "不應出現但找到：$Path / $Pattern"
+        Fail "Forbidden content found: $Path / $Pattern"
     }
     else {
-        Pass "未發現禁用內容：$Path / $Pattern"
+        Pass "No forbidden content: $Path / $Pattern"
     }
 }
 
 function Assert-FirstLineStartsWithHeader([string]$Path) {
     if (-not (Test-Path -Path $Path -PathType Leaf)) {
-        Fail "檔案不存在（跳過首行檢查）：$Path"
+        Fail "File not found (skipping header check): $Path"
         return
     }
     $firstLine = Get-Content -Path $Path -TotalCount 1
     if ($null -ne $firstLine -and $firstLine.StartsWith('#')) {
-        Pass "首行為標題：$Path"
+        Pass "First line is header: $Path"
     }
     else {
-        Fail "首行不是標題（可能有外層 code fence）：$Path"
+        Fail "First line is not a header (possible outer code fence): $Path"
     }
 }
 
@@ -61,10 +61,10 @@ function Assert-MatchCount([string]$Path, [string]$Pattern, [int]$ExpectedCount)
     $matches = Select-String -Path $Path -Pattern $Pattern -AllMatches
     $actualCount = if ($null -eq $matches) { 0 } else { @($matches).Count }
     if ($actualCount -eq $ExpectedCount) {
-        Pass "數量符合：$Path / $Pattern = $ExpectedCount"
+        Pass "Count matched: $Path / $Pattern = $ExpectedCount"
     }
     else {
-        Fail "數量不符：$Path / $Pattern，預期 $ExpectedCount，實際 $actualCount"
+        Fail "Count mismatch: $Path / $Pattern, expected $ExpectedCount, actual $actualCount"
     }
 }
 
@@ -73,19 +73,19 @@ function Assert-LineOrder([string]$Path, [string]$FirstPattern, [string]$SecondP
     $secondMatch = Select-String -Path $Path -Pattern $SecondPattern | Select-Object -First 1
 
     if ($null -eq $firstMatch -or $null -eq $secondMatch) {
-        Fail "順序檢查失敗（缺少匹配）：$RuleName"
+        Fail "Order check failed (missing match): $RuleName"
         return
     }
 
     if ($firstMatch.LineNumber -lt $secondMatch.LineNumber) {
-        Pass "順序符合：$RuleName"
+        Pass "Order matched: $RuleName"
     }
     else {
-        Fail "順序不符：$RuleName"
+        Fail "Order mismatch: $RuleName"
     }
 }
 
-Write-Host "=== ZeroSpec 驗收開始（Windows PowerShell） ==="
+Write-Host "=== ZeroSpec Verification Started (Windows PowerShell) ==="
 
 Assert-FileExists 'prompts/INIT-SCAN.md'
 Assert-FileExists 'prompts/INIT-BUILD.md'
@@ -116,35 +116,45 @@ Assert-FirstLineStartsWithHeader 'templates/SA-TEMPLATE.md'
 Assert-FirstLineStartsWithHeader 'examples/minimal-day1/AGENTS.md'
 Assert-FirstLineStartsWithHeader 'examples/minimal-day1/docs/README.md'
 
-Assert-Contains 'prompts/SPEC.md' '## 前置條件'
-Assert-Contains 'prompts/ADR.md' '## 前置條件'
-Assert-Contains 'prompts/SA.md' '## 前置條件'
+Assert-Contains 'prompts/SPEC.md' '## Prerequisites'
+Assert-Contains 'prompts/ADR.md' '## Prerequisites'
+Assert-Contains 'prompts/SA.md' '## Prerequisites'
 
 Assert-Contains 'prompts/SPEC.md' 'docs/README\.md'
 Assert-Contains 'prompts/ADR.md' 'docs/README\.md'
 Assert-Contains 'prompts/SA.md' 'docs/README\.md'
-Assert-Contains 'prompts/SPEC.md' '讀取既有文件（若為更新）'
-Assert-Contains 'prompts/INIT-SCAN.md' 'Plan 模式可讀取 codebase'
+Assert-Contains 'prompts/SPEC.md' 'Read existing document'
+Assert-Contains 'prompts/INIT-SCAN.md' 'Plan mode can read the codebase'
 
 Assert-Contains 'README.md' 'DAILY-USAGE\.md'
 Assert-Contains 'GUIDE.md' 'DAILY-USAGE\.md'
+Assert-Contains 'README.md' 'DAILY-USAGE\.md#22-coexistence-of-copilot-instructionsmd-and-agentsmd'
+Assert-Contains 'README.md' 'GUIDE\.md#7-adoption-and-continuous-operation'
+Assert-Contains 'README.md' '#getting-started-under-30-minutes'
+Assert-Contains 'README.md' '^## Getting Started \(Under 30 Minutes\)'
+Assert-Contains 'anti-patterns.md' 'GUIDE\.md#34-guardrails-against-instruction-overload'
+Assert-Contains 'anti-patterns.md' 'DAILY-USAGE\.md#56-ai-repeatedly-violates-the-same-agentsmd-rule'
+Assert-Contains 'DAILY-USAGE.md' '^### 2\.2 Coexistence of .*copilot-instructions\.md.*AGENTS\.md'
+Assert-Contains 'DAILY-USAGE.md' '^### 5\.6 AI Repeatedly Violates the Same AGENTS\.md Rule'
+Assert-Contains 'GUIDE.md' '^### 3\.4 Guardrails Against Instruction Overload'
+Assert-Contains 'GUIDE.md' '^## 7\. Adoption and Continuous Operation'
 
-Assert-Contains 'README.md' '## 關鍵約束（Quick Constraints）'
-Assert-Contains 'README.md' '流程編排、驗證與交易邏輯放在 Service'
-Assert-Contains 'README.md' '資料存取統一走 Repository/Service 抽象'
-Assert-Contains 'README.md' '避免動詞式路徑與多版本混用'
+Assert-Contains 'README.md' '## Quick Constraints'
+Assert-Contains 'README.md' 'orchestration.*validation.*transaction logic.*Service'
+Assert-Contains 'README.md' 'all data access.*Repository/Service abstraction'
+Assert-Contains 'README.md' 'avoid verb-based paths.*multi-version mixing'
 
-Assert-Contains 'GUIDE.md' '責任定義'
-Assert-Contains 'GUIDE.md' '決策來源屬於 C3（人決策）'
+Assert-Contains 'GUIDE.md' 'Responsibility definition'
+Assert-Contains 'GUIDE.md' 'decision source is C3 \(human decision\)'
 
-Assert-Contains 'DAILY-USAGE.md' '128K–200K context 模型為基準'
-Assert-Contains 'DAILY-USAGE.md' '10–15 輪'
+Assert-Contains 'DAILY-USAGE.md' '128K[–-]200K context'
+Assert-Contains 'DAILY-USAGE.md' '10[–-]15 rounds'
 
-Assert-Contains 'prompts/UPDATE.md' 'Quick Constraints 視為 C3 決策的置頂投影'
-Assert-Contains 'prompts/UPDATE.md' '僅在使用者確認後寫入'
+Assert-Contains 'prompts/UPDATE.md' 'Quick Constraints as a pinned projection of C3 decisions'
+Assert-Contains 'prompts/UPDATE.md' 'write only after user confirmation'
 
-Assert-LineOrder 'prompts/INIT-BUILD.md' '^## 關鍵約束（Quick Constraints）$' '^## 領域/模組 ↔ 程式碼對照表$' 'INIT-BUILD：Quick Constraints 置於對照表前'
-Assert-LineOrder 'prompts/INIT-BUILD.md' '^## 領域/模組 ↔ 程式碼對照表$' '^## GenAI 文件導航$' 'INIT-BUILD：對照表置於導航前'
+Assert-LineOrder 'prompts/INIT-BUILD.md' '^## Quick Constraints$' '^## Domain-to-Code Map$' 'INIT-BUILD: Quick Constraints before Domain-to-Code Map'
+Assert-LineOrder 'prompts/INIT-BUILD.md' '^## Domain-to-Code Map$' '^## GenAI Docs Navigation$' 'INIT-BUILD: Domain-to-Code Map before GenAI Docs Navigation'
 
 Assert-FileExists 'examples/dotnet-dual-api/docs/README.md'
 Assert-FileExists 'examples/java-library/docs/README.md'
@@ -158,8 +168,8 @@ Assert-Contains 'examples/react-nx-monorepo/docs/README.md' 'inventory-frontend'
 
 Assert-NotContains 'GUIDE.md' '就就位'
 
-Assert-Contains 'prompts/INIT-BUILD.md' '跨模組共用元件的設計決策'
-Assert-Contains 'prompts/INIT-BUILD.md' '長度指引'
+Assert-Contains 'prompts/INIT-BUILD.md' 'design decisions for cross-module shared components'
+Assert-Contains 'prompts/INIT-BUILD.md' 'Length guideline'
 
 Assert-MatchCount 'prompts/INIT-SCAN.md' '^---BEGIN PROMPT---$' 1
 Assert-MatchCount 'prompts/INIT-BUILD.md' '^---BEGIN PROMPT---$' 1
@@ -186,17 +196,24 @@ Assert-NotContains 'prompts/SPEC.md' 'templates/DOCS-README-TEMPLATE\.md'
 Assert-NotContains 'prompts/ADR.md' 'templates/DOCS-README-TEMPLATE\.md'
 Assert-NotContains 'prompts/SA.md' 'templates/DOCS-README-TEMPLATE\.md'
 
-# Greenfield / Brownfield 導入路徑（v0.3）
-Assert-Contains 'GUIDE.md' 'Step 3\.5：依專案類型選擇下一步'
+# Greenfield / Brownfield adoption path (v0.3)
+Assert-Contains 'GUIDE.md' 'Step 3\.5'
 Assert-Contains 'GUIDE.md' 'Greenfield'
 Assert-Contains 'GUIDE.md' 'Brownfield'
 Assert-Contains 'GUIDE.md' 'As-Is'
 Assert-Contains 'README.md' 'Brownfield'
-Assert-Contains 'DAILY-USAGE.md' '劇本 F'
+Assert-Contains 'DAILY-USAGE.md' 'Scenario F'
 Assert-Contains 'prompts/INIT-BUILD.md' 'Greenfield|Brownfield'
-Assert-Contains 'anti-patterns.md' '一次補齊所有既有 API'
+Assert-Contains 'anti-patterns.md' 'Backfill all existing APIs.*once'
 
-Write-Host "=== 驗收摘要 ==="
+# i18n: zh-TW variants exist (v0.4)
+Assert-FileExists 'README.zh-TW.md'
+Assert-FileExists 'GUIDE.zh-TW.md'
+Assert-FileExists 'DAILY-USAGE.zh-TW.md'
+Assert-FileExists 'anti-patterns.zh-TW.md'
+Assert-FileExists 'CONTRIBUTING.zh-TW.md'
+
+Write-Host "=== Verification Summary ==="
 Write-Host "PASS: $script:PassCount"
 Write-Host "FAIL: $script:FailCount"
 
@@ -204,4 +221,4 @@ if ($script:FailCount -gt 0) {
     exit 1
 }
 
-Write-Host '結果：全部檢查通過'
+Write-Host 'Result: All checks passed'

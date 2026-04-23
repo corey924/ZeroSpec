@@ -1,110 +1,112 @@
 # ZeroSpec — ADR Prompt Pack
 
-> 當 **跨模組技術二選一決策** 發生時使用。將以下 Prompt 貼入 AI Agent，自動產生 ADR 文件草稿。
+> Use when a **cross-module either/or technical decision** is made. Paste the Prompt below into your AI Agent to generate an ADR document draft.
 
 ---
 
-## 觸發條件
+## Trigger Conditions
 
-- 架構分層策略選型（如 Clean Architecture vs Hexagonal）
-- 技術方案二選一（如 Kafka vs Event Hubs、JWT vs Session）
-- 跨模組共用元件的設計決策
-- 基礎設施選型（如 PostgreSQL vs MySQL、Redis vs Memcached）
+- Architecture layering strategy selection (e.g., Clean Architecture vs Hexagonal)
+- Either/or technical decision (e.g., Kafka vs Event Hubs, JWT vs Session)
+- Design decisions for cross-module shared components
+- Infrastructure selection (e.g., PostgreSQL vs MySQL, Redis vs Memcached)
 
-## 不觸發（不需要 ADR）
+## Does NOT Trigger (No ADR needed)
 
-- 新增一支 CRUD API
-- 修改 Redis TTL 預設值
-- 單純的 bug fix
+- Adding a CRUD API
+- Changing Redis TTL defaults
+- Simple bug fix
 
 ---
 
-## 使用方式
+## How to Use
 
-1. 確認觸發條件已滿足
-2. 複製下方 Prompt 貼入 Agent
-3. Agent 產出 ADR 草稿後，審核內容並存檔至 `docs/adr/`
+1. Confirm a trigger condition is met
+2. Copy the Prompt below and paste into the Agent
+3. Review the ADR draft and save to `docs/adr/`
 
-> **Multi-root Workspace 提示**
+> **Multi-root Workspace Tip**
 >
-> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+> When your workspace contains multiple projects, specify the target at the start to prevent the AI from modifying other projects:
 >
 > ```
-> 目標專案：my-backend
-> 請為本次架構決策產生 ADR 文件。
+> Target project: my-backend
+> Generate an ADR document for this architecture decision.
 > ```
 >
-> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
-> 若偵測到欲寫入的檔案不在目標專案範圍內，請先停止並回報，不要直接寫入。
-> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+> Or open any file within the target project (Active File anchoring) so the Agent prioritizes that project's context.
+> If the target file path falls outside the target project scope, stop and report — do not write.
+> See [DAILY-USAGE Section 2.4](../DAILY-USAGE.md#24-multi-root-workspace-notes).
 
 ---
 
 ````
 ---BEGIN PROMPT---
 
-請為本次技術決策產生 ADR 文件。
+Generate an ADR document for this technical decision.
 
-## 前置條件
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
 
-- `AGENTS.md` 已存在（若無，先用 INIT-SCAN + INIT-BUILD 建立）
-- `docs/README.md` 已存在（若無，請先使用 INIT-BUILD 建立）
+## Prerequisites
 
-## 執行步驟
+- `AGENTS.md` exists (if not, run INIT-SCAN + INIT-BUILD first)
+- `docs/README.md` exists (if not, run INIT-BUILD first)
 
-1. **讀取 AGENTS.md**：了解專案技術棧與架構約束
-2. **讀取 docs/README.md**：確認命名正規式與 ADR 編號順序
-3. **讀取既有 ADR**：掃描 docs/adr/ 確認編號順序與既有決策脈絡
-4. **與我確認**：
-   - 這次的決策背景是什麼？（先引用可驗證證據；若資訊不足，標註 `[待確認]` 再詢問）
-   - 有哪些選項？（至少列出 2 個）
-   - 最終選了哪個？為什麼？
-5. **產出 ADR 草稿**，格式如下：
+## Steps
+
+1. **Read AGENTS.md**: Understand the project's tech stack and architecture constraints
+2. **Read docs/README.md**: Confirm naming regex and ADR numbering sequence
+3. **Read existing ADRs**: Scan docs/adr/ to confirm numbering and existing decision context
+4. **Confirm with me**:
+   - What is the decision context? (Cite verifiable evidence first; if insufficient, mark `[unverified]` and ask)
+   - What are the options? (List at least 2)
+   - Which was chosen and why?
+5. **Produce ADR draft** in the following format:
 
 ```markdown
-# ADR-xxx: {決策標題}
+# ADR-xxx: {Decision Title}
 
-| 欄位     | 值                                |
-| -------- | --------------------------------- |
-| 決策日期 | {今天日期}                        |
-| 狀態     | Accepted                          |
-| 關聯     | SA-xxx, ADR-yyy, SPEC-xxx（若有） |
-| 影響範圍 | （受影響的模組或領域）            |
+| Field         | Value                              |
+| ------------- | ---------------------------------- |
+| Decision Date | {today's date}                     |
+| Status        | Accepted                           |
+| Related       | SA-xxx, ADR-yyy, SPEC-xxx (if any) |
+| Impact Scope  | (Affected modules or domains)      |
 
-## 背景
-（從對話脈絡與程式碼推斷，標註 [待審核]）
+## Context
+(Infer from conversation context and code, mark [needs review])
 
-## 考慮選項
+## Options Considered
 
-### 選項 A — {名稱}
-- 優點：...
-- 缺點：...
+### Option A — {Name}
+- Pros: ...
+- Cons: ...
 
-### 選項 B — {名稱}
-- 優點：...
-- 缺點：...
+### Option B — {Name}
+- Pros: ...
+- Cons: ...
 
-## 決策
-選擇選項 X，理由是...
+## Decision
+Chose Option X because...
 
-## 後果
-- 正面影響：...
-- 負面影響 / 風險：...
-- 後續行動：...
+## Consequences
+- Positive impact: ...
+- Negative impact / risks: ...
+- Follow-up actions: ...
 ```
 
-## 規則
+## Rules
 
-- 命名格式：`ADR-{三位數}_{小寫連字號描述}.md`
-- ADR 只能 Append 或 Supersede（新 ADR 標註 `Superseded by ADR-yyy`），不可修改已接受的內容
-- 編號從既有 ADR 的最大值 +1 開始
-- 若無可驗證證據，不補寫背景細節，統一標註 `[待確認]`
+- Naming format: `ADR-{3-digit}_{lowercase-hyphenated-desc}.md`
+- ADRs are append-only or supersede-only (new ADR marks old one as `Superseded by ADR-yyy`) — MUST NOT edit accepted content
+- Numbering starts from max existing ADR number + 1
+- If no verifiable evidence exists, DO NOT fill in context details — mark `[unverified]` instead
 
-## 產出後驗證
+## Post-Output Verification
 
-1. 檢查文件中引用的模組、元件名稱是否在程式碼中真實存在
-2. 確認 `docs/README.md` 的文件清單已包含新產出的 ADR 文件
-3. 若候選文件表中有對應條目，將其移至文件清單
+1. Verify that modules and component names referenced in the document actually exist in code
+2. Confirm `docs/README.md` document index includes the newly created ADR
+3. If a matching entry exists in the candidate documents table, move it to the document index
 
 ---END PROMPT---
 ````

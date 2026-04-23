@@ -1,79 +1,81 @@
 # ZeroSpec — SA Prompt Pack
 
-> 當需要 **系統全貌快照** 時使用。將以下 Prompt 貼入 AI Agent，自動產生 System Analysis 文件。
+> Use when a **system-wide snapshot** is needed. Paste the Prompt below into your AI Agent to generate a System Analysis document.
 
 ---
 
-## 觸發條件
+## Trigger Conditions
 
-- 專案進入新的里程碑階段
-- 架構或核心依賴發生重大變更
-- 新成員連續多次詢問同類架構問題
-- 需要產出系統整體入門文件
+- Project enters a new milestone phase
+- Major change in architecture or core dependencies
+- New team members repeatedly asking the same architecture questions
+- Need for a system-level onboarding document
 
 ---
 
-## 使用方式
+## How to Use
 
-1. 確認觸發條件已滿足
-2. 複製下方 Prompt 貼入 Agent
-3. Agent 產出 SA 草稿後，審核內容並存檔至 `docs/analysis/`
+1. Confirm a trigger condition is met
+2. Copy the Prompt below and paste into the Agent
+3. Review the SA draft and save to `docs/analysis/`
 
-> **Multi-root Workspace 提示**
+> **Multi-root Workspace Tip**
 >
-> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+> When your workspace contains multiple projects, specify the target at the start to prevent the AI from modifying other projects:
 >
 > ```
-> 目標專案：my-backend
-> 請產生系統全貌分析文件。
+> Target project: my-backend
+> Generate a system analysis document.
 > ```
 >
-> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
-> 若偵測到欲寫入的檔案不在目標專案範圍內，請先停止並回報，不要直接寫入。
-> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+> Or open any file within the target project (Active File anchoring) so the Agent prioritizes that project's context.
+> If the target file path falls outside the target project scope, stop and report — do not write.
+> See [DAILY-USAGE Section 2.4](../DAILY-USAGE.md#24-multi-root-workspace-notes).
 
 ---
 
 ````
 ---BEGIN PROMPT---
 
-請為這個專案產生一份系統分析文件（System Analysis），作為里程碑式的系統快照。
+Generate a System Analysis document for this project as a milestone-level system snapshot.
 
-## 前置條件
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
 
-- `AGENTS.md` 已存在（若無，先用 INIT-SCAN + INIT-BUILD 建立）
-- `docs/README.md` 已存在（若無，請先使用 INIT-BUILD 建立）
+## Prerequisites
 
-## 執行步驟
+- `AGENTS.md` exists (if not, run INIT-SCAN + INIT-BUILD first)
+- `docs/README.md` exists (if not, run INIT-BUILD first)
 
-1. **讀取 AGENTS.md**：了解專案定位、技術棧、架構模式
-2. **讀取 docs/README.md**：確認命名正規式與 SA 編號順序
-3. **掃描專案頂層結構與核心模組（避免無限制遍歷所有小檔）**：
-   - 列出所有主要模組/套件及其職責
-   - 識別核心依賴與外部整合
-   - 產生模組關係圖（Mermaid 格式）
-4. **讀取既有 SPEC 與 ADR**：整合已記錄的介面契約與決策脈絡
-5. **產出 SA 文件**，格式如下：
+## Steps
+
+1. **Read AGENTS.md**: Understand project summary, tech stack, architecture pattern
+2. **Read docs/README.md**: Confirm naming regex and SA numbering sequence
+3. **Scan top-level project structure and core modules (DO NOT recursively traverse all small files)**:
+   - List all major modules/packages and their responsibilities
+   - Identify core dependencies and external integrations
+   - Generate a module relationship diagram (Mermaid format)
+4. **Read existing SPECs and ADRs**: Incorporate documented interface contracts and decision context
+5. **Produce SA document** in the following format:
 
 ```markdown
-# SA-xxx: {專案名稱} 系統架構分析
+# SA-xxx: {Project Name} System Architecture Analysis
 
-| 欄位     | 值         |
-| -------- | ---------- |
-| 版本     | v0.1       |
-| 快照日期 | {今天日期} |
-| 狀態     | Active     |
+| Field         | Value          |
+| ------------- | -------------- |
+| Version       | v0.1           |
+| Snapshot Date | {today's date} |
+| Status        | Active         |
 
-## 系統概述
-（一段話描述系統定位與核心功能）
+## System Overview
+(One paragraph describing the system's purpose and core capabilities)
 
-## 技術棧
-（從 AGENTS.md 與設定檔萃取，保持 Major.Minor 精度）
+## Tech Stack
+(Extract from AGENTS.md and config files, maintain Major.Minor precision)
 
-## 架構模式
-（描述分層策略、模組切分原則）
+## Architecture Pattern
+(Describe layering strategy, module separation principles)
 
-## 模組關係圖
+## Module Relationship Diagram
 
 ```mermaid
 graph TD
@@ -81,37 +83,37 @@ graph TD
     B --> C[Module C]
 ```
 
-## 核心模組清單
-| 模組 | 職責 | 關鍵類別/檔案 |
-| ---- | ---- | ------------- |
-| ...  | ...  | ...           |
+## Core Modules
+| Module | Responsibility | Key Classes/Files |
+| ------ | -------------- | ----------------- |
+| ...    | ...            | ...               |
 
-## 外部整合
-| 外部系統 | 整合方式 | 備註 |
-| -------- | -------- | ---- |
-| ...      | ...      | ...  |
+## External Integrations
+| External System | Integration Method | Notes |
+| --------------- | ------------------ | ----- |
+| ...             | ...                | ...   |
 
-## 已知風險與技術債
-（從程式碼品質與架構現況推斷，標註 [待審核]）
+## Known Risks & Tech Debt
+(Infer from code quality and architecture state, mark [needs review])
 
-## 關聯文件
+## Related Documents
 - AGENTS.md
-- 既有 SPEC / ADR 列表
+- Existing SPEC / ADR list
 ```
 
-## 規則
+## Rules
 
-- 命名格式：`SA-{三位數}_{小寫連字號描述}.md`
-- SA 是快照性質：記錄「此刻的現況」，不預測未來
-- 不列舉精確檔案數量，用結構模式描述
-- 版本號只寫 Major.Minor
-- 若無法從程式碼、設定檔或既有文件驗證，標註 `[待確認]`，不得猜測
+- Naming format: `SA-{3-digit}_{lowercase-hyphenated-desc}.md`
+- SA is a snapshot: record "the current state" — DO NOT predict the future
+- DO NOT list exact file counts; describe structural patterns
+- Write versions as Major.Minor only — omit Patch
+- If unable to verify from code, config files, or existing docs, mark `[unverified]` — DO NOT guess
 
-## 產出後驗證
+## Post-Output Verification
 
-1. 檢查文件中引用的模組、類別名稱是否在程式碼中真實存在
-2. 確認 Mermaid 圖中的模組關係與程式碼依賴一致
-3. 確認 `docs/README.md` 的文件清單已包含新產出的 SA 文件
+1. Verify that modules and class names referenced in the document actually exist in code
+2. Confirm the Mermaid diagram's module relationships match code dependencies
+3. Confirm `docs/README.md` document index includes the newly created SA
 
 ---END PROMPT---
 ````

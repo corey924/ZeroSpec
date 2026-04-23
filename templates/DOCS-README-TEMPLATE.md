@@ -1,55 +1,55 @@
-# {專案名稱} — 文件治理中心
+# {Project Name} — Docs Governance Hub
 
-> 本文件定義專案文件的分層規則、命名規範與維護條件。
-> GenAI Agent 在處理文件相關任務時應先讀取本文件。
+> This file defines the layering rules, naming conventions, and maintenance triggers for project documentation.
+> GenAI Agents MUST read this file before performing any documentation task.
 >
-> 複製本模板至 `docs/README.md`，替換 `{佔位符}` 後使用。
+> Copy this template to `docs/README.md` and replace `{placeholders}` before use.
 
-## SDD 文件四層分類
+## SDD Document Classification
 
-| 分類              | 目錄             | 命名格式                   | 觸發條件                       |
-| ----------------- | ---------------- | -------------------------- | ------------------------------ |
-| SA（系統分析）    | `docs/analysis/` | `SA-{三位數}_{描述}.md`    | 里程碑或架構重大變更           |
-| ADR（架構決策）   | `docs/adr/`      | `ADR-{三位數}_{描述}.md`   | 跨模組技術二選一決策           |
-| SPEC（介面契約）  | `docs/spec/`     | `SPEC-{三位數}_{描述}.md`  | API 新增或行為變更（**強制**） |
-| INFRA（基礎設施） | `docs/infra/`    | `INFRA-{三位數}_{描述}.md` | 部署拓樸或 CI 變更             |
+| Category                    | Directory        | Naming Format               | Trigger                                         |
+| --------------------------- | ---------------- | --------------------------- | ----------------------------------------------- |
+| SA (System Analysis)        | `docs/analysis/` | `SA-{3-digit}_{desc}.md`    | Milestone or major architecture change          |
+| ADR (Architecture Decision) | `docs/adr/`      | `ADR-{3-digit}_{desc}.md`   | Cross-module either/or tech decision            |
+| SPEC (Interface Contract)   | `docs/spec/`     | `SPEC-{3-digit}_{desc}.md`  | API addition or behavior change (**mandatory**) |
+| INFRA (Infrastructure)      | `docs/infra/`    | `INFRA-{3-digit}_{desc}.md` | Deployment topology or CI change                |
 
-- 命名正規式：`^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$`
-- **彈性擴充**：Library 專案可用 INTEGRATION 取代 INFRA；前端專案可加 Components 索引
+- Naming regex: `^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$`
+- **Flexible extension**: Library projects may use INTEGRATION instead of INFRA; frontend projects may add a Components index
 
 ## Source of Truth
 
-SPEC 是開發與 GenAI 的主要參照檔案。每次介面新增或修改都直接更新 SPEC，並在 Changelog 追蹤變更歷程。
+SPEC is the primary reference for development and GenAI. Update SPEC directly on every interface addition or change, and track changes in the Changelog.
 
-**最低維護規則**：凡 PR 涉及介面或行為異動，必須同步更新 SPEC 內容與 Changelog。
+**Minimum maintenance rule**: Every PR involving interface or behavior changes MUST update the SPEC content and Changelog.
 
-## ADR 觸發條件
+## ADR Trigger Conditions
 
-- ✅ 需要 ADR：架構分層策略選型、認證方案設計（如 JWT 雙 Token）、技術方案二選一（如 Kafka vs Event Hubs）、跨模組共用元件的設計決策
-- ❌ 不需要 ADR：新增一支 CRUD API、修改快取 TTL 預設值、單純 bug fix
+- ✅ Needs ADR: architecture layering strategy, auth scheme design (e.g., JWT dual-token), either/or tech decision (e.g., Kafka vs Event Hubs), design decisions for cross-module shared components
+- ❌ No ADR needed: adding a CRUD API, changing cache TTL defaults, simple bug fix
 
-## 候選文件（Lazy Evaluation）
+## Candidate Documents (Lazy Evaluation)
 
-> 以下為建議可能需要的文件。觸發條件滿足時再建立，不預建空殼。
+> These are documents that may be needed. Create them only when the trigger condition is met — DO NOT pre-create empty shells.
 
-| 候選文件             | 觸發時機       |
-| -------------------- | -------------- |
-| `SA-001_{描述}.md`   | {描述觸發時機} |
-| `SPEC-001_{描述}.md` | {描述觸發時機} |
-| `ADR-001_{描述}.md`  | {描述觸發時機} |
+| Candidate            | Trigger            |
+| -------------------- | ------------------ |
+| `SA-001_{desc}.md`   | {describe trigger} |
+| `SPEC-001_{desc}.md` | {describe trigger} |
+| `ADR-001_{desc}.md`  | {describe trigger} |
 
-## 文件清單
+## Document Index
 
-> 隨文件新增時更新此表。
+> Update this table as documents are added.
 
-| 文件 | 路徑 | 狀態     |
-| ---- | ---- | -------- |
-| —    | —    | 尚無文件 |
+| Document | Path | Status           |
+| -------- | ---- | ---------------- |
+| —        | —    | No documents yet |
 
-<!-- 跨子系統共識（多 repo 時啟用）
-## 跨子系統共識
+<!-- Cross-system consensus (enable for multi-repo setups)
+## Cross-System Consensus
 
-| 專案           | 文件庫路徑                          |
+| Project        | Docs Path                           |
 | -------------- | ----------------------------------- |
 | {related-repo} | ../../{related-repo}/docs/README.md |
 -->

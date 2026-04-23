@@ -1,35 +1,35 @@
-# SA-xxx: 標題（專案名稱 + 分析主題）
+# SA-xxx: Title (Project Name + Analysis Topic)
 
-> 複製本模板並依序編號，例如 `SA-001_system-architecture.md`。
-> 命名正規式：`^SA-\d{3}_[a-z0-9-]+\.md$`
+> Copy this template and assign a sequential number, e.g., `SA-001_system-architecture.md`.
+> Naming regex: `^SA-\d{3}_[a-z0-9-]+\.md$`
 
-| 欄位     | 值         |
-| -------- | ---------- |
-| 版本     | v0.1       |
-| 快照日期 | YYYY-MM-DD |
-| 狀態     | Active     |
+| Field         | Value      |
+| ------------- | ---------- |
+| Version       | v0.1       |
+| Snapshot Date | YYYY-MM-DD |
+| Status        | Active     |
 
-## 系統概述
+## System Overview
 
-用一段話描述系統定位與核心功能。
+One paragraph describing the system's purpose and core capabilities.
 
-## 技術棧
+## Tech Stack
 
-（從 AGENTS.md 與設定檔萃取，保持 Major.Minor 精度）
+(Extract from AGENTS.md and config files, maintain Major.Minor precision)
 
-| 項目     | 版本 / 說明 |
-| -------- | ----------- |
-| 語言     | ...         |
-| 框架     | ...         |
-| 建置工具 | ...         |
-| 資料庫   | ...         |
-| 部署     | ...         |
+| Item       | Version / Description |
+| ---------- | --------------------- |
+| Language   | ...                   |
+| Framework  | ...                   |
+| Build Tool | ...                   |
+| Database   | ...                   |
+| Deployment | ...                   |
 
-## 架構模式
+## Architecture Pattern
 
-描述分層策略、模組切分原則、資料流向。
+Describe the layering strategy, module separation principles, and data flow.
 
-## 模組關係圖
+## Module Relationship Diagram
 
 ```mermaid
 graph TD
@@ -37,26 +37,26 @@ graph TD
     B --> C[Module C]
 ```
 
-## 核心模組清單
+## Core Modules
 
-| 模組 | 職責 | 關鍵類別/檔案 |
-| ---- | ---- | ------------- |
-| ...  | ...  | ...           |
+| Module | Responsibility | Key Classes/Files |
+| ------ | -------------- | ----------------- |
+| ...    | ...            | ...               |
 
-## 外部整合
+## External Integrations
 
-| 外部系統 | 整合方式  | 備註 |
-| -------- | --------- | ---- |
-| ...      | REST / MQ | ...  |
+| External System | Integration Method | Notes |
+| --------------- | ------------------ | ----- |
+| ...             | REST / MQ          | ...   |
 
-## 已知風險與技術債
+## Known Risks & Tech Debt
 
-（從程式碼品質與架構現況推斷，標註 `[待審核]`）
+(Infer from code quality and architecture state, mark `[needs review]`)
 
 - ...
 - ...
 
-## 關聯文件
+## Related Documents
 
 - `AGENTS.md`
-- 既有 SPEC / ADR 列表
+- Existing SPEC / ADR list

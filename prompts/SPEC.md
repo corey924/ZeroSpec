@@ -1,118 +1,120 @@
 # ZeroSpec — SPEC Prompt Pack
 
-> 當 **API 新增或行為變更** 時使用。將以下 Prompt 貼入 AI Agent，自動產生 SPEC 文件草稿。
+> Use when an **API is added or its behavior changes**. Paste the Prompt below into your AI Agent to generate a SPEC document draft.
 
 ---
 
-## 觸發條件
+## Trigger Conditions
 
-- 新增對外 API 端點
-- 修改既有 API 的 Request / Response 結構
-- 變更 API 的權限需求或業務規則
-- **Bug fix 造成對外行為變更**（這时 SPEC 應紀錄修復前後的行為差異，見下方「Bugfix 變體」）
+- New external API endpoint
+- Modified Request / Response structure of an existing API
+- Changed API permission requirements or business rules
+- **Bug fix that changes external behavior** (the SPEC should record the before/after difference — see "Bugfix Variant" below)
 
 ---
 
-## 使用方式
+## How to Use
 
-1. 確認觸發條件已滿足
-2. 複製下方 Prompt 貼入 Agent
-3. Agent 產出 SPEC 草稿後，審核內容並存檔至 `docs/spec/`
+1. Confirm a trigger condition is met
+2. Copy the Prompt below and paste into the Agent
+3. Review the SPEC draft and save to `docs/spec/`
 
-### Bugfix 變體（當觸發條件為對外行為變更的 bug fix）
+### Bugfix Variant (when the trigger is a behavior-changing bug fix)
 
-若本次是修復 bug 而非新功能，SPEC 更新建議以「差異變更」形式記錄，而非重寫整份介面定義：
+If this change is a bug fix rather than a new feature, record it as a delta update instead of rewriting the full interface definition:
 
-- **Current Behavior**：修復前的實際行為（從修復前的 SPEC 或 Git log 推導）
-- **Expected Behavior**：修復後的正確行為
-- **Unchanged Behavior**：未受本次修復影響的行為（避免回歸誤解）
-- **影響範圍**：相關 Consumer / 下游系統
+- **Current Behavior**: Actual behavior before the fix (infer from the prior SPEC or Git log)
+- **Expected Behavior**: Correct behavior after the fix
+- **Unchanged Behavior**: Behavior not affected by this fix (to prevent regression misunderstandings)
+- **Impact Scope**: Affected consumers / downstream systems
 
-將以上資訊以 `## Changelog` 的新条目寫入，經典範例：`- YYYY-MM-DD Bugfix: {摘要}（Before: … → After: …）`。
+Write the above as a new entry in `## Changelog`. Example: `- YYYY-MM-DD Bugfix: {summary} (Before: … → After: …)`.
 
-> **來源參考**：Kiro Bugfix Spec 的 current/expected/unchanged 結構對避免震盪有幫助；ZeroSpec 以輕量化方式融入既有 SPEC，不另建正式 Bugfix 檔。
+> **Reference**: Kiro Bugfix Spec's current/expected/unchanged structure helps prevent oscillation; ZeroSpec incorporates it as a lightweight addition to existing SPECs rather than a separate Bugfix file.
 
-> **Multi-root Workspace 提示**
+> **Multi-root Workspace Tip**
 >
-> 工作區含多個專案時，建議在指令開頭指定目標專案，避免 AI 誤改其他專案：
+> When your workspace contains multiple projects, specify the target at the start to prevent the AI from modifying other projects:
 >
 > ```
-> 目標專案：my-backend
-> 請為本次 API 變更產生 SPEC 文件。
+> Target project: my-backend
+> Generate a SPEC document for this API change.
 > ```
 >
-> 或先點開目標專案中的任一檔案（Active File 錨定），Agent 會自動以該專案為優先 context。
-> 若偵測到欲寫入的檔案不在目標專案範圍內，請先停止並回報，不要直接寫入。
-> 詳見 [DAILY-USAGE §2.4](../DAILY-USAGE.md#24-multi-root-workspace-注意事項)。
+> Or open any file within the target project (Active File anchoring) so the Agent prioritizes that project's context.
+> If the target file path falls outside the target project scope, stop and report — do not write.
+> See [DAILY-USAGE Section 2.4](../DAILY-USAGE.md#24-multi-root-workspace-notes).
 
 ---
 
 ````
 ---BEGIN PROMPT---
 
-請為本次 API 變更產生或更新 SPEC 文件。
+Generate or update a SPEC document for this API change.
 
-## 前置條件
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
 
-- `AGENTS.md` 已存在（若無，先用 INIT-SCAN + INIT-BUILD 建立）
-- `docs/README.md` 已存在（若無，請先使用 INIT-BUILD 建立）
+## Prerequisites
 
-## 執行步驟
+- `AGENTS.md` exists (if not, run INIT-SCAN + INIT-BUILD first)
+- `docs/README.md` exists (if not, run INIT-BUILD first)
 
-1. **讀取 AGENTS.md**：了解專案技術棧、架構層級、API 路徑慣例與權限格式
-2. **讀取 docs/README.md**：確認命名正規式、SPEC 編號順序與候選文件清單
-3. **掃描相關原始碼**：讀取本次變更涉及的 Controller、Service、DTO 類別
-4. **讀取既有文件（若為更新）**：若判定為更新既有 SPEC，請務必先讀取該 `docs/spec/SPEC-xxx.md` 的原始內容，避免覆寫遺失既有 API 定義
-5. **產出 SPEC 草稿**，格式如下：
+## Steps
+
+1. **Read AGENTS.md**: Understand the project's tech stack, architecture layers, API path conventions, and permission format
+2. **Read docs/README.md**: Confirm naming regex, SPEC numbering sequence, and candidate document list
+3. **Scan related source code**: Read the Controller, Service, and DTO classes involved in this change
+4. **Read existing document (if updating)**: If this updates an existing SPEC, MUST read the original `docs/spec/SPEC-xxx.md` content first to avoid overwriting existing API definitions
+5. **Produce SPEC draft** in the following format:
 
 ```markdown
-# SPEC-xxx: {業務領域名稱}
+# SPEC-xxx: {Business Domain Name}
 
-| 欄位     | 值                                           |
-| -------- | -------------------------------------------- |
-| 版本     | v0.1                                         |
-| 狀態     | Draft                                        |
-| 適用範圍 | （此 SPEC 涵蓋的 Controller / Service 範圍） |
-| 關聯     | SA-xxx, ADR-xxx（若有）                      |
+| Field   | Value                                         |
+| ------- | --------------------------------------------- |
+| Version | v0.1                                          |
+| Status  | Draft                                         |
+| Scope   | (Controllers / Services covered by this SPEC) |
+| Related | SA-xxx, ADR-xxx (if any)                      |
 
-## 概述
-（從程式碼推斷此領域的業務目標與 API 端點範圍）
+## Overview
+(Infer the domain's business goal and API endpoint scope from code)
 
-## 介面定義
+## Interface Definitions
 ### `METHOD /api/v1/resource`
-| 項目     | 說明 |
-| -------- | ---- |
-| 功能     | ...  |
-| 權限     | ...  |
-| Request  | ...  |
-| Response | ...  |
+| Item       | Description |
+| ---------- | ----------- |
+| Function   | ...         |
+| Permission | ...         |
+| Request    | ...         |
+| Response   | ...         |
 
-## DTO 定義
-（列出關鍵 DTO 類別與欄位）
+## DTO Definitions
+(List key DTO classes and fields)
 
-## 業務規則
-（從程式碼中的驗證邏輯與註解推斷）
+## Business Rules
+(Infer from validation logic and comments in code)
 
 ## Changelog
-| 版本 | 日期       | 變更內容 |
-| ---- | ---------- | -------- |
-| v0.1 | {今天日期} | 初版建立 |
+| Version | Date           | Changes       |
+| ------- | -------------- | ------------- |
+| v0.1    | {today's date} | Initial draft |
 ```
 
-## 規則
+## Rules
 
-- 命名格式：`SPEC-{三位數}_{小寫連字號描述}.md`
-- 如果是更新既有 SPEC：只修改變更的段落 + 在 Changelog 追加一列
-- 版本號只寫 Major.Minor（不寫 Patch）
-- DTO 欄位從實際程式碼萃取，不猜測
-- 任何欄位若缺乏程式碼或設定檔證據，標註 `[待確認]`，不得猜測
-- 業務規則與權限定義段落標註 `[待審核]`（需人確認邊界條件與 RBAC 一致性）
+- Naming format: `SPEC-{3-digit}_{lowercase-hyphenated-desc}.md`
+- If updating an existing SPEC: modify only the changed sections + append one row to Changelog
+- Write versions as Major.Minor only — omit Patch
+- Extract DTO fields from actual code — DO NOT guess
+- If any field lacks code or config evidence, mark `[unverified]` — DO NOT guess
+- Mark business rules and permission definitions with `[needs review]` (requires human confirmation of boundary conditions and RBAC consistency)
 
-## 產出後驗證
+## Post-Output Verification
 
-1. 檢查文件中引用的 class / method / API 路徑是否在程式碼中真實存在
-2. 確認 `docs/README.md` 的文件清單已包含新產出的 SPEC 文件
-3. 若候選文件表中有對應條目，將其移至文件清單
+1. Verify that every class / method / API path referenced in the document actually exists in code
+2. Confirm `docs/README.md` document index includes the newly created SPEC
+3. If a matching entry exists in the candidate documents table, move it to the document index
 
 ---END PROMPT---
 ````

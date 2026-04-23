@@ -2,6 +2,16 @@
 
 set -euo pipefail
 
+# Keep a predictable PATH in restricted CI shells.
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
+for required_cmd in dirname grep cut head; do
+  if ! command -v "$required_cmd" >/dev/null 2>&1; then
+    echo "FAIL: Required command not found in PATH: $required_cmd"
+    exit 1
+  fi
+done
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
@@ -21,9 +31,9 @@ fail() {
 assert_file_exists() {
   local file="$1"
   if [[ -f "$file" ]]; then
-    pass "檔案存在：$file"
+    pass "File exists: $file"
   else
-    fail "檔案不存在：$file"
+    fail "File not found: $file"
   fi
 }
 
@@ -31,9 +41,9 @@ assert_grep() {
   local pattern="$1"
   local file="$2"
   if grep -Eq "$pattern" "$file"; then
-    pass "符合規則：$file / $pattern"
+    pass "Rule matched: $file / $pattern"
   else
-    fail "未符合規則：$file / $pattern"
+    fail "Rule not matched: $file / $pattern"
   fi
 }
 
@@ -41,24 +51,24 @@ assert_no_grep() {
   local pattern="$1"
   local file="$2"
   if grep -Eq "$pattern" "$file"; then
-    fail "不應出現但找到：$file / $pattern"
+    fail "Forbidden content found: $file / $pattern"
   else
-    pass "未發現禁用內容：$file / $pattern"
+    pass "No forbidden content: $file / $pattern"
   fi
 }
 
 assert_first_line_starts_with_header() {
   local file="$1"
   if [[ ! -f "$file" ]]; then
-    fail "檔案不存在（跳過首行檢查）：$file"
+    fail "File not found (skipping header check): $file"
     return
   fi
   local first_line
   first_line="$(head -n 1 "$file" || true)"
   if [[ "$first_line" == \#* ]]; then
-    pass "首行為標題：$file"
+    pass "First line is header: $file"
   else
-    fail "首行不是標題（可能有外層 code fence）：$file"
+    fail "First line is not a header (possible outer code fence): $file"
   fi
 }
 
@@ -69,9 +79,9 @@ assert_count_eq() {
   local actual
   actual="$(grep -Ec "$pattern" "$file" || true)"
   if [[ "$actual" == "$expected" ]]; then
-    pass "數量符合：$file / $pattern = $expected"
+    pass "Count matched: $file / $pattern = $expected"
   else
-    fail "數量不符：$file / $pattern，預期 $expected，實際 $actual"
+    fail "Count mismatch: $file / $pattern, expected $expected, actual $actual"
   fi
 }
 
@@ -87,18 +97,18 @@ assert_order() {
   second_line="$(grep -nEm1 "$second_pattern" "$file" | cut -d: -f1 || true)"
 
   if [[ -z "$first_line" || -z "$second_line" ]]; then
-    fail "順序檢查失敗（缺少匹配）：$rule_name"
+    fail "Order check failed (missing match): $rule_name"
     return
   fi
 
   if (( first_line < second_line )); then
-    pass "順序符合：$rule_name"
+    pass "Order matched: $rule_name"
   else
-    fail "順序不符：$rule_name"
+    fail "Order mismatch: $rule_name"
   fi
 }
 
-echo "=== ZeroSpec 驗收開始（macOS/Linux） ==="
+echo "=== ZeroSpec Verification Started (macOS/Linux) ==="
 
 assert_file_exists "prompts/INIT-SCAN.md"
 assert_file_exists "prompts/INIT-BUILD.md"
@@ -129,35 +139,45 @@ assert_first_line_starts_with_header "templates/SA-TEMPLATE.md"
 assert_first_line_starts_with_header "examples/minimal-day1/AGENTS.md"
 assert_first_line_starts_with_header "examples/minimal-day1/docs/README.md"
 
-assert_grep "## 前置條件" "prompts/SPEC.md"
-assert_grep "## 前置條件" "prompts/ADR.md"
-assert_grep "## 前置條件" "prompts/SA.md"
+assert_grep "## Prerequisites" "prompts/SPEC.md"
+assert_grep "## Prerequisites" "prompts/ADR.md"
+assert_grep "## Prerequisites" "prompts/SA.md"
 
 assert_grep "docs/README\.md" "prompts/SPEC.md"
 assert_grep "docs/README\.md" "prompts/ADR.md"
 assert_grep "docs/README\.md" "prompts/SA.md"
-assert_grep "讀取既有文件（若為更新）" "prompts/SPEC.md"
-assert_grep "Plan 模式可讀取 codebase" "prompts/INIT-SCAN.md"
+assert_grep "Read existing document" "prompts/SPEC.md"
+assert_grep "Plan mode can read the codebase" "prompts/INIT-SCAN.md"
 
 assert_grep "DAILY-USAGE\.md" "README.md"
 assert_grep "DAILY-USAGE\.md" "GUIDE.md"
+assert_grep "DAILY-USAGE\.md#22-coexistence-of-copilot-instructionsmd-and-agentsmd" "README.md"
+assert_grep "GUIDE\.md#7-adoption-and-continuous-operation" "README.md"
+assert_grep "#getting-started-under-30-minutes" "README.md"
+assert_grep "^## Getting Started \(Under 30 Minutes\)" "README.md"
+assert_grep "GUIDE\.md#34-guardrails-against-instruction-overload" "anti-patterns.md"
+assert_grep "DAILY-USAGE\.md#56-ai-repeatedly-violates-the-same-agentsmd-rule" "anti-patterns.md"
+assert_grep '^### 2\.2 Coexistence of .*copilot-instructions\.md.*AGENTS\.md' "DAILY-USAGE.md"
+assert_grep "^### 5\.6 AI Repeatedly Violates the Same AGENTS\.md Rule" "DAILY-USAGE.md"
+assert_grep "^### 3\.4 Guardrails Against Instruction Overload" "GUIDE.md"
+assert_grep "^## 7\. Adoption and Continuous Operation" "GUIDE.md"
 
-assert_grep "## 關鍵約束（Quick Constraints）" "README.md"
-assert_grep "流程編排、驗證與交易邏輯放在 Service" "README.md"
-assert_grep "資料存取統一走 Repository/Service 抽象" "README.md"
-assert_grep "避免動詞式路徑與多版本混用" "README.md"
+assert_grep "## Quick Constraints" "README.md"
+assert_grep "orchestration.*validation.*transaction logic.*Service" "README.md"
+assert_grep "all data access.*Repository/Service abstraction" "README.md"
+assert_grep "avoid verb-based paths.*multi-version mixing" "README.md"
 
-assert_grep "責任定義" "GUIDE.md"
-assert_grep "決策來源屬於 C3（人決策）" "GUIDE.md"
+assert_grep "Responsibility definition" "GUIDE.md"
+assert_grep "decision source is C3 \(human decision\)" "GUIDE.md"
 
-assert_grep "128K–200K context 模型為基準" "DAILY-USAGE.md"
-assert_grep "10–15 輪" "DAILY-USAGE.md"
+assert_grep "128K[–-]200K context" "DAILY-USAGE.md"
+assert_grep "10[–-]15 rounds" "DAILY-USAGE.md"
 
-assert_grep "Quick Constraints 視為 C3 決策的置頂投影" "prompts/UPDATE.md"
-assert_grep "僅在使用者確認後寫入" "prompts/UPDATE.md"
+assert_grep "Quick Constraints as a pinned projection of C3 decisions" "prompts/UPDATE.md"
+assert_grep "write only after user confirmation" "prompts/UPDATE.md"
 
-assert_order "^## 關鍵約束（Quick Constraints）$" "^## 領域/模組 ↔ 程式碼對照表$" "prompts/INIT-BUILD.md" "INIT-BUILD：Quick Constraints 置於對照表前"
-assert_order "^## 領域/模組 ↔ 程式碼對照表$" "^## GenAI 文件導航$" "prompts/INIT-BUILD.md" "INIT-BUILD：對照表置於導航前"
+assert_order "^## Quick Constraints$" "^## Domain-to-Code Map$" "prompts/INIT-BUILD.md" "INIT-BUILD: Quick Constraints before Domain-to-Code Map"
+assert_order "^## Domain-to-Code Map$" "^## GenAI Docs Navigation$" "prompts/INIT-BUILD.md" "INIT-BUILD: Domain-to-Code Map before GenAI Docs Navigation"
 
 assert_file_exists "examples/dotnet-dual-api/docs/README.md"
 assert_file_exists "examples/java-library/docs/README.md"
@@ -171,8 +191,8 @@ assert_grep "inventory-frontend" "examples/react-nx-monorepo/docs/README.md"
 
 assert_no_grep "就就位" "GUIDE.md"
 
-assert_grep "跨模組共用元件的設計決策" "prompts/INIT-BUILD.md"
-assert_grep "長度指引" "prompts/INIT-BUILD.md"
+assert_grep "design decisions for cross-module shared components" "prompts/INIT-BUILD.md"
+assert_grep "Length guideline" "prompts/INIT-BUILD.md"
 
 assert_count_eq "^---BEGIN PROMPT---$" "prompts/INIT-SCAN.md" 1
 assert_count_eq "^---BEGIN PROMPT---$" "prompts/INIT-BUILD.md" 1
@@ -199,17 +219,24 @@ assert_no_grep "templates/DOCS-README-TEMPLATE\\.md" "prompts/SPEC.md"
 assert_no_grep "templates/DOCS-README-TEMPLATE\\.md" "prompts/ADR.md"
 assert_no_grep "templates/DOCS-README-TEMPLATE\\.md" "prompts/SA.md"
 
-# Greenfield / Brownfield 導入路徑（v0.3）
-assert_grep "Step 3\\.5：依專案類型選擇下一步" "GUIDE.md"
+# Greenfield / Brownfield adoption path (v0.3)
+assert_grep "Step 3\\.5" "GUIDE.md"
 assert_grep "Greenfield" "GUIDE.md"
 assert_grep "Brownfield" "GUIDE.md"
 assert_grep "As-Is" "GUIDE.md"
 assert_grep "Brownfield" "README.md"
-assert_grep "劇本 F" "DAILY-USAGE.md"
+assert_grep "Scenario F" "DAILY-USAGE.md"
 assert_grep "Greenfield|Brownfield" "prompts/INIT-BUILD.md"
-assert_grep "一次補齊所有既有 API" "anti-patterns.md"
+assert_grep "Backfill all existing APIs.*once" "anti-patterns.md"
 
-echo "=== 驗收摘要 ==="
+# i18n: zh-TW variants exist (v0.4)
+assert_file_exists "README.zh-TW.md"
+assert_file_exists "GUIDE.zh-TW.md"
+assert_file_exists "DAILY-USAGE.zh-TW.md"
+assert_file_exists "anti-patterns.zh-TW.md"
+assert_file_exists "CONTRIBUTING.zh-TW.md"
+
+echo "=== Verification Summary ==="
 echo "PASS: $pass_count"
 echo "FAIL: $fail_count"
 
@@ -217,4 +244,4 @@ if [[ $fail_count -gt 0 ]]; then
   exit 1
 fi
 
-echo "結果：全部檢查通過"
+echo "Result: All checks passed"

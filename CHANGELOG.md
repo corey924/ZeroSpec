@@ -4,6 +4,40 @@
 
 ---
 
+## v0.4 — 2026-04-23
+
+> Phase 2 i18n: All user-facing docs rewritten to AI-Native English as default; zh-TW originals preserved as `*.zh-TW.md`.
+
+### ⚠️ Breaking Changes
+
+- **File renames**: `README.md`, `GUIDE.md`, `DAILY-USAGE.md`, `anti-patterns.md`, `CONTRIBUTING.md` renamed to `*.zh-TW.md` suffix. New English versions take the original filenames.
+- **CI assertion updates**: Verification scripts now check English content strings. Projects using custom CI checks against these files MUST update assertions.
+- **Cross-reference anchors changed**: English versions use English heading anchors (e.g. `#34-guardrails-against-instruction-overload` instead of `#34-指令過載防護guardrails`).
+
+### Migration Guide
+
+1. If you link to ZeroSpec docs from external files, all primary filenames (e.g. `GUIDE.md`, `DAILY-USAGE.md`) remain the same — **no link changes needed**.
+2. If you link to specific heading anchors in ZeroSpec docs, update to English anchors.
+3. For zh-TW content, use the `*.zh-TW.md` variants (e.g. `GUIDE.zh-TW.md`).
+
+### New
+
+- `docs:` English AI-Native rewrites for README.md, GUIDE.md, DAILY-USAGE.md, anti-patterns.md, CONTRIBUTING.md
+- `i18n:` Language switch links (`🌐`) added to both English and zh-TW versions
+- `i18n:` Derived-from headers in English files track source zh-TW commit for sync
+- `scripts:` Verification scripts updated for English content assertions
+- `scripts:` Verification hardening — added anchor/link integrity checks for key cross-doc references, switched brittle full-sentence assertions to semantic regex patterns, and added minimal PATH/command preflight in `verify-zerospec.sh` for restricted CI shells
+- `ci:` Workflow hardening — pinned `actions/checkout` SHA (v4.3.1), added `permissions: contents: read`, `timeout-minutes`, `concurrency` group, OS matrix (ubuntu + windows), ShellCheck lint job, and Lychee offline link/anchor checker job
+
+### Design Notes
+
+- English versions are **AI-Native rewrites** (not translations): imperative voice, 15–25% shorter, consistent terminology
+- zh-TW originals preserved intact as `*.zh-TW.md` — no content changes
+- Phase 1 (v0.3.1): Prompts, templates, and CI scripts already English (prior session)
+- Phase 2 (v0.4): User-facing docs now English-first
+
+---
+
 ## v0.3 — 2026-04-22
 
 > Greenfield / Brownfield 導入路徑分叉 + 既有專案 SPEC 補登策略成形。

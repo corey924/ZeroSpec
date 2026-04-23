@@ -1,56 +1,60 @@
-# ZeroSpec 反模式清單
+# ZeroSpec Anti-Patterns
 
-> 以下是在多專案生態圈中實際驗證發現的常見錯誤。每條附有問題描述與修正方法。
+> Derived from: [anti-patterns.zh-TW.md](anti-patterns.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-23
 
----
+> **🌐 [台灣正體中文版](anti-patterns.zh-TW.md)**
 
-## 版本與數據漂移
-
-| #   | 反模式                   | 問題                                                                      | 修正方法                                          |
-| --- | ------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------- |
-| 1   | **寫死 Patch 級版本號**  | `ASP.NET Core 10.0.5` 下次升版就過時                                      | 只寫 Major.Minor + 指向設定檔                     |
-| 2   | **列舉精確檔案數量**     | 「43 個元件」新增一個就脫鉤                                               | 描述結構模式而非計數                              |
-| 3   | **同一版本號出現在兩處** | 一處改了另一處忘記                                                        | 第二處用「見 X」引用                              |
-| 4   | **版本精度不一致**       | A 專案寫 `10.0.5`（過精確）、B 專案寫 `10.x`（過模糊），AI 無法判斷約束力 | 統一為 Major.Minor（如 `10.0`），Patch 交由設定檔 |
-
-## 內容膨脹
-
-| #   | 反模式                 | 問題                                 | 修正方法                            |
-| --- | ---------------------- | ------------------------------------ | ----------------------------------- |
-| 5   | **大段人類入職教學**   | brew install/git 入門佔用 AI context | 移至人類專用 README 或限縮讀取範圍  |
-| 6   | **未來功能佔大量篇幅** | 尚未啟用的規劃干擾日常任務           | 壓縮為觸發條件 + 治理骨架（~10 行） |
-| 7   | **預建大量空殼文件**   | AI 面對空檔案困惑，浪費 token 開啟   | 使用 Lazy Evaluation，未觸發不建立  |
-
-## 結構與語意
-
-| #   | 反模式                   | 問題                                | 修正方法                         |
-| --- | ------------------------ | ----------------------------------- | -------------------------------- |
-| 8   | **導航表用檔名而非意圖** | AI 無法 intent-match                | 左欄用「你想做什麼」自然語言     |
-| 9   | **導航表語意重疊**       | 兩列描述相似但指向不同文件，AI 選錯 | 為每列使用明確區隔的自然語言意圖 |
-| 10  | **跨專案用詞不一致**     | AI 要花額外 token 對齊語意          | 同一規則在所有專案用完全相同句型 |
-
-## 書寫規範
-
-| #   | 反模式             | 問題                            | 修正方法                               |
-| --- | ------------------ | ------------------------------- | -------------------------------------- |
-| 11  | **簡體/繁體混用**  | 造成 AI tokenizer 歧義          | 統一為一種書寫體系                     |
-| 12  | **中英混雜無規則** | AI 難以判斷哪些術語是固定不譯的 | 技術術語保留英文原名，描述文字統一語系 |
-
-## 治理過度
-
-| #   | 反模式                           | 問題                                                                                                           | 修正方法                                                                                                                                                        |
-| --- | -------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 13  | **Day-1 要求完整四層文件**       | 導入成本過高，團隊放棄                                                                                         | 只建 AGENTS.md + docs/README.md，其餘事件觸發                                                                                                                   |
-| 14  | **要求手動撰寫風格指南**         | 主觀治理文件無絕對答案，耗時無效                                                                               | 讓 AI 從程式碼歸納慣例，人只審核                                                                                                                                |
-| 15  | **強制 Checklist 但無自動化**    | 人工遵循率逐步下降                                                                                             | 用 Prompt Pack 讓 AI 產草稿，人做審核                                                                                                                           |
-| 16  | **只建不更**                     | 跑完 INIT 後從不回顧 AGENTS.md，逐漸過時                                                                       | 每月快速回顧 + 用 UPDATE Prompt 同步                                                                                                                            |
-| 17  | **治理混居**                     | 把文件治理規則和程式碼規範塞在同一個檔案                                                                       | AGENTS.md 管程式碼規範，docs/README.md 管文件治理                                                                                                               |
-| 18  | **開源範例含真實專案線索**       | 暴露內部命名或個人路徑，增加洩密疑慮                                                                           | 範例統一使用 `my-*`/`sample-*`/`shared-*`，避免真實 repo 名與個人絕對路徑                                                                                       |
-| 19  | **一次補齊所有既有 API 的 SPEC** | 投資報酬率低、分散開發軌道精力；Dead Zone API（長期未動、無 Consumer）的 SPEC 幾乎不會被消費                   | Brownfield 補登依優先序：最近有異動 > 跨系統/跨團隊依賴 > 業務邏輯複雜；Dead Zone 可接受永遠沒有 SPEC                                                           |
-| 20  | **補 SPEC 時混入 To-Be 改善**    | 把「現在程式碼長這樣」和「未來應該改成這樣」寫在同一份 SPEC，AI 無法判斷哪個是現況約束                         | 堅守 As-Is 原則：SPEC 描述當前程式碼行為，改善點記在 SPEC 的 TODO 欄或另開 ADR                                                                                  |
-| 21  | **AGENTS.md 臃腫失焦**           | 篇幅明顯偏長且含「AI 本來就會做對」的通用常識（如「寫乾淨程式碼」、語言內建慣例），核心規則被稀釋，AI 反覆違規 | 套用「每行自檢法則」：移除這行 AI 會犯錯嗎？不會就刪；通用常識不寫，低頻內容移至 docs/ 子文件（見 [GUIDE §3.4](GUIDE.md#34-指令過載防護guardrails)）            |
-| 22  | **AI 反覆違規就加更多規則**      | AI 忽略某條已寫的規則 → 再加一條類似規則 → AGENTS.md 越來越長 → 違規更嚴重的惡性循環                           | 先診斷是長度問題還是歧義問題：重複違規 2 次以上應修剪或改寫原規則，而非疊加（診斷流程見 [DAILY-USAGE §5.6](DAILY-USAGE.md#56-ai-反覆違反同一條-agentsmd-規則)） |
+Common mistakes discovered across multi-project ecosystems. Each entry includes the problem and its fix.
 
 ---
 
-*本清單隨實務經驗持續更新。如有新的反模式發現，歡迎回饋。*
+## Version & Data Drift
+
+| #   | Anti-Pattern                       | Problem                                                              | Fix                                                        |
+| --- | ---------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 1   | **Hardcoded patch-level version**  | `ASP.NET Core 10.0.5` becomes stale on next upgrade                  | Write Major.Minor only + point to config file              |
+| 2   | **Exact file counts**              | "43 components" — one addition breaks accuracy                       | Describe structural patterns, not counts                   |
+| 3   | **Duplicate version numbers**      | Updated in one place, forgotten in another                           | Second occurrence uses "see X declaration" reference       |
+| 4   | **Inconsistent version precision** | Project A writes `10.0.5` (too precise), B writes `10.x` (too vague) | Standardize on Major.Minor (e.g. `10.0`); Patch via config |
+
+## Content Bloat
+
+| #   | Anti-Pattern                  | Problem                                             | Fix                                                              |
+| --- | ----------------------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
+| 5   | **Long onboarding tutorials** | `brew install` / git basics consume AI context      | Move to human-only README or restrict read scope                 |
+| 6   | **Future plans taking space** | Unimplemented roadmap items distract from daily use | Compress to trigger conditions + governance skeleton (~10 lines) |
+| 7   | **Pre-created empty files**   | AI wastes tokens opening empty shells               | Use Lazy Evaluation — create only when triggered                 |
+
+## Structure & Semantics
+
+| #   | Anti-Pattern                         | Problem                                          | Fix                                                 |
+| --- | ------------------------------------ | ------------------------------------------------ | --------------------------------------------------- |
+| 8   | **Navigation by filename**           | AI cannot intent-match                           | Use natural language intent in left column          |
+| 9   | **Overlapping navigation entries**   | Similar descriptions pointing to different files | Use clearly distinct natural language per row       |
+| 10  | **Inconsistent cross-project terms** | AI spends extra tokens aligning semantics        | Use identical phrasing for the same rule everywhere |
+
+## Writing Standards
+
+| #   | Anti-Pattern                     | Problem                                                       | Fix                                                   |
+| --- | -------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------- |
+| 11  | **Mixed writing systems**        | Simplified/Traditional Chinese mix causes tokenizer ambiguity | Unify to a single writing system                      |
+| 12  | **Unstructured mixed languages** | AI cannot tell which terms are fixed English names            | Keep technical terms in English; unify prose language |
+
+## Over-Governance
+
+| #   | Anti-Pattern                                  | Problem                                                                                                                                                | Fix                                                                                                                                                                                                                                              |
+| --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 13  | **Demanding full 4-layer docs on Day-1**      | Adoption cost too high — team gives up                                                                                                                 | Build only AGENTS.md + docs/README.md; rest is event-triggered                                                                                                                                                                                   |
+| 14  | **Manual style guide writing**                | Subjective governance docs have no definitive answer — time-consuming and ineffective                                                                  | Let AI infer conventions from code; human reviews only                                                                                                                                                                                           |
+| 15  | **Mandatory checklist without automation**    | Manual compliance rate decays over time                                                                                                                | Use Prompt Packs for AI-drafted output; human reviews                                                                                                                                                                                            |
+| 16  | **Build once, never update**                  | Running INIT then never revisiting AGENTS.md — gradual staleness                                                                                       | Monthly quick review + UPDATE Prompt sync                                                                                                                                                                                                        |
+| 17  | **Mixed governance**                          | Code rules and doc governance rules crammed into one file                                                                                              | AGENTS.md for code rules; docs/README.md for doc governance                                                                                                                                                                                      |
+| 18  | **Real project names in examples**            | Exposes internal naming or personal paths                                                                                                              | Use `my-*` / `sample-*` / `shared-*` in examples; avoid real repo names and personal absolute paths                                                                                                                                              |
+| 19  | **Backfill all existing APIs at once**        | Low ROI, drains development track energy; Dead Zone APIs (long-idle, no consumers) produce SPECs nobody reads                                          | Brownfield backfill by priority: recently changed > cross-system dependency > complex logic; Dead Zone APIs can permanently skip SPEC                                                                                                            |
+| 20  | **Mixing To-Be into backfill SPECs**          | "Current code behavior" and "future ideal" in one SPEC — AI cannot tell which is the binding constraint                                                | As-Is principle: SPEC describes current behavior; improvements go in SPEC TODO section or a separate ADR                                                                                                                                         |
+| 21  | **Bloated unfocused AGENTS.md**               | Clearly too long with generic advice AI already knows ("write clean code", language built-in conventions) — core rules diluted, AI violations increase | Apply the per-line self-check: "Would removing this line cause AI to make an error?" If not, remove it. Move low-frequency content to docs/ sub-files ([GUIDE Section 3.4](GUIDE.md#34-guardrails-against-instruction-overload))                 |
+| 22  | **Adding more rules when AI keeps violating** | AI ignores an existing rule → add a similar rule → AGENTS.md grows → violations get worse — a vicious cycle                                            | First diagnose: is it a length problem or an ambiguity problem? After 2+ repeated violations, trim or rewrite the original rule instead of stacking ([DAILY-USAGE Section 5.6](DAILY-USAGE.md#56-ai-repeatedly-violates-the-same-agentsmd-rule)) |
+
+---
+
+*This list is updated as new patterns emerge. Contributions welcome.*
