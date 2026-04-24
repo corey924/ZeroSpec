@@ -284,6 +284,18 @@ assert_file_exists "DAILY-USAGE.zh-TW.md"
 assert_file_exists "anti-patterns.zh-TW.md"
 assert_file_exists "CONTRIBUTING.zh-TW.md"
 
+# === Bloat Check (warning only — does not affect PASS/FAIL) ===
+echo "=== Bloat Check (warning only) ==="
+for agents_file in examples/*/AGENTS.md; do
+  if [[ -f "$agents_file" ]]; then
+    read -r lines words < <(awk '{ w += NF } END { print NR, w }' "$agents_file")
+    tokens=$(( words * 4 / 3 ))
+    if [[ $lines -gt 300 || $tokens -gt 4000 ]]; then
+      echo "WARNING: $agents_file may exceed GUIDE §3.4 limits (lines: $lines, est. tokens: ~$tokens). Review and trim."
+    fi
+  fi
+done
+
 echo "=== Verification Summary ==="
 echo "PASS: $pass_count"
 echo "FAIL: $fail_count"

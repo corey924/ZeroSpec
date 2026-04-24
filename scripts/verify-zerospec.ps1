@@ -261,6 +261,18 @@ Assert-FileExists 'DAILY-USAGE.zh-TW.md'
 Assert-FileExists 'anti-patterns.zh-TW.md'
 Assert-FileExists 'CONTRIBUTING.zh-TW.md'
 
+# === Bloat Check (warning only — does not affect PASS/FAIL) ===
+Write-Host '=== Bloat Check (warning only) ==='
+Get-ChildItem -Path 'examples' -Filter 'AGENTS.md' -Recurse | ForEach-Object {
+    $contentLines = Get-Content $_.FullName
+    $lines = $contentLines.Count
+    $words = (($contentLines -join "`n") -split '\s+' | Where-Object { $_ -ne '' }).Count
+    $tokens = [int]($words * 4 / 3)
+    if ($lines -gt 300 -or $tokens -gt 4000) {
+        Write-Host "WARNING: $($_.FullName) may exceed GUIDE §3.4 limits (lines: $lines, est. tokens: ~$tokens). Review and trim."
+    }
+}
+
 Write-Host "=== Verification Summary ==="
 Write-Host "PASS: $script:PassCount"
 Write-Host "FAIL: $script:FailCount"
