@@ -4,7 +4,7 @@
 
 > **在 AI Coding Agent 動手前，先把它需要的專案上下文整理好：架構規則、模組導航、版本真相來源。零依賴，純 Markdown。**
 
-**版本**：v0.4.1
+**版本**：v0.4.2
 **狀態**：Active
 
 ---
@@ -74,6 +74,12 @@ ZeroSpec 產出的文件重點是任務前理解；Layer 1 工具的重點是任
 - **有 SDD 的做法（SDD-like）**：ZeroSpec 用事件觸發維持 SPEC / ADR / SA 的持續更新。
 - **不是完整流程 SDD**：ZeroSpec 不負責 phase gate、簽核流程與執行狀態轉換。
 - **一句話記法**：ZeroSpec 是 **SDD-ready 的 Layer 0 基線**；需要嚴格流程編排時，再銜接 Layer 1 工具。
+
+### 適合先從輕量 SDD 開始
+
+- 如果你想先試 SDD 輔助開發，但還不想 Day-1 就導入完整 workflow，ZeroSpec 很適合拿來起步。
+- 它先補的是比較輕的基線：`AGENTS.md`、`docs/README.md`，以及由事件觸發的 SPEC / ADR / SA 更新。
+- 之後如果團隊真的需要更嚴格的 phase gate、審核流程或 spec workflow，可以把 ZeroSpec 留在 Layer 0，再和 OpenSpec 或 Spec Kit 併行。
 
 ## 內容模型
 
@@ -192,13 +198,17 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 ### 導入後怎麼用？
 
-| 觸發事件           | 使用 Prompt Pack                         |
-| ------------------ | ---------------------------------------- |
-| 新增/變更 API      | [`prompts/SPEC.md`](prompts/SPEC.md)     |
-| 架構決策           | [`prompts/ADR.md`](prompts/ADR.md)       |
-| 系統快照           | [`prompts/SA.md`](prompts/SA.md)         |
-| 專案演進需同步文件 | [`prompts/UPDATE.md`](prompts/UPDATE.md) |
-| 未觸發以上事件     | **不建立任何文件**                       |
+| 觸發事件               | 使用 Prompt Pack / 方式                                                                 |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| 新增/變更 API          | [`prompts/SPEC.md`](prompts/SPEC.md)                                                    |
+| 架構決策               | [`prompts/ADR.md`](prompts/ADR.md)                                                      |
+| 系統快照               | [`prompts/SA.md`](prompts/SA.md)                                                        |
+| 專案演進需同步文件     | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                |
+| 需要平台 pointer 設定（可選） | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；JetBrains 直接使用 `AGENTS.md` |
+| 想使用一鍵觸發捷徑（可選 VS Code adapter） | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/` |
+| 未觸發以上事件         | **不建立任何文件**                                                                      |
+
+> `templates/prompts/*.prompt.md` 是提供 VS Code Prompt 介面的可選快捷層。ZeroSpec 核心仍維持跨工具：Cursor、Claude Code、Windsurf、JetBrains 也可透過複製貼上 / 書籤 / Symlink 使用同一套 Prompt Packs。
 
 建議每月做一次快速回顧、每季做一次完整回顧，詳細做法見 [GUIDE.zh-TW.md §7](GUIDE.zh-TW.md#7-導入與持續運作流程)。
 
@@ -234,6 +244,7 @@ zerospec/
 │   ├── pull_request_template.md  ← PR 描述範本
 │   └── workflows/
 │       └── verify-zerospec.yml   ← PR / push 自動驗收（最小 CI）
+├── AGENTS.md                    ← AI 導航指引（給在 ZeroSpec 本身工作的貢獻者）
 ├── CONTRIBUTING.md              ← 貢獻指南
 ├── README.md                    ← 你正在讀的這份
 ├── GUIDE.md                     ← 完整方法論（設計原則、防漂移、持續運作、業界佐證）
@@ -250,7 +261,9 @@ zerospec/
 │   ├── ADR-TEMPLATE.md          ← 直接可用的 ADR 模板
 │   ├── SPEC-TEMPLATE.md         ← 直接可用的 SPEC 模板
 │   ├── SA-TEMPLATE.md           ← 直接可用的 SA 模板
-│   └── DOCS-README-TEMPLATE.md  ← docs/README.md 文件治理模板
+│   ├── DOCS-README-TEMPLATE.md  ← docs/README.md 文件治理模板
+│   ├── prompts/                 ← 可選：VS Code Prompt Files adapter（可複製到 .github/prompts/）
+│   └── pointers/                ← 可選：各平台 pointer 模板（Copilot / Claude Code / Cursor / Windsurf；JetBrains 直接使用 AGENTS.md）
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux 驗收腳本
 │   └── verify-zerospec.ps1      ← Windows PowerShell 驗收腳本

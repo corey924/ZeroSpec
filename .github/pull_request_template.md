@@ -7,6 +7,7 @@
 ## SDD Sync Checklist
 - [ ] If this PR adds an API or changes behavior, the PR description references the relevant `SPEC-xxx` (e.g., `closes SPEC-003 Changelog entry`)
 - [ ] If this PR includes an architecture-level either/or decision, the PR description references `ADR-xxx`
+- [ ] If this PR adds rules to `AGENTS.md`, each new rule passes the [§3.4 per-line self-check](../GUIDE.md#34-guardrails-against-instruction-overload)
 - [ ] This change does not trigger either condition above (leave unchecked or check this item)
 
 ## Scope of Impact

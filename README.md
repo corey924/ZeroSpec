@@ -4,7 +4,7 @@
 
 > **🌐 [台灣正體中文版](README.zh-TW.md)**
 
-**Version**: v0.4.1
+**Version**: v0.4.2
 **Status**: Active
 
 ---
@@ -74,6 +74,12 @@ ZeroSpec artifacts are optimized for pre-task understanding. Layer 1 specs are o
 - **SDD-like**: ZeroSpec keeps SPEC / ADR / SA alive through event triggers.
 - **Not full workflow SDD**: ZeroSpec does not enforce phase gates, approvals, or execution states.
 - **Practical shorthand**: ZeroSpec is an **SDD-ready Layer 0 baseline**. Add Layer 1 tooling when you need strict process orchestration.
+
+### Good Fit for Light SDD
+
+- Start here if you want SDD-style guardrails without adopting a full workflow engine on day 1.
+- ZeroSpec gives you the lightweight baseline first: `AGENTS.md`, `docs/README.md`, and event-triggered SPEC / ADR / SA updates.
+- If later you need stricter workflows, approvals, or phase gates, keep ZeroSpec as Layer 0 and run OpenSpec or Spec Kit alongside it as Layer 1.
 
 ## Content Model
 
@@ -194,13 +200,17 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 
 ### After Adoption
 
-| Trigger Event              | Prompt Pack                              |
-| -------------------------- | ---------------------------------------- |
-| API added/changed          | [`prompts/SPEC.md`](prompts/SPEC.md)     |
-| Architecture decision      | [`prompts/ADR.md`](prompts/ADR.md)       |
-| System snapshot needed     | [`prompts/SA.md`](prompts/SA.md)         |
-| Project evolved, sync docs | [`prompts/UPDATE.md`](prompts/UPDATE.md) |
-| None of the above          | **Create nothing**                       |
+| Trigger Event                        | Prompt Pack / Method                                              |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| API added/changed                    | [`prompts/SPEC.md`](prompts/SPEC.md)                             |
+| Architecture decision                | [`prompts/ADR.md`](prompts/ADR.md)                               |
+| System snapshot needed               | [`prompts/SA.md`](prompts/SA.md)                                 |
+| Project evolved, sync docs           | [`prompts/UPDATE.md`](prompts/UPDATE.md)                         |
+| Need platform pointer setup (optional) | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; JetBrains uses `AGENTS.md` directly |
+| Want one-click trigger shortcuts (optional VS Code adapter) | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/` |
+| None of the above                    | **Create nothing**                                               |
+
+> `templates/prompts/*.prompt.md` is an optional shortcut layer for VS Code prompt UIs. ZeroSpec core remains tool-agnostic: Cursor, Claude Code, Windsurf, and JetBrains users can use the same Prompt Packs via copy-paste/bookmark/symlink.
 
 Monthly quick review + quarterly full review recommended. Details in [GUIDE.md Section 7](GUIDE.md#7-adoption-and-continuous-operation).
 
@@ -233,6 +243,7 @@ zerospec/
 │   ├── pull_request_template.md  ← PR description template
 │   └── workflows/
 │       └── verify-zerospec.yml   ← PR / push auto-verify (minimal CI)
+├── AGENTS.md                    ← AI Navigation Guide (for contributors working on ZeroSpec itself)
 ├── CONTRIBUTING.md              ← Contribution guide
 ├── README.md                    ← You are reading this
 ├── GUIDE.md                     ← Full methodology (design, drift prevention, operations, evidence)
@@ -249,7 +260,9 @@ zerospec/
 │   ├── ADR-TEMPLATE.md          ← Ready-to-use ADR template
 │   ├── SPEC-TEMPLATE.md         ← Ready-to-use SPEC template
 │   ├── SA-TEMPLATE.md           ← Ready-to-use SA template
-│   └── DOCS-README-TEMPLATE.md  ← docs/README.md governance template
+│   ├── DOCS-README-TEMPLATE.md  ← docs/README.md governance template
+│   ├── prompts/                 ← Optional: VS Code Prompt Files adapter (copy to .github/prompts/)
+│   └── pointers/                ← Optional: platform pointer templates (Copilot / Claude Code / Cursor / Windsurf; JetBrains uses AGENTS.md directly)
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux verification script
 │   └── verify-zerospec.ps1      ← Windows PowerShell verification script

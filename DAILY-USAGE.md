@@ -77,11 +77,15 @@ ZeroSpec itself (`prompts/`, `templates/`, `GUIDE.md`) is a "toolbox," not a wor
 | Approach       | Description                                                                   | Best For                                     |
 | -------------- | ----------------------------------------------------------------------------- | -------------------------------------------- |
 | **Bookmark**   | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed         | Individual developers                        |
-| **Snippet**    | Save frequently used Prompt Packs as IDE User Snippets or Text Expander       | Power users                                  |
-| **Symlink**    | Create a `.zerospec/` symlink in target project pointing to ZeroSpec prompts/ | Multi-project ecosystems                     |
-| **Copy-paste** | Simplest — open ZeroSpec README, follow the link, copy the Prompt             | Everyone (recommended Day-1 starting method) |
+| **Snippet**      | Save frequently used Prompt Packs as IDE User Snippets or Text Expander                                                                              | Power users                                  |
+| **Prompt Files** | Copy `templates/prompts/*.prompt.md` to your project's `.github/prompts/`; invoke the same Prompt Packs from supported VS Code prompt UIs             | VS Code users (optional adapter)             |
+| **Pointers**     | Copy the matching file from `templates/pointers/` to your project; connects `AGENTS.md` to your AI platform without duplication                      | All platforms (Day-1 setup)                  |
+| **Symlink**      | Create a `.zerospec/` symlink in target project pointing to ZeroSpec prompts/                                                                        | Multi-project ecosystems                     |
+| **Copy-paste**   | Simplest — open ZeroSpec README, follow the link, copy the Prompt                                                                                   | Everyone (recommended Day-1 starting method) |
 
 > **Do not** add the entire ZeroSpec folder to your target project's workspace. This causes the Agent to read irrelevant Markdown and wastes context.
+
+> **Prompt Files setup**: These files rely on `#file:prompts/XXX.md`. Keep ZeroSpec in the same workspace (multi-root) or use a `.zerospec/` symlink so paths resolve. Pick one setup only.
 
 ### 2.2 Coexistence of `copilot-instructions.md` and `AGENTS.md`
 

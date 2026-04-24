@@ -4,6 +4,27 @@ This file tracks the version history of the ZeroSpec framework.
 
 ---
 
+## v0.4.2 — 2026-04-24
+
+### New
+
+- `templates:` Added `templates/prompts/` with 7 VS Code Prompt Files (`*.prompt.md`) covering all Prompt Packs (INIT-SCAN, INIT-BUILD, SPEC, ADR, SA, AUDIT, UPDATE) — optional VS Code shortcut adapter (not required by ZeroSpec core); copy to `.github/prompts/` with ZeroSpec in workspace
+- `templates:` Added `templates/pointers/` with platform pointer templates (`copilot-instructions.md`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules`) to connect project `AGENTS.md` without duplication; Cursor/Windsurf/JetBrains can still use AGENTS.md natively
+- `core:` Added root `AGENTS.md` for contributors working on ZeroSpec itself (dogfooding Layer 0 guidance on the framework repo)
+- `docs:` DAILY-USAGE §2.1 — added **Prompt Files** approach row + setup note for `#file:` path resolution (EN + zh-TW)
+- `docs:` GUIDE §0 — added Quick Decision Flow (5-step numbered guide for Greenfield/Brownfield/unsure paths) (EN + zh-TW)
+- `docs:` GUIDE §7 — added Retirement Rule subsection under Acceptance Metrics: 30-day adoption gate + git log measurement (EN + zh-TW)
+- `docs:` README now positions ZeroSpec as a good starting point for light SDD-assisted development and explicitly notes coexistence with OpenSpec / Spec Kit
+- `docs:` README Repo Structure — added `templates/prompts/` and `AGENTS.md` entries with description
+- `docs:` README After Adoption table — added optional Prompt Files row
+
+### Changed
+
+- `.github:` PR template SDD Sync Checklist — added `AGENTS.md` rule admission check linking to GUIDE §3.4 per-line self-check
+- `scripts:` `verify-zerospec.sh` + `verify-zerospec.ps1` — added Bloat Check section (WARNING only, does not affect PASS/FAIL): alerts when any `examples/*/AGENTS.md` exceeds 300 lines or ~4K tokens (aligned with GUIDE §3.4)
+
+---
+
 ## v0.4.1 — 2026-04-24
 
 ### New

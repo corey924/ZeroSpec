@@ -97,6 +97,14 @@ Only Tier C requires human authoring (~5–8 team decisions). Everything else is
 
 **One-line test**: If you cannot write at least 3 stable rules that "would cause PR rejection if violated," the resulting AGENTS.md will be an empty shell — wait for architecture maturity.
 
+#### Quick Decision Flow
+
+1. **Does your team use AI coding agents?** → No → skip ZeroSpec for now; revisit later.
+2. **Can you write at least 3 rules that would cause PR rejection if violated?** → No → stabilize architecture first; ZeroSpec shell with no real rules adds no value.
+3. **Is this an existing project with a large API surface?** → Yes → **Brownfield path**: run INIT-SCAN + INIT-BUILD, then SA Prompt, then backfill priority SPECs gradually (see [Step 3.5](#step-35-choose-next-step-by-project-type)).
+4. **Is this a new or small project?** → Yes → **Greenfield path**: run INIT-SCAN + INIT-BUILD, then let the first real API trigger the first SPEC naturally.
+5. **Still unsure?** → Start with the [30-Second Path in README.md](README.md#30-second-path). If the generated `AGENTS.md` feels useful after one real task, you're on the right track.
+
 ---
 
 ## 1. Why ZeroSpec
@@ -531,6 +539,14 @@ Use these as directional targets for projects with reasonably stable architectur
 | SPEC draft coverage after API change | ≥ 90%    |
 
 > **Day-2+ usage**: daily operation modes, IDE configuration, Plan vs Agent selection, scenario playbooks → see [DAILY-USAGE.md](DAILY-USAGE.md).
+
+#### Retirement Rule
+
+Any optional add-on (e.g., IDE Prompt File templates, adapter snippets) should justify its place over time:
+
+- If a new addition is **not referenced in any PR or raised in any Issue within 30 days**, downgrade it to `examples/` or remove it at the next quarterly review.
+- Measurement: `git log --all --oneline --grep="templates/prompts"` to check reference frequency.
+- Principle: maintenance cost compounds. Remove before adding.
 
 ---
 

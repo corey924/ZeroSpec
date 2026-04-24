@@ -75,11 +75,15 @@ ZeroSpec 本體（`prompts/`、`templates/`、`GUIDE.md`）是「工具箱」，
 | 方式         | 說明                                                          | 適合誰                         |
 | ------------ | ------------------------------------------------------------- | ------------------------------ |
 | **書籤式**   | 瀏覽器或 IDE 書籤 ZeroSpec 資料夾，需要時點開複製 Prompt      | 個人開發者                     |
-| **Snippet**  | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander | 頻繁使用者                     |
-| **Symlink**  | 在目標專案建一個 `.zerospec/` symlink 指向 ZeroSpec prompts/  | 多專案生態圈                   |
+| **Snippet**      | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander                                                       | 頻繁使用者                     |
+| **Prompt Files** | 將 `templates/prompts/*.prompt.md` 複製到專案的 `.github/prompts/`；可在支援的 VS Code Prompt 介面呼叫同一套 Prompt Packs | VS Code 使用者（可選 adapter） |
+| **Pointers**     | 從 `templates/pointers/` 複製對應平台的模板到你的專案，讓 AGENTS.md 與 AI 平台直接對接，不複製內容 | 所有平台（Day-1 設定）         |
+| **Symlink**      | 在目標專案建一個 `.zerospec/` symlink 指向 ZeroSpec prompts/                                                        | 多專案生態圈                   |
 | **複製貼上** | 最簡單——需要時開 ZeroSpec README，按連結找到 Prompt，複製貼入 | 所有人（Day-1 推薦的起步方式） |
 
 > **不建議**：把 ZeroSpec 整個資料夾加進目標專案的 workspace。這會讓 Agent 讀到不相關的 markdown，浪費 context。
+
+> **Prompt Files 設定**：這些檔案依賴 `#file:prompts/XXX.md`。請確保 ZeroSpec 與目標專案在同一個 workspace（multi-root），或使用 `.zerospec/` symlink 讓路徑可解析。**擇一配置即可**。
 
 ### 2.2 `.github/copilot-instructions.md` 與 `AGENTS.md` 的共存
 
@@ -237,8 +241,8 @@ AI Agent 在長對話中（約 15–20 輪後）可能逐漸偏離 AGENTS.md 的
 | 跨模組技術決策           | `prompts/ADR.md` 的 Prompt    | 複製 10 秒   |
 | 月度回顧                 | `prompts/UPDATE.md` 的 Prompt | 複製 10 秒   |
 | 忘記某個模板長怎樣       | `templates/` 目錄             | 瀏覽 30 秒   |
-| 想查某個反模式的修正方法 | `anti-patterns.md`            | 瀏覽 1 分鐘  |
-| 新人加入想了解這套方法論 | `GUIDE.md`                    | 閱讀 15 分鐘 |
+| 想查某個反模式的修正方法 | `anti-patterns.zh-TW.md`      | 瀏覽 1 分鐘  |
+| 新人加入想了解這套方法論 | `GUIDE.zh-TW.md`              | 閱讀 15 分鐘 |
 
 ### 不需要開 ZeroSpec 的時刻
 
@@ -470,7 +474,7 @@ Step 4 — Commit & SPEC（同對話）
    → 但注意：若每條規則都加強調語，等於沒有強調
 ```
 
-**不建議的反應**：再加一條新規則「禁止違反規則 X」。這只會讓 AGENTS.md 更長、問題更嚴重（詳見 [anti-patterns #22](anti-patterns.md)）。
+**不建議的反應**：再加一條新規則「禁止違反規則 X」。這只會讓 AGENTS.md 更長、問題更嚴重（詳見 [anti-patterns #22](anti-patterns.zh-TW.md)）。
 
 ### 5.7 「想快速驗收 AGENTS.md 是否真的有效」
 
