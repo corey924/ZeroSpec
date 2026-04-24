@@ -1,0 +1,5 @@
+# ZeroSpec pointer — copy to .windsurfrules at your project root
+# Windsurf reads AGENTS.md natively (auto-read). This file is OPTIONAL.
+# Use only for Windsurf-specific overrides not covered in AGENTS.md.
+
+# Source of truth: see AGENTS.md for architecture rules, module navigation, and constraints.

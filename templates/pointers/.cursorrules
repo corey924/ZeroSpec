@@ -1,0 +1,5 @@
+# ZeroSpec pointer — copy to .cursorrules at your project root
+# Cursor reads AGENTS.md natively (auto-read). This file is OPTIONAL.
+# Use only for Cursor-specific overrides not covered in AGENTS.md.
+
+# Source of truth: see AGENTS.md for architecture rules, module navigation, and constraints.
