@@ -2,12 +2,20 @@
 
 > **🌐 [English](GUIDE.md)**
 
-> **Zero-dependency specification framework for AI-readable repositories.**
-> 讓 AI Coding Agent 在 30 秒內理解你的專案，並遵循你的架構規範產生程式碼。
+> **Zero-dependency Markdown baseline for AI-readable repositories.**
+> 幫 AI Coding Agent 在開始改檔前，先把專案上下文交接清楚：知道檔案在哪裡、哪些規則不能踩、哪份文件才是真相來源。
 
-**版本**：v0.3 — 2026-04-22
+**版本**：v0.4 — 2026-04-24
 **適用對象**：想讓 GenAI Agent（GitHub Copilot / Codex / Claude / Gemini / Cursor）高效理解專案的工程團隊
 **驗證背景**：已於含後端（.NET（C#）/ Python）、前端（React + TypeScript）與共用 Library 的多專案生態圈中實際驗證
+
+---
+
+## 誰適合先讀這份指南？
+
+- 若你負責維護 `AGENTS.md`、整理團隊規範，或評估 ZeroSpec 如何融入既有流程，這份指南適合先讀。
+- 如果你剛接觸 ZeroSpec，建議先讀 [README.zh-TW.md](README.zh-TW.md)，再回來看這份較完整的方法與治理說明。
+- 若你主要想看日常怎麼用，建議先讀 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md)。
 
 ---
 
@@ -30,24 +38,34 @@
 
 ZeroSpec 是一套零依賴、純 Markdown 的專案 AI 可讀性框架，定位為 **Layer 0（Context Readiness）**。
 
+你可以把它想成 AI Agent 開工前的技術交接單：不是流程引擎，而是先把必要上下文交接清楚。
+
 ### Layer 0 vs Layer 1
 
-| 層級        | 職責                                                           | 代表工具          |
-| ----------- | -------------------------------------------------------------- | ----------------- |
-| **Layer 0** | 讓專案「可被 AI 讀懂」— 架構約束、導航、Source of Truth        | **ZeroSpec**      |
-| **Layer 1** | 讓 AI「照流程執行任務」— 工作流引擎、phase gate、change-folder | OpenSpec, SpecKit |
+| 層級        | 職責                                                           | 代表工具           |
+| ----------- | -------------------------------------------------------------- | ------------------ |
+| **Layer 0** | 讓專案「可被 AI 讀懂」— 架構約束、導航、Source of Truth        | **ZeroSpec**       |
+| **Layer 1** | 讓 AI「照流程執行任務」— 工作流引擎、phase gate、change-folder | OpenSpec, Spec Kit |
 
 ZeroSpec 不綁定任何 IDE、代理平台或程式語言。它只做一件事：**確保 AI 在開始任何任務前，已擁有精準的專案脈絡。**
+
+如果用 SDD 的開發模式來看，ZeroSpec 是一個輕量的 Layer 0 基線：API 變更觸發 SPEC 更新，架構決策觸發 ADR，需要系統快照時觸發 SA。
+
+### ZeroSpec 和 SDD 的關係
+
+- **有 SDD 的做法（SDD-like）**：ZeroSpec 用事件觸發維持 SPEC / ADR / SA 的持續更新。
+- **不是完整流程 SDD**：ZeroSpec 不負責 phase gate、簽核流程與執行狀態轉換。
+- **一句話記法**：ZeroSpec 是 **SDD-ready 的 Layer 0 基線**；需要嚴格流程編排時，再銜接 Layer 1 工具。
 
 #### 與 Layer 1 工具的長期整合路徑
 
 ZeroSpec 可以獨立運作，也可以隨團隊成熟度逐步銜接 Layer 1 工具。以下是市場主流 SDD 實務（API-First、Contract-First、phase gate）推導出的自然演進路徑，供長期評估參考：
 
-| 階段                      | 時程參考   | 做法                                                                                               | Layer 1 工具       |
-| ------------------------- | ---------- | -------------------------------------------------------------------------------------------------- | ------------------ |
-| **Stage 1：建立習慣**     | Month 1–3  | AGENTS.md + 事件觸發 SPEC 更新（PR 時人工確認）；目標是讓 Agent 產出品質穩定                       | 不需要             |
-| **Stage 2：加入 CI 閘門** | Month 3–6  | PR template 加 SPEC Checklist；簡單 CI script 偵測 Controller 變更但 `docs/spec/` 無異動時發出警告 | 不需要             |
-| **Stage 3：Layer 1 整合** | 6 個月以上 | ZeroSpec SPEC 作為 Layer 1 工具的輸入基礎；Layer 1 在其之上疊加執行階段與核准閘門                  | OpenSpec / SpecKit |
+| 階段                      | 時程參考   | 做法                                                                                               | Layer 1 工具        |
+| ------------------------- | ---------- | -------------------------------------------------------------------------------------------------- | ------------------- |
+| **Stage 1：建立習慣**     | Month 1–3  | AGENTS.md + 事件觸發 SPEC 更新（PR 時人工確認）；目標是讓 Agent 產出品質穩定                       | 不需要              |
+| **Stage 2：加入 CI 閘門** | Month 3–6  | PR template 加 SPEC Checklist；簡單 CI script 偵測 Controller 變更但 `docs/spec/` 無異動時發出警告 | 不需要              |
+| **Stage 3：Layer 1 整合** | 6 個月以上 | ZeroSpec SPEC 作為 Layer 1 工具的輸入基礎；Layer 1 在其之上疊加執行階段與核准閘門                  | OpenSpec / Spec Kit |
 
 **Stage 3 的觸發信號**：需要跨團隊 spec 核准流程、強制 phase gate、或 AI 生成管線需要自動化驗收條件。多數中小型團隊在 Stage 2 就已足夠。
 
@@ -83,14 +101,16 @@ ZeroSpec 的核心創新是區分「誰來寫」，而非「要不要寫」：
 
 ## 1. 為什麼需要 ZeroSpec
 
-現代 AI Coding Agent 在處理任務前會自動讀取專案根目錄的指引檔案（如 `AGENTS.md`、`.cursor/rules`），作為生成程式碼的約束條件。如果這些檔案結構混亂、資訊過時或缺乏關鍵規範，AI 會：
+在正確配置下，現代 AI Coding Agent 通常會在處理任務前讀取專案根目錄的指引檔案（如 `AGENTS.md`、`.cursor/rules`），作為生成程式碼的約束條件。如果這些檔案結構混亂、資訊過時或缺乏關鍵規範，Agent 常見會出現下列情況：
 
-- **盲目搜尋**：浪費 token 與時間在檔案系統中找 base package 或路徑別名
-- **違反架構**：在 Controller 層寫業務邏輯、用錯狀態管理方案
-- **產生幻覺**：引用文件中已過時的版號或不存在的 API
-- **注意力分散**：閱讀大量給人類看的安裝教學與未來規劃
+- **搜尋效率差**：花較多 token 與時間在檔案系統中找 base package 或路徑別名
+- **違反架構分層**：在 Controller 層寫業務邏輯、用錯狀態管理方案
+- **引用錯誤資訊**：帶入已過時的版號或不存在的 API
+- **注意力被稀釋**：把大量 context 花在人類導向的安裝教學與未來規劃
 
-ZeroSpec 的目標是：**用最少的 token 傳遞最精準的約束，讓 AI 像資深團隊成員一樣理解你的專案。**
+這些情況不是每次都會發生，但在真實專案裡已經夠常見，值得用結構化方式提前處理。
+
+ZeroSpec 的目標是：**用盡量少的 token 傳遞盡量清楚的專案約束，幫助 Agent 更穩定地遵守團隊規範，而不是取代工程判斷。**
 
 ---
 
@@ -131,7 +151,9 @@ project-root/
 
 如此即使代理平台不同，也能保持一致的交付品質。
 
-### 模型選用建議
+### 補充說明：模型選用建議
+
+模型選擇會影響使用體驗，但它不是 ZeroSpec 是否成立的前提。若你同時在評估不同模型做不同任務，可把下面這份表格當成一般性參考；較偏日常操作的建議，可放到 [DAILY-USAGE.md](DAILY-USAGE.md) 理解。
 
 不同任務情境適合不同模型系列。以下為一般性建議，只列系列名、不綁版號，依個人方案與額度自行選擇：
 
@@ -222,7 +244,7 @@ project-root/
 
 建議控制原則：
 
-- **建議長度**：以精簡為主（參考 Anthropic 官方建議）；主線明顯偏長時應拆分至 docs/ 子文件
+- **建議長度**：以精簡為主；150–300 行約等於 2,000–4,000 tokens，在主流 LLM system prompt 配額（通常為 4K–16K tokens）中留有充足空間。超出此範圍會擠壓任務 context，降低回應品質。主線明顕偏長時應拆分至 docs/ 子文件，並透過導航表格參照
 - **必備欄位**：專案定位、定錨資訊、導航表、產生規範、驗證指令、文件同步條件
 - **可移除欄位**：長篇背景故事、新手安裝教學、尚未採用的未來藍圖細節
 
@@ -243,7 +265,7 @@ project-root/
 
 > **「移除這一行會讓 AI 在下一個任務犯錯嗎？」** 若不會，這行就應刪除，或移到 `docs/` 子文件讓 AI 按需讀取。
 
-這個法則來自 Anthropic 對 CLAUDE.md 的官方建議。把 AGENTS.md 視為程式碼對待：定期 review、修剪、透過觀察 Agent 行為變化來驗證改動是否有效。
+這個法則來自 Anthropic 對 CLAUDE.md 的官方建議。把 AGENTS.md 當成程式碼來維護：定期檢查、精簡，並用 Agent 的實際回應驗證改動是否有效。
 
 #### 強調語法的節制使用
 
@@ -251,11 +273,11 @@ project-root/
 
 #### HTML 註解作為人類備忘
 
-若有段落只給「維護者本人」看、不希望佔 AI context token，可用 block-level HTML 註解包起來：
+若某段內容只給維護者看，又不想吃掉 AI context token，建議用 block-level HTML 註解包起來：
 
 ```markdown
 <!--
-維護者備忘：此段商品命名慣例是 2024-Q3 跨團隊會議決議，改動前請先問 @coreyc。
+維護者備忘：此段商品命名慣例是 2024-Q3 跨團隊會議決議，改動前請先問 @tech-lead。
 -->
 ```
 
@@ -353,7 +375,7 @@ AI 模型對文件開頭的注意力權重最高，隨位置遞減。在長對�
 
 這是整套方法中最重要的約定：
 
-> SPEC 是開發與 GenAI 的主要參照檔案。每次介面新增或修改都直接更新 SPEC，並在 Changelog 追蹤變更歷程。
+> SPEC 通常作為開發與 GenAI 的主要參照檔案。當介面或行為有明確變更時，建議同步更新 SPEC，並在 Changelog 追蹤變更歷程。
 
 **最低維護規則**：凡 PR 涉及介面或行為異動，使用 [SPEC Prompt Pack](prompts/SPEC.md) 讓 AI 產生/更新 SPEC 草稿，人審核後合併。
 
@@ -556,6 +578,8 @@ SDD 機制的持續運作不只依賴事件觸發，還需要定期回顧以確�
 
 ### 驗收指標
 
+以下指標比較適合拿來當方向性目標，前提是專案架構已相對穩定，且團隊對規範有基本共識。它們不是保證值，而是回顧與調整時的參考。
+
 | 指標                       | 目標      |
 | -------------------------- | --------- |
 | Day-1 人工投入時間         | ≤ 30 分鐘 |
@@ -589,7 +613,7 @@ SDD 機制的持續運作不只依賴事件觸發，還需要定期回顧以確�
 
 ### 8.2 一致化檢查清單
 
-跨專案必須語意統一的項目：
+跨專案建議保持語意一致的項目：
 
 - [ ] 導航表的 ADR 列描述用詞完全相同
 - [ ] SPEC 的 Source of Truth 定義完全相同
@@ -655,6 +679,7 @@ Architecture Decision Records 由 Michael Nygard 在 2011 年提出，已成為�
 ### 9.4 Source of Truth 與文件防漂移
 
 - [OpenSpec](https://github.com/Fission-AI/OpenSpec) — AI-native 的規格管理工具
+- [Spec Kit](https://github.com/github/spec-kit) — Spec-Driven Development CLI
 - [API-First Development](https://swagger.io/resources/articles/adopting-an-api-first-approach/) — Swagger/OpenAPI 方法論
 
 ### 9.5 Context Window 最佳化

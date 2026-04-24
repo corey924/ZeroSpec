@@ -5,7 +5,7 @@
 > 本文件描述 ZeroSpec 在 Day-1 初始化之後，工程師日常開發中如何「自然地」與 SDD 機制共存。
 > 適合已完成 INIT-SCAN + INIT-BUILD、手邊有 `AGENTS.md` + `docs/README.md` 的團隊。
 
-**版本**：v0.3 — 2026-04-22
+**版本**：v0.4 — 2026-04-24
 **對象**：已導入 ZeroSpec 的個人開發者或小型團隊
 
 ---
@@ -24,15 +24,15 @@
 
 ## 1. 日常開發中的三種操作模式
 
-ZeroSpec 導入後，日常開發不需要每次都翻 ZeroSpec 的 Prompt Pack。大部分時間，AI Agent 會**自動讀取你專案裡的 `AGENTS.md`**——這就是 ZeroSpec 設計的運作方式。
+ZeroSpec 導入後，日常開發通常就是在保留 `AGENTS.md` 的前提下直接使用 Agent 模式。若平台配置正確，很多 AI Agent 會在啟動或任務一開始讀取 `AGENTS.md`。多數日常任務不需要再另外打開 ZeroSpec 的 Prompt Pack。
 
 ### 模式 A：純寫程式碼（90% 時間）
 
-你照常開 Agent 模式寫 code。Agent 啟動時自動讀取 `AGENTS.md`，遵守你的架構規範。
+你照常開 Agent 模式寫 code。在配置穩定的情況下，Agent 會把 `AGENTS.md` 當作專案約束的起點。
 
-**你不需要做任何 ZeroSpec 相關動作。**
+**很多任務不需要額外執行 ZeroSpec 步驟。**
 
-> 這正是 ZeroSpec 的目標：Day-1 之後，它應該是「隱形基礎設施」。
+> 比較理想的結果是：Day-1 設定完成後，ZeroSpec 會逐漸融入日常開發流程，而不是變成另一份要額外維護的清單。
 
 ### 模式 B：事件觸發文件更新（~8% 時間）
 
@@ -42,7 +42,7 @@ ZeroSpec 導入後，日常開發不需要每次都翻 ZeroSpec 的 Prompt Pack�
 2. 從 ZeroSpec 複製對應 Prompt Pack（SPEC / ADR / SA）
 3. 貼入 Agent → 產出草稿 → 審核 → 合併進 PR
 
-**關鍵認知**：文件更新是 PR 的一部分，不是獨立任務。養成習慣後，這步驟約 5-10 分鐘。
+**建議做法**：把文件更新視為 PR 範圍的一部分，而不是獨立的後續任務。養成習慣後，這步驟通常約 5–10 分鐘。
 
 ### 模式 C：定期回顧（~2% 時間）
 
@@ -51,6 +51,20 @@ ZeroSpec 導入後，日常開發不需要每次都翻 ZeroSpec 的 Prompt Pack�
 ---
 
 ## 2. IDE 與代理平台配置建議
+
+### 多代理入口檔速查表
+
+不同 AI 平台會在啟動時或任務開始時讀取不同的指引檔。核心原則是：**平台特定入口檔盡量以 import 或參照方式引用 `AGENTS.md`**，而不是複製內容。重複貼上同一準則，容易形成互相競爭的指令集，也會消耗 Agent 的注意力配額。
+
+| 平台                         | 主要入口檔                                      | 自動讀取                                                     | Pointer 策略                                             |
+| ---------------------------- | ----------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
+| **GitHub Copilot (VS Code)** | `.github/copilot-instructions.md` + `AGENTS.md` | copilot-instructions ✅ / AGENTS.md ❌（需 `@AGENTS.md` 引用） | 在 copilot-instructions 內加入 `@AGENTS.md` 參照         |
+| **Cursor**                   | `AGENTS.md` / `.cursorrules`                    | ✅                                                            | 以 AGENTS.md 為唯一來源；其他入口檔以 import 引用        |
+| **Claude Code**              | `CLAUDE.md`                                     | ✅                                                            | CLAUDE.md 首行加 `@AGENTS.md`（Claude Code import 語法） |
+| **Windsurf**                 | `AGENTS.md`                                     | ✅                                                            | 直接使用                                                 |
+| **JetBrains AI Assistant**   | `AGENTS.md`                                     | ✅（需開啟 Attach project files）                             | 直接使用                                                 |
+
+> 各平台的詳細操作說明請見 §2.2（Copilot / Claude Code）與 §2.4（Multi-root Workspace）。本表為一覽式速查參考。
 
 ### 2.1 ZeroSpec Repo 不需要常駐打開
 
@@ -71,10 +85,10 @@ ZeroSpec 本體（`prompts/`、`templates/`、`GUIDE.md`）是「工具箱」，
 
 GitHub Copilot 同時支援兩種指引檔案：
 
-| 檔案                              | 讀取時機     | 適合放什麼                             |
-| --------------------------------- | ------------ | -------------------------------------- |
-| `.github/copilot-instructions.md` | 每次對話自動 | 個人偏好、語言、回覆格式（跨專案通用） |
-| `AGENTS.md`                       | 每次任務自動 | 專案特有約束（架構、命名、技術棧）     |
+| 檔案                              | 常見讀取時機                           | 適合放什麼                             |
+| --------------------------------- | -------------------------------------- | -------------------------------------- |
+| `.github/copilot-instructions.md` | Copilot 對話開始時自動讀取             | 個人偏好、語言、回覆格式（跨專案通用） |
+| `AGENTS.md`                       | 平台支援時於任務開始讀取，或由參照帶入 | 專案特有約束（架構、命名、技術棧）     |
 
 **最佳實踐**：
 
@@ -324,7 +338,7 @@ Week 2–4：並行兩條軌道
 
 ### 劇本 G：Explore → Plan → Implement 的實作節奏（推薦用於中等以上任務）
 
-多數 Agent 平台（Claude Code Plan 模式、Copilot Chat、Cursor Composer）都支援「先分析、再實作」的分段操作。對於跨多檔的任務，先分段走一輪通常比讓 Agent 直接動手品質更高：
+多數 Agent 平台（Claude Code Plan 模式、Copilot Chat、Cursor Composer）都支援「先分析、再實作」的分段操作。對於跨多檔的任務，先分段走一輪通常比讓 Agent 直接動手更穩定：
 
 ```
 任務：在 my-backend 新增 OAuth 登入流程（跨 AuthController、SecurityConfig、User entity）
@@ -348,7 +362,7 @@ Step 4 — Commit & SPEC（同對話）
 
 **何時可跳過這節奏**：單檔 typo、單行 log 新增、單純 rename 這類「一句話描述得完的 diff」。計畫階段的成本只在任務複雜時才划算。
 
-**為什麼值得做**：AGENTS.md 能提供結構約束，但無法替代任務層級的計畫；Explore 階段能讓 Agent 在動手前認清本次任務的邊界，是防止「生出貌似正確但遺漏 edge case」的最有效手段。
+**為什麼值得做**：AGENTS.md 能提供結構約束，但無法替代任務層級的計畫；Explore 階段能讓 Agent 在動手前認清本次任務的邊界，這通常是降低「生出貌似正確但遺漏 edge case」風險的實用做法。
 
 ---
 
@@ -370,7 +384,7 @@ Step 4 — Commit & SPEC（同對話）
 **緩解策略**：
 - 行事曆設定每月固定 15 分鐘「SDD 快速回顧」事件
 - UPDATE Prompt 的差異報告會自動偵測新增/移除的 Controller / Service
-- 如果對照表落後超過 3 個模組，Agent 寫出來的 code 通常還是正確的——因為它靠 `AGENTS.md` 的架構規範（C 類）而非對照表（B 類）做決策。對照表主要幫 Agent「更快找到對的檔案」，不影響正確性。
+- 如果對照表落後超過 3 個模組，Agent 寫出來的 code 往往仍可用——因為影響正確性的通常還是 `AGENTS.md` 的架構規範（C 類），而不是對照表（B 類）本身。對照表更像是幫 Agent 快速定位檔案的導航輔助。
 
 ### 5.3 「團隊其他人不買單」
 
@@ -430,7 +444,7 @@ Step 4 — Commit & SPEC（同對話）
 
 ### 5.6 「AI 反覆違反同一條 AGENTS.md 規則」
 
-**根因優先順序**（由高到低）：
+**建議檢查順序**：
 
 1. **AGENTS.md 過長 / 核心規則被噪音埋沒**：檔案明顯偏長且含大量 AI 本來就會的通用常識 → 核心規則落在注意力稀釋區
 2. **規則描述有歧義**：同一條規則在 AGENTS.md 兩處描述不一致，或語句抽象到 AI 無法驗證（如「寫乾淨程式碼」）
@@ -475,6 +489,24 @@ Step 4 — Commit & SPEC（同對話）
 - **多數答錯**：跑 [AUDIT Prompt](prompts/AUDIT.md) 做整體稽核
 
 > 每次 AGENTS.md 大改（例如 UPDATE Prompt 寫檔後、Brownfield 補 SPEC 後）建議都跑一次。
+
+### 5.8 指定產出語言（例如 zh-TW）
+
+所有 ZeroSpec Prompt Pack 都包含這段語言規則：
+
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
+
+這代表 **Prompt 本身永遠是英文**（指令格式），但 **產出檔案**（`AGENTS.md`、SPEC、ADR 等）通常會依據專案偵測到的語言決定。很多專案不需要額外操作。
+
+**自動偵測可能失準的時機**：如果你的專案 README 以英文撰寫，但你希望 `AGENTS.md` 與 `docs/` 使用其他語言（如台灣正體中文），Agent 可能會預設產出英文。此時可使用以下覆寫方式：
+
+| 範圍       | 做法                                                                                                   | 適用時機       |
+| ---------- | ------------------------------------------------------------------------------------------------------ | -------------- |
+| **一次性** | 在 Prompt 前加一行：`所有產出檔案請使用台灣正體中文（zh-TW）。`                                        | 臨時任務或測試 |
+| **專案層** | 在 `AGENTS.md` 開頭或 `.github/copilot-instructions.md` 加入：`All generated docs should be in zh-TW.` | 團隊一致性     |
+| **個人層** | 在 IDE 全域設定（如 `~/.copilot/instructions/`）加入：`Prefer zh-TW for generated docs.`               | 個人長期偏好   |
+
+**建議**：團隊成員語言一致時，用專案層設定。混合語言團隊則讓自動偵測運作，必要時用一次性覆寫。
 
 ---
 

@@ -1,7 +1,7 @@
 # ZeroSpec Methodology Guide
 
-> **Zero-dependency specification framework for AI-readable repositories.**
-> Help AI Coding Agents understand your project in 30 seconds and follow your architecture rules.
+> **Zero-dependency Markdown baseline for AI-readable repositories.**
+> Give AI coding agents a clear pre-coding brief: where code lives, which rules matter, and which files are source of truth.
 
 > Derived from: [GUIDE.zh-TW.md](GUIDE.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-23
 
@@ -10,6 +10,14 @@
 **Version**: v0.4 — 2026-04-23
 **Audience**: Engineering teams using GenAI Agents (GitHub Copilot / Codex / Claude / Gemini / Cursor)
 **Validation**: Verified across backend (.NET C# / Python), frontend (React + TypeScript), and shared library ecosystems
+
+---
+
+## Who Should Read This Guide?
+
+- Read this guide if you are maintaining `AGENTS.md`, designing team conventions, or deciding how ZeroSpec fits your engineering workflow.
+- If you are new to ZeroSpec, start with [README.md](README.md) first, then return here for methodology and long-term operating guidance.
+- If you mainly want day-to-day usage patterns, prefer [DAILY-USAGE.md](DAILY-USAGE.md).
 
 ---
 
@@ -32,24 +40,34 @@
 
 ZeroSpec is a zero-dependency, pure-Markdown AI readability framework. It operates as **Layer 0 (Context Readiness)**.
 
+Think of ZeroSpec as the project's pre-coding brief for AI agents: not a workflow engine, but the minimum context handoff before implementation starts.
+
 ### Layer 0 vs Layer 1
 
 | Layer       | Responsibility                                                | Representative Tools |
 | ----------- | ------------------------------------------------------------- | -------------------- |
 | **Layer 0** | Make the project "AI-readable" — constraints, navigation, SoT | **ZeroSpec**         |
-| **Layer 1** | Make AI "execute by process" — workflows, phase gates         | OpenSpec, SpecKit    |
+| **Layer 1** | Make AI "execute by process" — workflows, phase gates         | OpenSpec, Spec Kit   |
 
 ZeroSpec is not bound to any IDE, agent platform, or language. Its sole function: **ensure AI has precise project context before starting any task.**
+
+From an SDD workflow perspective, ZeroSpec is a lightweight Layer 0 baseline: API changes trigger SPEC updates, architecture decisions trigger ADRs, and system snapshots trigger SA updates.
+
+### How ZeroSpec Relates to SDD
+
+- **SDD-like**: ZeroSpec keeps SPEC / ADR / SA alive through event triggers.
+- **Not full workflow SDD**: ZeroSpec does not enforce phase gates, approvals, or execution states.
+- **Practical shorthand**: ZeroSpec is an **SDD-ready Layer 0 baseline**. Add Layer 1 tooling when you need strict process orchestration.
 
 #### Long-Term Integration with Layer 1
 
 ZeroSpec works standalone or integrates with Layer 1 tools as the team matures:
 
-| Stage                      | Timeline  | Approach                                                                           | Layer 1 Tool       |
-| -------------------------- | --------- | ---------------------------------------------------------------------------------- | ------------------ |
-| **Stage 1: Build habits**  | Month 1–3 | AGENTS.md + event-triggered SPEC updates (human review at PR time)                 | Not needed         |
-| **Stage 2: Add CI gates**  | Month 3–6 | PR template with SPEC Checklist; simple CI warns when Controller changes lack SPEC | Not needed         |
-| **Stage 3: Layer 1 merge** | 6+ months | ZeroSpec SPEC as Layer 1 input; Layer 1 adds execution phases and approval gates   | OpenSpec / SpecKit |
+| Stage                      | Timeline  | Approach                                                                           | Layer 1 Tool        |
+| -------------------------- | --------- | ---------------------------------------------------------------------------------- | ------------------- |
+| **Stage 1: Build habits**  | Month 1–3 | AGENTS.md + event-triggered SPEC updates (human review at PR time)                 | Not needed          |
+| **Stage 2: Add CI gates**  | Month 3–6 | PR template with SPEC Checklist; simple CI warns when Controller changes lack SPEC | Not needed          |
+| **Stage 3: Layer 1 merge** | 6+ months | ZeroSpec SPEC as Layer 1 input; Layer 1 adds execution phases and approval gates   | OpenSpec / Spec Kit |
 
 **Stage 3 trigger signals**: cross-team spec approval flows, mandatory phase gates, or automated acceptance conditions. Most small-to-mid teams stay at Stage 2.
 
@@ -83,14 +101,16 @@ Only Tier C requires human authoring (~5–8 team decisions). Everything else is
 
 ## 1. Why ZeroSpec
 
-AI Coding Agents read guidance files (e.g. `AGENTS.md`, `.cursor/rules`) at the project root before generating code. If these files are unstructured, outdated, or lack critical rules, AI will:
+When properly configured, AI Coding Agents often read guidance files (e.g. `AGENTS.md`, `.cursor/rules`) at the project root before generating code. If these files are unstructured, outdated, or lack critical rules, agents commonly show behaviors that reduce output quality:
 
-- **Blind search**: Waste tokens finding base packages or path aliases
-- **Violate architecture**: Put business logic in Controllers, use wrong state management
-- **Hallucinate**: Reference outdated versions or nonexistent APIs
-- **Lose focus**: Read lengthy human onboarding tutorials and future roadmaps
+- **Inefficient search**: Spend extra tokens finding base packages or path aliases
+- **Architectural violations**: Put business logic in Controllers or use the wrong state management approach
+- **Reference errors**: Cite outdated versions or nonexistent APIs
+- **Context dilution**: Spend attention on long human onboarding tutorials and future roadmaps
 
-ZeroSpec's goal: **Deliver maximum constraint precision in minimum tokens — make AI act like a senior team member.**
+These patterns are not inevitable, but they happen often enough in real projects that structured guidance is usually worth maintaining.
+
+ZeroSpec's goal: **deliver project-specific constraints in a format that agents can follow more reliably, while still leaving review and judgment to humans.**
 
 ---
 
@@ -124,7 +144,9 @@ The same document strategy may have minor differences across agent environments 
 
 Keep a "minimum viable spec" in every project: architecture constraints, build/test commands, docs sync triggers. This ensures consistent delivery quality regardless of agent platform.
 
-### Model Selection Guide
+### Optional Note: Model Selection
+
+Model choice can matter, but it is separate from ZeroSpec adoption. If you are also choosing models for specific tasks, these broad tendencies can help. For more day-to-day usage patterns, see [DAILY-USAGE.md](DAILY-USAGE.md).
 
 | Task Type                                 | Recommended Series               | Rationale                                                     |
 | ----------------------------------------- | -------------------------------- | ------------------------------------------------------------- |
@@ -203,7 +225,7 @@ When the Agent has full-text indexing / semantic search (Copilot `#codebase`, Cu
 
 Guidelines:
 
-- **Recommended length**: Keep concise (per Anthropic's official guidance); move content to docs/ sub-files when mainline gets noticeably long
+- **Recommended length**: Keep concise; 150–300 lines ≈ 2,000–4,000 tokens, which fits comfortably within mainstream LLM system prompt budgets (typically 4K–16K tokens) while leaving room for task-specific context. Exceeding this range risks crowding out conversation context and degrades response quality. Move overflowing sections to `docs/` sub-files and reference them via the navigation table.
 - **Required fields**: Project summary, anchor info, navigation table, code generation rules, verification commands, docs sync triggers
 - **Remove candidates**: Long background stories, beginner setup tutorials, unimplemented future roadmap details
 
@@ -234,7 +256,7 @@ Wrap maintainer-only notes in block HTML comments to avoid consuming AI context 
 
 ```markdown
 <!--
-Maintainer note: This naming convention was decided in 2024-Q3 cross-team meeting. Check with @coreyc before changing.
+Maintainer note: This naming convention was decided in 2024-Q3 cross-team meeting. Check with @tech-lead before changing.
 -->
 ```
 
@@ -305,7 +327,7 @@ Principle: **"Rules that must survive even after memory loss" go in Root; "detai
 
 The most important covenant in this methodology:
 
-> SPEC is the primary reference for development and GenAI. Every interface addition or modification updates the SPEC directly, with changes tracked in its Changelog.
+> SPEC usually serves as a primary reference for development and GenAI work. Interface additions or behavior changes should typically update the SPEC directly, with changes tracked in its Changelog.
 
 **Minimum maintenance rule**: For any PR involving interface or behavior changes, use the [SPEC Prompt Pack](prompts/SPEC.md) to let AI generate/update a SPEC draft. Human reviews and merges.
 
@@ -498,6 +520,8 @@ All quick review items, plus:
 
 ### Acceptance Metrics
 
+Use these as directional targets for projects with reasonably stable architecture and team agreement on conventions. They are useful review goals, not guarantees.
+
 | Metric                               | Target   |
 | ------------------------------------ | -------- |
 | Day-1 human effort                   | ≤ 30 min |
@@ -530,7 +554,7 @@ Each project's `docs/README.md` includes a cross-system conventions section:
 
 ### 8.2 Consistency Checklist
 
-Items that MUST be semantically identical across projects:
+Items that should stay semantically aligned across projects:
 
 - [ ] Navigation table ADR row descriptions use identical wording
 - [ ] SPEC Source of Truth definition is identical
@@ -582,7 +606,7 @@ If one platform repeatedly misses a rule, adjust that rule's visibility and clar
 
 ### 9.4 Source of Truth and Drift Prevention
 
-[OpenSpec](https://github.com/Fission-AI/OpenSpec) — AI-native spec management tool · [API-First Development](https://swagger.io/resources/articles/adopting-an-api-first-approach/) — Swagger/OpenAPI methodology
+[OpenSpec](https://github.com/Fission-AI/OpenSpec) — AI-native spec management tool · [Spec Kit](https://github.com/github/spec-kit) — Spec-Driven Development CLI · [API-First Development](https://swagger.io/resources/articles/adopting-an-api-first-approach/) — Swagger/OpenAPI methodology
 
 ### 9.5 Context Window Optimization
 

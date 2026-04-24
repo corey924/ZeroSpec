@@ -94,6 +94,7 @@ Assert-FileExists 'prompts/SPEC.md'
 Assert-FileExists 'prompts/ADR.md'
 Assert-FileExists 'prompts/SA.md'
 Assert-FileExists 'prompts/AUDIT.md'
+Assert-FileExists '.github/pull_request_template.md'
 
 Assert-FileExists 'templates/DOCS-README-TEMPLATE.md'
 Assert-FileExists 'templates/SPEC-TEMPLATE.md'
@@ -119,6 +120,13 @@ Assert-FirstLineStartsWithHeader 'examples/minimal-day1/docs/README.md'
 Assert-Contains 'prompts/SPEC.md' '## Prerequisites'
 Assert-Contains 'prompts/ADR.md' '## Prerequisites'
 Assert-Contains 'prompts/SA.md' '## Prerequisites'
+Assert-Contains 'prompts/AUDIT.md' '^## Limitations$'
+Assert-NotContains 'prompts/AUDIT.md' '^## 限制$'
+
+Assert-Contains '.github/pull_request_template.md' '^## Background / Problem$'
+Assert-Contains '.github/pull_request_template.md' '^## SDD Sync Checklist$'
+Assert-NotContains '.github/pull_request_template.md' '背景 / 問題|SDD 同步檢查項|驗證方式|額外說明'
+Assert-Contains 'CHANGELOG.md' '^This file tracks the version history of the ZeroSpec framework\.$'
 
 Assert-Contains 'prompts/SPEC.md' 'docs/README\.md'
 Assert-Contains 'prompts/ADR.md' 'docs/README\.md'
@@ -161,10 +169,50 @@ Assert-FileExists 'examples/java-library/docs/README.md'
 Assert-FileExists 'examples/python-package/docs/README.md'
 Assert-FileExists 'examples/react-nx-monorepo/docs/README.md'
 
+# examples: docs instance files (v0.4.1)
+Assert-FileExists 'examples/dotnet-dual-api/docs/analysis/SA-001_system-overview.md'
+Assert-FileExists 'examples/dotnet-dual-api/docs/spec/SPEC-001_api-auth-and-rbac.md'
+Assert-FileExists 'examples/dotnet-dual-api/docs/adr/ADR-001_dual-host-api-architecture.md'
+Assert-FileExists 'examples/java-library/docs/spec/SPEC-001_communication-core-service-interface.md'
+
 Assert-Contains 'examples/dotnet-dual-api/docs/README.md' 'booking-backend'
 Assert-Contains 'examples/java-library/docs/README.md' 'edge-comm-core'
 Assert-Contains 'examples/python-package/docs/README.md' 'etl-pipeline-core'
 Assert-Contains 'examples/react-nx-monorepo/docs/README.md' 'inventory-frontend'
+
+# examples i18n: English primary + zh-TW copies (v0.4.1)
+Assert-FileExists 'examples/minimal-day1/AGENTS.zh-TW.md'
+Assert-FileExists 'examples/minimal-day1/README.zh-TW.md'
+Assert-FileExists 'examples/minimal-day1/docs/README.zh-TW.md'
+Assert-FileExists 'examples/dotnet-dual-api/AGENTS.zh-TW.md'
+Assert-FileExists 'examples/dotnet-dual-api/docs/README.zh-TW.md'
+Assert-FileExists 'examples/java-library/AGENTS.zh-TW.md'
+Assert-FileExists 'examples/java-library/docs/README.zh-TW.md'
+Assert-FileExists 'examples/python-package/AGENTS.zh-TW.md'
+Assert-FileExists 'examples/python-package/docs/README.zh-TW.md'
+Assert-FileExists 'examples/react-nx-monorepo/AGENTS.zh-TW.md'
+Assert-FileExists 'examples/react-nx-monorepo/docs/README.zh-TW.md'
+
+# examples zh-TW docs index sync (projects with instantiated docs)
+Assert-Contains 'examples/dotnet-dual-api/docs/README.zh-TW.md' 'SA-001_system-overview\.md'
+Assert-Contains 'examples/dotnet-dual-api/docs/README.zh-TW.md' 'SPEC-001_api-auth-and-rbac\.md'
+Assert-Contains 'examples/dotnet-dual-api/docs/README.zh-TW.md' 'ADR-001_dual-host-api-architecture\.md'
+Assert-NotContains 'examples/dotnet-dual-api/docs/README.zh-TW.md' '尚無文件'
+
+Assert-Contains 'examples/java-library/docs/README.zh-TW.md' 'SPEC-001_communication-core-service-interface\.md'
+Assert-NotContains 'examples/java-library/docs/README.zh-TW.md' '尚無文件'
+
+# examples zh-TW docs index keeps Day-1 placeholders
+Assert-Contains 'examples/minimal-day1/docs/README.zh-TW.md' '尚無文件'
+Assert-Contains 'examples/python-package/docs/README.zh-TW.md' '尚無文件'
+Assert-Contains 'examples/react-nx-monorepo/docs/README.zh-TW.md' '尚無文件'
+
+# examples: Quick Constraints present in all AGENTS.md
+Assert-Contains 'examples/minimal-day1/AGENTS.md' '## Quick Constraints'
+Assert-Contains 'examples/dotnet-dual-api/AGENTS.md' '## Quick Constraints'
+Assert-Contains 'examples/java-library/AGENTS.md' '## Quick Constraints'
+Assert-Contains 'examples/python-package/AGENTS.md' '## Quick Constraints'
+Assert-Contains 'examples/react-nx-monorepo/AGENTS.md' '## Quick Constraints'
 
 Assert-NotContains 'GUIDE.md' '就就位'
 

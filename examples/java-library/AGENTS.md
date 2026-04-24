@@ -1,65 +1,71 @@
-# AGENTS.md — edge-comm-core AI 導航指引
+# AGENTS.md — edge-comm-core AI Navigation Guide
 
-> 本文件是 GenAI Agent 理解 edge-comm-core 專案的首要入口。請在處理任何程式碼任務前先讀完本文件。
+> Primary entry point for GenAI Agents. Read before starting any task.
 
-## 專案定位
+## Project Summary
 
-**邊緣設備通訊核心庫** — 封裝 自動化倉儲設備的指令派送、Job 生命週期管理（輪詢、重試、逾時補償）與廠商 Adapter 串接，以 **Library JAR** 方式注入主後端服務。
+**Edge Device Communication Core Library** — Encapsulates command dispatch, Job lifecycle management (polling, retry, timeout compensation), and vendor Adapter integration for automated warehouse devices. Delivered as a **Library JAR** injected into the main backend service.
 
-- **技術棧**：Java 21 + Spring Boot 3.5 + Gradle 8.14 + PostgreSQL 16（共用主後端同一 DB）
-- **Base Package**：`com.example.communication`（新增程式碼時以 `src/main/java` 實際結構為準）
-- **架構特性**：Library，無獨立 HTTP API，透過 Spring AutoConfiguration 整合
-- **對外入口**：唯一公用介面為 `CommunicationCoreService`，其餘 class 均為內部實作
-- **版本真相來源**：依賴與 plugin 版本以 `build.gradle` 為唯一準據
+- **Tech Stack**: Java 21 + Spring Boot 3.5 + Gradle 8.14 + PostgreSQL 16 (shared DB with main backend)
+- **Base Package**: `com.example.communication` (follow actual `src/main/java` structure)
+- **Architecture**: Library — no standalone HTTP API; integrated via Spring AutoConfiguration
+- **Public API**: Only `CommunicationCoreService` is public — all other classes are internal
+- **Version source of truth**: dependencies and plugin versions per `build.gradle`
 
-## GenAI 文件導航
+## Quick Constraints
 
-| 你想做什麼             | 先讀這裡                              |
-| ---------------------- | ------------------------------------- |
-| 了解系統全貌與元件職責 | docs/analysis/SA-001                  |
-| 查詢對外介面契約       | docs/spec/SPEC-001（Source of Truth） |
-| 了解與主後端整合步驟   | docs/INTEGRATION.md                   |
+1. `CommunicationCoreService` is the only public API — MUST NOT add REST Controllers
+2. Scheduling logic (`JobTimeoutScanner`, `JobRetryScheduler`) is owned by this library — MUST NOT move to consumer project
+3. Adding a new vendor Adapter MUST update `AdapterFactory` registry AND SPEC
 
-## 業務領域 ↔ Java Package 對照表
+## Domain-to-Code Map
 
-| 職責領域              | 關鍵 Package / Class                                         |
+| Domain                | Key Package / Class                                          |
 | --------------------- | ------------------------------------------------------------ |
-| **對外公用介面**      | `service/CommunicationCoreService`                           |
-| **指令派送**          | `dispatcher/CommandDispatcher`                               |
-| **廠商 Adapter 串接** | `adapter/VendorAdapter`, `adapter/AdapterFactory`            |
-| **Job 生命週期排程**  | `scheduler/JobTimeoutScanner`, `scheduler/JobRetryScheduler` |
-| **回調處理**          | `callback/JobCompletionHandler`                              |
-| **資料存取**          | `repository/JobRepository`, `repository/DeviceRepository`    |
+| **Public API**        | `service/CommunicationCoreService`                           |
+| **Command Dispatch**  | `dispatcher/CommandDispatcher`                               |
+| **Vendor Adapters**   | `adapter/VendorAdapter`, `adapter/AdapterFactory`            |
+| **Job Lifecycle**     | `scheduler/JobTimeoutScanner`, `scheduler/JobRetryScheduler` |
+| **Callback Handling** | `callback/JobCompletionHandler`                              |
+| **Data Access**       | `repository/JobRepository`, `repository/DeviceRepository`    |
 
-## 程式碼產生規範
+## Code Generation Rules
 
-### 架構約束
+### Architecture Constraints
 
-- **無 Controller 業務層**：唯一對外介面是 `CommunicationCoreService`，不新增 REST Controller
-- **排程邏輯屬內建**：`JobTimeoutScanner`、`JobRetryScheduler` 的邏輯由本 Library 自管
-- **不新增廠商 Adapter** 而不同步更新 `AdapterFactory` 的 registry 與 SPEC 介面說明
+- Only public API is `CommunicationCoreService` — do not add REST Controllers
+- Scheduling logic is owned by this library — do not delegate to consumer project
+- New vendor Adapters MUST update `AdapterFactory` registry and SPEC description
 
-### 介面異動規則
+### Interface Change Rules
 
-- 修改 `CommunicationCoreService` 任何 public method 簽章，**同一 PR 必須更新** SPEC Changelog
+- Any `CommunicationCoreService` public method signature change MUST update SPEC Changelog in the same PR
 
-## 常用開發指令
+## GenAI Documentation Navigation
 
-| 指令                            | 說明             |
-| ------------------------------- | ---------------- |
-| `./gradlew build`               | 建置並執行測試   |
-| `./gradlew test`                | 僅執行測試       |
-| `./gradlew publishToMavenLocal` | 發布至本地 Maven |
+| What you want to do               | Read this first                      |
+| --------------------------------- | ------------------------------------ |
+| Understand system components      | docs/analysis/SA-001                 |
+| Look up public interface contract | docs/spec/SPEC-001 (Source of Truth) |
+| Integration with main backend     | docs/INTEGRATION.md                  |
 
-## 關聯專案
+## Common Commands
 
-| 專案                | 關係           | 說明                               |
-| ------------------- | -------------- | ---------------------------------- |
-| `logistics-api-hub` | Library 消費方 | 透過 Gradle 本地依賴引入本 Library |
+| Command                         | Description            |
+| ------------------------------- | ---------------------- |
+| `./gradlew build`               | Build and run tests    |
+| `./gradlew test`                | Run tests only         |
+| `./gradlew publishToMavenLocal` | Publish to local Maven |
 
-## 文件維護提醒
+## Related Projects
 
-- **PR 涉及 `CommunicationCoreService` 介面異動**：同步更新 SPEC Changelog
-- **PR 涉及整合步驟變更**：更新 `docs/INTEGRATION.md`
-- **新增架構決策**：撰寫新 ADR
-- 文件治理規則詳見 `docs/README.md`
+| Project             | Relationship     | Notes                                            |
+| ------------------- | ---------------- | ------------------------------------------------ |
+| `logistics-api-hub` | Library consumer | Imports this library via Gradle local dependency |
+
+## Documentation Maintenance Reminders
+
+- **`CommunicationCoreService` interface change**: update SPEC Changelog
+- **Integration step change**: update `docs/INTEGRATION.md`
+- **Architecture decision**: write new ADR
+- Docs governance rules: `docs/README.md`

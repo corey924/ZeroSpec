@@ -37,6 +37,7 @@ Act as a project system analyst.
 This task is analysis-only. Do not generate code or write files.
 
 > **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
+> To override, prepend `Respond in {locale}` (e.g. `Respond in zh-TW`) before pasting this prompt.
 
 ## Goal
 

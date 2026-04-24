@@ -41,6 +41,7 @@ Based on the prior project analysis, create two files: `AGENTS.md` and `docs/REA
 Follow these four steps in strict order:
 
 > **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
+> To override, prepend `Respond in {locale}` (e.g. `Respond in zh-TW`) before pasting this prompt.
 
 ## Step 1: Import SCAN Results
 

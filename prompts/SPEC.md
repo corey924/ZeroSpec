@@ -53,6 +53,7 @@ Write the above as a new entry in `## Changelog`. Example: `- YYYY-MM-DD Bugfix:
 Generate or update a SPEC document for this API change.
 
 > **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
+> To override, prepend `Respond in {locale}` (e.g. `Respond in zh-TW`) before pasting this prompt.
 
 ## Prerequisites
 

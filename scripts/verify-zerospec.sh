@@ -117,6 +117,7 @@ assert_file_exists "prompts/SPEC.md"
 assert_file_exists "prompts/ADR.md"
 assert_file_exists "prompts/SA.md"
 assert_file_exists "prompts/AUDIT.md"
+assert_file_exists ".github/pull_request_template.md"
 
 assert_file_exists "templates/DOCS-README-TEMPLATE.md"
 assert_file_exists "templates/SPEC-TEMPLATE.md"
@@ -142,6 +143,13 @@ assert_first_line_starts_with_header "examples/minimal-day1/docs/README.md"
 assert_grep "## Prerequisites" "prompts/SPEC.md"
 assert_grep "## Prerequisites" "prompts/ADR.md"
 assert_grep "## Prerequisites" "prompts/SA.md"
+assert_grep "^## Limitations$" "prompts/AUDIT.md"
+assert_no_grep "^## 限制$" "prompts/AUDIT.md"
+
+assert_grep "^## Background / Problem$" ".github/pull_request_template.md"
+assert_grep "^## SDD Sync Checklist$" ".github/pull_request_template.md"
+assert_no_grep "背景 / 問題|SDD 同步檢查項|驗證方式|額外說明" ".github/pull_request_template.md"
+assert_grep "^This file tracks the version history of the ZeroSpec framework\\.$" "CHANGELOG.md"
 
 assert_grep "docs/README\.md" "prompts/SPEC.md"
 assert_grep "docs/README\.md" "prompts/ADR.md"
@@ -184,10 +192,50 @@ assert_file_exists "examples/java-library/docs/README.md"
 assert_file_exists "examples/python-package/docs/README.md"
 assert_file_exists "examples/react-nx-monorepo/docs/README.md"
 
+# examples: docs instance files (v0.4.1)
+assert_file_exists "examples/dotnet-dual-api/docs/analysis/SA-001_system-overview.md"
+assert_file_exists "examples/dotnet-dual-api/docs/spec/SPEC-001_api-auth-and-rbac.md"
+assert_file_exists "examples/dotnet-dual-api/docs/adr/ADR-001_dual-host-api-architecture.md"
+assert_file_exists "examples/java-library/docs/spec/SPEC-001_communication-core-service-interface.md"
+
 assert_grep "booking-backend" "examples/dotnet-dual-api/docs/README.md"
 assert_grep "edge-comm-core" "examples/java-library/docs/README.md"
 assert_grep "etl-pipeline-core" "examples/python-package/docs/README.md"
 assert_grep "inventory-frontend" "examples/react-nx-monorepo/docs/README.md"
+
+# examples i18n: English primary + zh-TW copies (v0.4.1)
+assert_file_exists "examples/minimal-day1/AGENTS.zh-TW.md"
+assert_file_exists "examples/minimal-day1/README.zh-TW.md"
+assert_file_exists "examples/minimal-day1/docs/README.zh-TW.md"
+assert_file_exists "examples/dotnet-dual-api/AGENTS.zh-TW.md"
+assert_file_exists "examples/dotnet-dual-api/docs/README.zh-TW.md"
+assert_file_exists "examples/java-library/AGENTS.zh-TW.md"
+assert_file_exists "examples/java-library/docs/README.zh-TW.md"
+assert_file_exists "examples/python-package/AGENTS.zh-TW.md"
+assert_file_exists "examples/python-package/docs/README.zh-TW.md"
+assert_file_exists "examples/react-nx-monorepo/AGENTS.zh-TW.md"
+assert_file_exists "examples/react-nx-monorepo/docs/README.zh-TW.md"
+
+# examples zh-TW docs index sync (projects with instantiated docs)
+assert_grep "SA-001_system-overview\\.md" "examples/dotnet-dual-api/docs/README.zh-TW.md"
+assert_grep "SPEC-001_api-auth-and-rbac\\.md" "examples/dotnet-dual-api/docs/README.zh-TW.md"
+assert_grep "ADR-001_dual-host-api-architecture\\.md" "examples/dotnet-dual-api/docs/README.zh-TW.md"
+assert_no_grep "尚無文件" "examples/dotnet-dual-api/docs/README.zh-TW.md"
+
+assert_grep "SPEC-001_communication-core-service-interface\\.md" "examples/java-library/docs/README.zh-TW.md"
+assert_no_grep "尚無文件" "examples/java-library/docs/README.zh-TW.md"
+
+# examples zh-TW docs index keeps Day-1 placeholders
+assert_grep "尚無文件" "examples/minimal-day1/docs/README.zh-TW.md"
+assert_grep "尚無文件" "examples/python-package/docs/README.zh-TW.md"
+assert_grep "尚無文件" "examples/react-nx-monorepo/docs/README.zh-TW.md"
+
+# examples: Quick Constraints present in all AGENTS.md
+assert_grep "## Quick Constraints" "examples/minimal-day1/AGENTS.md"
+assert_grep "## Quick Constraints" "examples/dotnet-dual-api/AGENTS.md"
+assert_grep "## Quick Constraints" "examples/java-library/AGENTS.md"
+assert_grep "## Quick Constraints" "examples/python-package/AGENTS.md"
+assert_grep "## Quick Constraints" "examples/react-nx-monorepo/AGENTS.md"
 
 assert_no_grep "就就位" "GUIDE.md"
 

@@ -46,6 +46,7 @@
 Generate an ADR document for this technical decision.
 
 > **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
+> To override, prepend `Respond in {locale}` (e.g. `Respond in zh-TW`) before pasting this prompt.
 
 ## Prerequisites
 

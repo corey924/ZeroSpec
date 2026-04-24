@@ -1,24 +1,24 @@
-# minimal-day1 範例
+# minimal-day1 Example
 
-此範例展示 **剛跑完 INIT-SCAN + INIT-BUILD 後的 Day-1 產出**。
+This example shows a **Day-1 output immediately after running INIT-SCAN + INIT-BUILD**.
 
-## 包含檔案
+## Contents
 
-- `AGENTS.md` — 精簡版 AI 導航指引（~70 行）
-- `docs/README.md` — 文件治理中心
+- `AGENTS.md` — minimal AI navigation guide (~60 lines)
+- `docs/README.md` — docs governance hub
 
-## 設計重點
+## Design Intent
 
-- **只有最必要的段落**：專案定位、對照表（3 個模組）、基本規範、常用指令
-- **沒有完整的文件導航**：因為 Day-1 尚無 docs/ 文件可導航
-- **候選文件已就緒**：docs/README.md 的 Lazy Evaluation 表已列出建議的第一份 SPEC
-- **隨專案演進逐步豐富**：模組增加時用 UPDATE Prompt 更新對照表，API 穩定後用 SPEC Prompt 建立契約
+- **Essential sections only**: Project Summary, domain map (3 modules), core rules, common commands
+- **No full docs navigation**: Day-1 has no `docs/` files yet to navigate to
+- **Candidate documents ready**: `docs/README.md` Lazy Evaluation table lists the recommended first SPEC
+- **Grows with the project**: add modules via UPDATE Prompt; formalize APIs via SPEC Prompt as they stabilize
 
-## 與成熟版範例的差異
+## Day-1 vs. Mature Example Comparison
 
-| 項目           | Day-1（本範例）   | 成熟版（其他範例）    |
-| -------------- | ----------------- | --------------------- |
-| 對照表模組數   | 3 個              | 8-12 個               |
-| 文件導航表     | 僅 docs/README.md | 完整 SA/SPEC/ADR 導航 |
-| 程式碼規範條目 | 3-5 條            | 10-15 條              |
-| 關聯專案段落   | 省略              | 含相對路徑與關係說明  |
+| Aspect                     | Day-1 (this example) | Mature (other examples)           |
+| -------------------------- | -------------------- | --------------------------------- |
+| Domain map entries         | 3                    | 8–12                              |
+| Docs navigation table      | docs/README.md only  | Full SA / SPEC / ADR navigation   |
+| Code generation rule count | 3–5                  | 10–15                             |
+| Related Projects section   | Omitted              | Includes relative paths and notes |

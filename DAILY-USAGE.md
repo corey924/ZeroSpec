@@ -26,15 +26,15 @@
 
 ## 1. Three Daily Operation Modes
 
-After ZeroSpec adoption, daily work is just Agent mode with your project's `AGENTS.md` in place. The AI Agent **auto-reads `AGENTS.md`** on startup — that is how ZeroSpec is designed to work. You rarely need to open ZeroSpec's Prompt Packs.
+After ZeroSpec adoption, daily work usually means Agent mode with your project's `AGENTS.md` in place. When properly configured, many AI Agents read `AGENTS.md` at startup or early in the task. In many day-to-day tasks, you will not need to open ZeroSpec's Prompt Packs.
 
 ### Mode A: Pure Coding (90% of the time)
 
-Write code normally in Agent mode. The Agent reads `AGENTS.md` on startup and follows your architecture rules.
+Write code normally in Agent mode. In a well-configured setup, the Agent starts from `AGENTS.md` and uses it as the project constraint baseline.
 
-**No ZeroSpec action required.**
+**In many tasks, no explicit ZeroSpec step is required.**
 
-> This is ZeroSpec's goal: after Day-1, it becomes "invisible infrastructure."
+> The intended outcome is that, after Day-1, ZeroSpec fades into the normal development workflow rather than becoming another checklist to manage.
 
 ### Mode B: Event-Triggered Doc Updates (~8%)
 
@@ -44,7 +44,7 @@ When a PR involves API additions, architecture decisions, or major changes, swit
 2. Copy the relevant Prompt Pack from ZeroSpec (SPEC / ADR / SA)
 3. Paste into Agent → draft generated → review → merge into PR
 
-**Key insight**: Doc updates are part of the PR, not a separate task. Once habitual, this takes ~5–10 minutes.
+**Recommendation**: Treat doc updates as part of the PR scope, not as a separate follow-up task. Once the habit is in place, this often takes ~5–10 minutes.
 
 ### Mode C: Periodic Review (~2%)
 
@@ -53,6 +53,20 @@ Monthly or quarterly, run an UPDATE Prompt for a health check. See [Section 6](#
 ---
 
 ## 2. IDE and Agent Platform Configuration
+
+### Multi-Agent Entry File Quick Reference
+
+Different AI platforms read different guidance files at startup or task start. The core principle: **prefer platform-specific entry files that import or reference `AGENTS.md`** rather than duplicating its content. Duplicated rules can create competing instruction sets and consume the agent's limited attention budget.
+
+| Platform                     | Primary Entry File                              | Auto-Read                                                            | Pointer Strategy                                                    |
+| ---------------------------- | ----------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **GitHub Copilot (VS Code)** | `.github/copilot-instructions.md` + `AGENTS.md` | copilot-instructions ✅ / AGENTS.md ❌ (requires `@AGENTS.md` mention) | Add `@AGENTS.md` reference inside copilot-instructions              |
+| **Cursor**                   | `AGENTS.md` / `.cursorrules`                    | ✅                                                                    | Keep AGENTS.md as source of truth; other entry files import from it |
+| **Claude Code**              | `CLAUDE.md`                                     | ✅                                                                    | `@AGENTS.md` at top of CLAUDE.md (Claude Code import syntax)        |
+| **Windsurf**                 | `AGENTS.md`                                     | ✅                                                                    | Use directly                                                        |
+| **JetBrains AI Assistant**   | `AGENTS.md`                                     | ✅ (requires Attach project files enabled)                            | Use directly                                                        |
+
+> Each platform is covered in detail in §2.2 (Copilot / Claude Code) and §2.4 (multi-root). This table is the at-a-glance reference.
 
 ### 2.1 ZeroSpec Repo Does NOT Need to Stay Open
 
@@ -73,10 +87,10 @@ ZeroSpec itself (`prompts/`, `templates/`, `GUIDE.md`) is a "toolbox," not a wor
 
 GitHub Copilot supports both guidance files:
 
-| File                              | Read Timing             | Best Content                                                    |
-| --------------------------------- | ----------------------- | --------------------------------------------------------------- |
-| `.github/copilot-instructions.md` | Every conversation auto | Personal preferences, language, response format (cross-project) |
-| `AGENTS.md`                       | Every task auto         | Project-specific constraints (architecture, naming, tech stack) |
+| File                              | Typical Read Timing                        | Best Content                                                    |
+| --------------------------------- | ------------------------------------------ | --------------------------------------------------------------- |
+| `.github/copilot-instructions.md` | Auto-read for each Copilot conversation    | Personal preferences, language, response format (cross-project) |
+| `AGENTS.md`                       | Task start when supported, or by reference | Project-specific constraints (architecture, naming, tech stack) |
 
 **Best practice**:
 
@@ -313,7 +327,7 @@ Extra time: Week 1 ~45–60 min (SA + first SPEC); Weeks 2–4 ~10–20 min/week
 
 ### Scenario G: Explore → Plan → Implement Rhythm (Recommended for Medium+ Tasks)
 
-Most Agent platforms (Claude Code Plan mode, Copilot Chat, Cursor Composer) support "analyze first, implement later." For multi-file tasks, staged execution typically yields higher quality:
+Most Agent platforms (Claude Code Plan mode, Copilot Chat, Cursor Composer) support "analyze first, implement later." For multi-file tasks, staged execution often yields better quality:
 
 ```
 Task: Add OAuth login flow to my-backend (spans AuthController, SecurityConfig, User entity)
@@ -337,7 +351,7 @@ Step 4 — Commit & SPEC (same conversation)
 
 **When to skip this rhythm**: Single-file typos, single-line log additions, simple renames — "diffs describable in one sentence." The planning overhead only pays off for complex tasks.
 
-**Why it matters**: AGENTS.md provides structural constraints but cannot replace task-level planning. The Explore phase lets the Agent understand the task boundary before acting — the most effective guard against "plausible-looking code that misses edge cases."
+**Why it matters**: AGENTS.md provides structural constraints but cannot replace task-level planning. The Explore phase helps the Agent understand the task boundary before acting, which is a practical guard against "plausible-looking code that misses edge cases."
 
 ---
 
@@ -359,7 +373,7 @@ Step 4 — Commit & SPEC (same conversation)
 **Mitigation strategies**:
 - Set a monthly 15-minute "SDD Quick Review" calendar event
 - UPDATE Prompt's diff report auto-detects added/removed Controllers and Services
-- If the map lags by 3+ modules, Agent-generated code is usually still correct — it relies on architecture rules (Tier C) not the map (Tier B) for decisions. The map helps the Agent "find the right file faster" but does not affect correctness.
+- If the map lags by 3+ modules, Agent-generated code is often still usable — architecture rules (Tier C) usually matter more for correctness than the map itself. The map is primarily a navigation aid that helps the Agent find the right file faster.
 
 ### 5.3 "Team Members Don't Buy In"
 
@@ -419,7 +433,7 @@ If a document has never been referenced since creation, it probably should not e
 
 ### 5.6 AI Repeatedly Violates the Same AGENTS.md Rule
 
-**Root cause priority** (high → low):
+**Suggested investigation order**:
 
 1. **AGENTS.md too long / core rules buried in noise**: File is noticeably long with generic knowledge the AI already has → core rules fall into the attention dilution zone
 2. **Rule description is ambiguous**: Same rule described inconsistently in two places, or wording too abstract to verify (e.g. "write clean code")
@@ -464,6 +478,24 @@ After writing or major updates to AGENTS.md, **run a quick test in a new convers
 - **Mostly wrong**: Run [AUDIT Prompt](prompts/AUDIT.md) for a full audit
 
 > Run this test after every major AGENTS.md change (e.g. after UPDATE Prompt writes, after Brownfield SPEC backfill).
+
+### 5.8 Specifying Output Language (e.g. zh-TW)
+
+All ZeroSpec Prompt Packs include this language rule:
+
+> **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
+
+This means the **prompt itself is always English** (instruction format), but the **generated output** (`AGENTS.md`, SPECs, ADRs) will usually match your project's detected language. In many repos, no manual action is needed.
+
+**When auto-detection may fall short**: If your project's README is in English but you want `AGENTS.md` and `docs/` in a different language (e.g. zh-TW), the Agent may default to English. Use one of these overrides:
+
+| Scope             | How                                                                                                       | When                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **One-time**      | Prepend to the prompt: `Respond in zh-TW for all generated files.`                                        | Ad-hoc tasks or testing       |
+| **Project-level** | Add to `AGENTS.md` header or `.github/copilot-instructions.md`: `All generated docs should be in zh-TW.`  | Team-wide consistency         |
+| **Personal**      | Add to your IDE global instructions (e.g. `~/.copilot/instructions/`): `Prefer zh-TW for generated docs.` | Personal long-term preference |
+
+**Recommendation**: For teams where everyone shares the same locale, use project-level. For mixed-language teams, let auto-detection work and use one-time override when needed.
 
 ---
 

@@ -41,6 +41,7 @@ This Prompt does not write files or modify code — it only produces an assessme
 Audit this project's `AGENTS.md` and produce a structured report across the dimensions below. **This task is read-only — DO NOT write any files.**
 
 > **Language**: Detect the repository's primary language from README, docs, and code comments. Respond in that language. Default to English if ambiguous.
+> To override, prepend `Respond in {locale}` (e.g. `Respond in zh-TW`) before pasting this prompt.
 
 ## Prerequisites
 
@@ -200,8 +201,8 @@ If these actions involve file writes, use [UPDATE Prompt](UPDATE.md) with the au
 
 ---
 
-## 限制
+## Limitations
 
-- 本 Prompt 只能診斷 AGENTS.md 本身，無法評估「Agent 實際遵從率」
-- 實際遵從率需要長期觀察 PR review 紀錄或跑多次真實任務統計
-- 若報告中「可驗證／不可驗證」的判斷有疑慮，以使用者經驗為準
+- This Prompt can only diagnose `AGENTS.md` itself; it cannot evaluate actual Agent compliance rate.
+- Actual compliance rate requires long-term observation of PR review history or repeated real-task sampling.
+- If there is ambiguity in the report's "verifiable / not verifiable" judgment, use user experience as the final reference.

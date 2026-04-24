@@ -1,72 +1,72 @@
-# AGENTS.md — booking-backend AI 導航指引
+# AGENTS.md — booking-backend AI Navigation Guide
 
-> 本文件是 GenAI Agent 理解 booking-backend 專案的首要入口。請在處理任何程式碼任務前先讀完本文件。
+> Primary entry point for GenAI Agents. Read before starting any task.
 
-## 專案定位
+## Project Summary
 
-**大型展會預約後端系統** — 提供後台管理 API 與終端使用者 API，涵蓋劃位、付款回調、報表與營運管理。
+**Large-scale Event Booking API** — Dual-host backend covering seat allocation, payment callbacks, reporting, and operations.
 
-- **技術棧**：.NET 10（C#）+ ASP.NET Core + EF Core + SQL Server + MSTest
-- **架構模式**：雙 API Host（Admin / EndUser）共用 Service 層
-- **部署方式**：Azure Web App（CI 由 GitHub Actions 驅動）
-- **版本真相來源**：
-  - .NET SDK 以 `global.json` 為準
-  - 套件版本以各專案 `.csproj` 為準
+- **Tech Stack**: .NET 10 (C#) + ASP.NET Core + EF Core + SQL Server + MSTest
+- **Architecture**: Dual API Host (Admin / EndUser) sharing a common Service layer
+- **Base Namespace**: `Booking.Api.Admin`, `Booking.Api.EndUser`, `Booking.Service`, `Booking.Test` (follow `Booking.sln`)
+- **Deployment**: Azure Web App (CI via GitHub Actions)
+- **Version source of truth**: .NET SDK per `global.json`; packages per `.csproj`
 
-## 定錨資訊
+## Quick Constraints
 
-- **Base Namespace**：`Booking.Api.Admin`、`Booking.Api.EndUser`、`Booking.Service`、`Booking.Test`
-- **Solution 結構**：以 `Booking.sln` 為唯一結構入口
+1. Controllers handle HTTP request/response only — no business logic
+2. Controllers MUST NOT write SQL or access DbContext directly
+3. Never bypass the auth chain (Filter / Middleware / Policy)
+4. No real credentials or secrets in docs or code
 
-## GenAI 文件導航
+## Domain-to-Code Map
 
-| 你想做什麼                | 先讀這裡                                     |
-| ------------------------- | -------------------------------------------- |
-| 了解系統全貌與風險區域    | docs/analysis/SA-001_system-overview.md      |
-| 查詢 API、JWT、權限、RBAC | docs/spec/SPEC-001_api-auth-and-rbac.md      |
-| 查詢外部整合與背景工作    | docs/spec/SPEC-002_external-integrations.md  |
-| 查詢部署與 CI/CD 設定     | docs/infra/INFRA-001_deployment-and-ci-cd.md |
+| Domain                     | API Host        | Code Location                 |
+| -------------------------- | --------------- | ----------------------------- |
+| Auth & Authorization       | Admin + EndUser | `Controllers/`, `Middleware/` |
+| Seat Planning & Operations | EndUser + Admin | `Booking.Service/Services/`   |
+| Payment & Callbacks        | EndUser         | `Filters/`, `Services/`       |
+| Reporting & Scheduling     | Admin           | `ScheduleJobs/`, `Services/`  |
 
-## 業務領域 ↔ 程式碼對照表
+## Code Generation Rules
 
-| 業務領域       | 主要 API Host   | 核心程式碼位置                |
-| -------------- | --------------- | ----------------------------- |
-| 認證與授權     | Admin + EndUser | `Controllers/`, `Middleware/` |
-| 規劃與劃位營運 | EndUser + Admin | `Booking.Service/Services/`    |
-| 付款與回調     | EndUser         | `Filters/`, `Services/`       |
-| 報表與排程     | Admin           | `ScheduleJobs/`, `Services/`  |
+### Architecture
 
-## 程式碼產生規範
+- Controllers handle HTTP only — business logic belongs in `Booking.Service/Services`
+- Data access belongs in `Booking.Service/Repositories`
 
-### 架構層級
+### Naming
 
-- Controller 僅處理 HTTP request/response，不放業務邏輯
-- 業務邏輯集中在 `Booking.Service/Services`
-- 資料存取集中在 `Booking.Service/Repositories`
+- New services: `{Domain}Service`
+- New repositories: `{Domain}Repository`
 
-### 命名慣例
+### Prohibited
 
-- 新增服務：`{Domain}Service`
-- 新增儲存庫：`{Domain}Repository`
+- Controllers MUST NOT write SQL or access DbContext directly
+- Never bypass existing auth chain (Filter / Middleware / Policy)
+- No real credentials or secrets in docs or code
 
-### 禁止事項
+## GenAI Documentation Navigation
 
-- 不可在 Controller 直接寫 SQL 或直接操作 DbContext
-- 不可繞過既有授權鏈路（Filter / Middleware / Policy）
-- 不可在文件中寫入真實憑證或密鑰
+| What you want to do          | Read this first                              |
+| ---------------------------- | -------------------------------------------- |
+| Understand system overview   | docs/analysis/SA-001_system-overview.md      |
+| Look up API, JWT, auth, RBAC | docs/spec/SPEC-001_api-auth-and-rbac.md      |
+| Query external integrations  | docs/spec/SPEC-002_external-integrations.md  |
+| Check deployment / CI/CD     | docs/infra/INFRA-001_deployment-and-ci-cd.md |
 
-## 常用開發指令
+## Common Commands
 
-| 指令                                         | 說明              |
-| -------------------------------------------- | ----------------- |
-| `dotnet build Booking.sln`                    | 建置整個 Solution |
-| `dotnet test Booking.Test/Booking.Test.csproj` | 執行單元測試      |
-| `dotnet run --project Booking.Api.Admin`      | 啟動後台 API      |
-| `dotnet run --project Booking.Api.EndUser`    | 啟動前台 API      |
+| Command                                        | Description       |
+| ---------------------------------------------- | ----------------- |
+| `dotnet build Booking.sln`                     | Build solution    |
+| `dotnet test Booking.Test/Booking.Test.csproj` | Run unit tests    |
+| `dotnet run --project Booking.Api.Admin`       | Start Admin API   |
+| `dotnet run --project Booking.Api.EndUser`     | Start EndUser API |
 
-## 文件維護提醒
+## Documentation Maintenance Reminders
 
-- **PR 涉及 API 契約或行為異動**：同步更新 `docs/spec/` 對應 SPEC 與 Changelog
-- **PR 涉及架構決策**：新增或更新 `docs/adr/`
-- **PR 涉及部署、CI/CD**：同步更新 `docs/infra/`
-- 文件治理規則詳見 `docs/README.md`
+- **API contract or behavior change**: update `docs/spec/` SPEC and Changelog
+- **Architecture decision**: add or update `docs/adr/`
+- **Deployment or CI/CD change**: update `docs/infra/`
+- Docs governance rules: `docs/README.md`

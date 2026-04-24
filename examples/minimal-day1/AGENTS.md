@@ -1,60 +1,63 @@
-# AGENTS.md — taskflow-api AI 導航指引
+# AGENTS.md — taskflow-api AI Navigation Guide
 
-> 本文件是 GenAI Agent 理解 taskflow-api 專案的首要入口。請在處理任何程式碼任務前先讀完本文件。
+> Primary entry point for GenAI Agents. Read before starting any task.
 
-## 專案定位
+## Project Summary
 
-**任務排程管理 API** — 提供任務建立、排程、執行追蹤的後端 REST API。
+**Task Scheduling API** — REST backend for task creation, scheduling, and execution tracking.
 
-- **技術棧**：.NET 10（C#）+ ASP.NET Core + EF Core + PostgreSQL 16
-- **Base Namespace**：`TaskFlow.Api`、`TaskFlow.Service`（以 Solution 結構為準）
-- **架構模式**：Clean Architecture（Controller → Service → Repository）
-- **部署方式**：Docker Compose（本地）/ Azure App Service（生產）
-- **版本真相來源**：
-  - .NET SDK 以 `global.json` 為準
-  - 套件版本以各專案 `.csproj` 為準
+- **Tech Stack**: .NET 10 (C#) + ASP.NET Core + EF Core + PostgreSQL 16
+- **Base Namespace**: `TaskFlow.Api`, `TaskFlow.Service` (follow Solution structure)
+- **Architecture**: Clean Architecture (Controller → Service → Repository)
+- **Deployment**: Docker Compose (local) / Azure App Service (production)
+- **Version source of truth**: .NET SDK per `global.json`; packages per `.csproj`
 
-## GenAI 文件導航
+## Quick Constraints
 
-| 你想做什麼       | 先讀這裡       |
-| ---------------- | -------------- |
-| 了解文件治理規則 | docs/README.md |
+1. Controllers handle HTTP request/response only — no business logic
+2. Controllers MUST NOT access DbContext directly
+3. API path format: `/api/v1/{resource}`
 
-## 領域/模組 ↔ 程式碼對照表
+## Domain-to-Code Map
 
-| 業務領域 | Controller           | 核心 Service       |
-| -------- | -------------------- | ------------------ |
-| 認證     | `AuthController`     | `IAuthService`     |
-| 任務管理 | `TaskController`     | `ITaskService`     |
-| 排程     | `ScheduleController` | `IScheduleService` |
+| Domain     | Controller           | Core Service       |
+| ---------- | -------------------- | ------------------ |
+| Auth       | `AuthController`     | `IAuthService`     |
+| Tasks      | `TaskController`     | `ITaskService`     |
+| Scheduling | `ScheduleController` | `IScheduleService` |
 
-## 程式碼產生規範
+## Code Generation Rules
 
-### 架構層級
+### Architecture
 
-- Controller 僅處理 HTTP request/response，不放業務邏輯
-- 業務邏輯集中在 `TaskFlow.Service/Services`
-- 資料存取集中在 `TaskFlow.Service/Repositories`
+- Controllers handle HTTP only — business logic belongs in `TaskFlow.Service/Services`
+- Data access belongs in `TaskFlow.Service/Repositories`
 
-### 路由慣例
+### Routing
 
-- API 路徑格式：`/api/v1/{resource}`
+- API path format: `/api/v1/{resource}`
 
-### 禁止事項
+### Prohibited
 
-- 不可在 Controller 直接操作 DbContext
-- 不可在文件中寫入真實憑證或密鑰
+- Controllers MUST NOT access DbContext directly
+- No real credentials or secrets in docs or code
 
-## 常用開發指令
+## GenAI Documentation Navigation
 
-| 指令                                | 說明              |
-| ----------------------------------- | ----------------- |
-| `dotnet build TaskFlow.sln`         | 建置整個 Solution |
-| `dotnet test TaskFlow.Test`         | 執行單元測試      |
-| `dotnet run --project TaskFlow.Api` | 啟動 API 服務     |
+| What you want to do        | Read this first |
+| -------------------------- | --------------- |
+| Understand docs governance | docs/README.md  |
 
-## 文件維護提醒
+## Common Commands
 
-- **PR 涉及 API 契約或行為異動**：同步更新 `docs/spec/` 對應 SPEC 與 Changelog
-- **PR 涉及架構決策**：新增 `docs/adr/` 對應 ADR
-- 文件治理規則詳見 `docs/README.md`
+| Command                             | Description      |
+| ----------------------------------- | ---------------- |
+| `dotnet build TaskFlow.sln`         | Build solution   |
+| `dotnet test TaskFlow.Test`         | Run unit tests   |
+| `dotnet run --project TaskFlow.Api` | Start API server |
+
+## Documentation Maintenance Reminders
+
+- **API contract or behavior change**: update `docs/spec/` SPEC and Changelog
+- **Architecture decision**: add `docs/adr/` ADR
+- Docs governance rules: `docs/README.md`

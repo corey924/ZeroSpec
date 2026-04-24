@@ -2,69 +2,82 @@
 
 > **🌐 [English](README.md)**
 
-> **ZeroSpec is a zero-dependency Markdown framework that helps AI agents understand your repository structure, rules, and source of truth before coding.**
-> 不裝框架、不跑 CLI，用結構化 Markdown 建立 AI 可讀的專案基線。
+> **在 AI Coding Agent 動手前，先把它需要的專案上下文整理好：架構規則、模組導航、版本真相來源。零依賴，純 Markdown。**
 
-**版本**：v0.3
+**版本**：v0.4.1
 **狀態**：Active
 
 ---
 
-## ZeroSpec 是什麼？
+## ZeroSpec 在解決什麼問題？
 
-ZeroSpec 是一套零依賴、純 Markdown 的專案文件基線，用來整理 AI Agent 真正需要的上下文：
+用 Copilot、Cursor、Claude Code 或類似工具在真實 Repo 上交付功能，這些情況你應該不陌生：
 
-- 專案定位
-- 架構約束
+- 導覽文件漂移，Agent 改錯模組
+- 改到正確的檔案，但悄悄違反了分散在多份文件裡的架構規則
+- 回覆引用了已棄用的 API、舊版本，或不再是真相來源的介面
+- 每個工具各自需要一套指引，時間久了開始分歧
+
+這些多數不是單一模型能力問題，而是上下文缺口——Agent 需要的專案知識，沒有被放在它能穩定找到的位置。
+
+ZeroSpec 在 Agent 開始動手前，把這些上下文放到一組可預測的檔案位置。純 Markdown，無新執行環境，不綁定平台。
+
+## 為什麼這件事值得處理？
+
+這些問題不是少數情況。
+
+- [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/ai/) 顯示，66% 的受訪者認為常見困擾是答案「幾乎對，但不完全對」，45.2% 認為除錯 AI 產生的程式碼更花時間。
+- METR 在 2025 年的[隨機對照研究](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)中，觀察到資深開源開發者在特定情境下使用 AI 工具時，完成任務反而慢了 19%。
+- [AGENTS.md](https://agents.md/) 已被 60k+ 開源專案採用，並由 Linux Foundation 旗下的 Agentic AI Foundation 維護，代表整個生態正在往開放、可預測的 agent guidance 格式收斂。
+
+這些資料不代表每個團隊都一定需要 ZeroSpec，但至少說明了一件事：AI 協作的成敗，往往不只取決於模型本身，也取決於專案上下文是否整理得足夠清楚。
+
+Simon Willison 在 [Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/) 也提到，當模型不了解你的程式庫或專案脈絡時，補對上下文通常比一味換模型更有效。
+
+## ZeroSpec 的做法
+
+ZeroSpec 把 Agent 在動手前通常需要的最小上下文固定下來：
+
+你可以把它想成 AI Agent 開工前的技術交接單：它不是流程引擎，而是先把「檔案在哪裡」「哪些規則不能踩」講清楚。
+
+- 專案定位與架構邊界
 - 版本真相來源
-- 模組導航
+- 領域到程式碼的導航
 - 文件治理規則
 
-多數 AI Coding Agent 在接手任務前，會先讀取專案根目錄的指引檔，例如 `AGENTS.md`。如果這些檔案缺少結構、內容過時，或把真正重要的規範埋在雜訊裡，常見結果會是：
+它建立在開放的 [AGENTS.md](https://agents.md/) 格式上，不另外發明專屬格式，也不要求新的服務或執行環境。所有內容都維持在一般 Markdown，方便團隊用既有的 code review 流程維護。
 
-- 找不到正確的模組或目錄
-- 寫出違反分層的程式碼
-- 引用錯誤版本、過時路徑或不存在的介面
+如果用 SDD 的開發模式來看，ZeroSpec 是一個輕量的 Layer 0 基線：API 變更觸發 SPEC 更新，架構決策觸發 ADR，需要系統快照時觸發 SA。
 
-ZeroSpec 的目標很單純：**用低維護成本，讓 AI Agent 能快速讀懂你的專案，並在日常開發中穩定遵守團隊規範。**
+## 何時適合導入 ZeroSpec
 
-它特別適合：
+| 適合導入                                       | 建議跳過                                    |
+| ---------------------------------------------- | ------------------------------------------- |
+| 需要一套可長期維護的 Agent 指引基線            | Repo 為一次性用途（POC、教學、短期腳本）    |
+| 希望零依賴且不綁定單一平台                     | Repo 以內容筆記為主，沒有長期維護程式碼需求 |
+| 希望文件能跟著開發節奏演進，不是一次性產物     | 架構仍在探索期，尚無法定義穩定硬規則        |
+| 需要 Layer 0 的上下文基線，再銜接 Layer 1 工具 | 團隊既有 Layer 1 已完整處理上下文注入       |
 
-- 想把專案整理成 AI 易讀、團隊也能長期維護的型態
-- 不想引入額外 CLI、框架或複雜平台綁定
-- 希望文件是「跟得上開發節奏的工作基線」，而不是一次性產物
-
-**不適合的情境**（請直接跳過 ZeroSpec）：
-
-- **一次性腳本 / POC / 教學範例**：沒有長期維護需求，設立 AGENTS.md 的成本超過收益
-- **純研究性筆記 Repo**（如 Jupyter notebook 樣本集）：內容型專案定位由 README 承擔即可
-- **專案結構連本人都沒確定的探索階段**：先讓架構穩定到能寫下 C 類硬規則再導入
-- **已導入 Layer 1 SDD 工具且不理會 Agent「先讀 AGENTS.md」的團隊**：ZeroSpec 的核心價值在於 Agent 自動讀取專案指引檔；若團隊已在其他機制中解決此問題，貿然導入反而增加維護負擔
-
-### 核心特性
-
-- **零依賴**：不需要安裝工具、CLI 或額外 runtime
-- **低人工成本**：AI 掃描 Repo 產生初稿，人只需要審核關鍵決策
-- **可持續運作**：不是 Day-1 做完就放著，而是能支撐後續更新與回顧
-- **事件觸發擴張**：文件在真的需要時才建立，不預先堆一批空檔案
-- **對齊 AGENTS.md 官方開放格式**：基於 [AGENTS.md](https://agents.md/)（Agentic AI Foundation / Linux Foundation 監管，已被大量開源專案採用），在其之上加入 SDD 治理與 Lazy Evaluation
-- **跨代理相容**：可搭配 GitHub Copilot、Codex、Claude、Gemini、Cursor 等主流代理
-- **可銜接其他流程**：可作為更高層工作流或規格管理工具的 Layer 0
-
-### Layer 0 定位
+## Layer 0 定位
 
 ZeroSpec 是 **Layer 0（Context Readiness）**，不是執行引擎：
 
-| 層級        | 職責                                        | 代表工具          |
-| ----------- | ------------------------------------------- | ----------------- |
-| **Layer 0** | 讓專案「可被 AI 讀懂」— 架構約束、導航、SoT | **ZeroSpec**      |
-| **Layer 1** | 讓 AI「照流程執行任務」— 工作流、phase gate | OpenSpec, SpecKit |
+| 層級        | 職責                                        | 代表工具           |
+| ----------- | ------------------------------------------- | ------------------ |
+| **Layer 0** | 讓專案「可被 AI 讀懂」— 架構約束、導航、SoT | **ZeroSpec**       |
+| **Layer 1** | 讓 AI「照流程執行任務」— 工作流、phase gate | OpenSpec, Spec Kit |
 
-**與 Layer 1 工具並行使用**：ZeroSpec 產出的 SPEC 是「AI 可讀的介面契約與業務脈絡」，用途是讓 Agent 在任務開始前正確理解邊界；Layer 1 工具（如 OpenSpec、SpecKit）的 SPEC 則是「執行流程規格」，驅動 phase gate 或 workflow engine。兩者服務目的不同，可以並行存在而不互相覆蓋。常見的銜接方式是：以 ZeroSpec SPEC 作為 Layer 1 工具的人類可讀輸入基礎，由 Layer 1 工具在其之上定義執行步驟與驗收條件。
+ZeroSpec 產出的文件重點是任務前理解；Layer 1 工具的重點是任務流程執行。兩者解決的問題不同，可以並行使用。
 
-### 內容產生三層分流
+### ZeroSpec 和 SDD 的關係
 
-ZeroSpec 的核心設計之一，是先分清楚哪些內容應由 AI 產生、哪些內容必須由人確認。詳見 [GUIDE.zh-TW.md §0](GUIDE.zh-TW.md#0-什麼是-zerospec)。
+- **有 SDD 的做法（SDD-like）**：ZeroSpec 用事件觸發維持 SPEC / ADR / SA 的持續更新。
+- **不是完整流程 SDD**：ZeroSpec 不負責 phase gate、簽核流程與執行狀態轉換。
+- **一句話記法**：ZeroSpec 是 **SDD-ready 的 Layer 0 基線**；需要嚴格流程編排時，再銜接 Layer 1 工具。
+
+## 內容模型
+
+ZeroSpec 會先分清楚哪些內容由 AI 產生、哪些內容必須由人確認。詳見 [GUIDE.zh-TW.md §0](GUIDE.zh-TW.md#0-什麼是-zerospec)。
 
 | 類別                    | 誰負責           | 人工投入     |
 | ----------------------- | ---------------- | ------------ |
@@ -113,19 +126,9 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 ---
 
-## 30 秒起步
+## 快速開始
 
-熟悉流程的使用者可照以下三步直接執行，詳細說明見「[快速開始](#快速開始30-分鐘內完成)」：
-
-1. 目標專案開 Agent 模式 → 貼 [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md) → 產現況盤點（不寫檔）
-2. 同一對話貼 [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) → 回答幾個團隊決策問題 → 產出 `AGENTS.md` + `docs/README.md`
-3. 跑一個真實小任務驗證 Agent 遵循新的架構約束
-
-> GitHub Copilot 用戶：Copilot 預設不會自動讀 `AGENTS.md`，需用 `@AGENTS.md` 引用或建立 `.github/copilot-instructions.md`，詳見 [DAILY-USAGE.zh-TW.md §2.2](DAILY-USAGE.zh-TW.md#22-githubcopilot-instructionsmd-與-agentsmd-的共存)。
-
----
-
-## 開始前
+### 開始前
 
 **目標專案**
 - [ ] 已 clone 至本機：`git clone <your-repo-url>`
@@ -148,20 +151,17 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 >
 > 若需要實際寫入檔案，請避免使用純 Plan 模式；`INIT-SCAN` 這類只做分析、不寫檔的步驟，則可視平台能力使用。
 
-**推薦 LLM 模型**（依方案自選版本，只列系列名）
+> GitHub Copilot 用戶：Copilot 不一定自動讀 `AGENTS.md`，需用 `@AGENTS.md` 引用或建立 `.github/copilot-instructions.md`，詳見 [DAILY-USAGE.zh-TW.md §2.2](DAILY-USAGE.zh-TW.md#22-githubcopilot-instructionsmd-與-agentsmd-的共存)。
 
-| 任務情境                             | 推薦模型系列                     | 說明                              |
-| ------------------------------------ | -------------------------------- | --------------------------------- |
-| 日常編碼（CRUD、重構、bug fix）      | Claude Sonnet / GPT / Gemini Pro | 速度與品質平衡，日常首選          |
-| 架構分析、系統掃描（INIT-SCAN / SA） | Claude Opus / o-series           | 長 context 深度推理，適合全局分析 |
-| 大量程式碼生成（INIT-BUILD / SPEC）  | Claude Sonnet / GPT-Codex        | 程式碼產出導向，支援 Repo 讀寫    |
-| 快速查詢、輕量任務                   | Gemini Flash                     | 低延遲快速回應                    |
+> **非英文專案提示**：Prompt Pack 以英文撰寫，但產出語言會自動偵測你的專案語境。若你的 Repo 以英文為主、但希望產出台灣正體中文，請見 [DAILY-USAGE.zh-TW.md §5.8](DAILY-USAGE.zh-TW.md#58-指定產出語言例如-zh-tw)。
 
-> 版本依個人方案與額度自行選擇。建議選用具備長 context window 且支援 Repo 讀寫的模型。
+### 30 秒起步
 
----
+1. 在目標專案開啟 Agent 模式，貼上 [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)。
+2. 在同一對話貼上 [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md)。
+3. 審核產出的 `AGENTS.md` 與 `docs/README.md`，再用一個真實小任務驗證。
 
-## 快速開始（30 分鐘內完成）
+### 完整流程（30 分鐘內完成）
 
 ### Step 1：分析現況（INIT-SCAN）
 
@@ -201,6 +201,8 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 | 未觸發以上事件     | **不建立任何文件**                       |
 
 建議每月做一次快速回顧、每季做一次完整回顧，詳細做法見 [GUIDE.zh-TW.md §7](GUIDE.zh-TW.md#7-導入與持續運作流程)。
+
+如果你需要模型選擇建議、多語系工作方式或長期日常操作範例，建議放到 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) 這類較長的使用指南，而不是塞在 README 首頁。
 
 ### 驗收方式
 
@@ -279,26 +281,35 @@ zerospec/
 
 ## 後續更新方向
 
-- 持續提升主流 GenAI Agent 的相容性與 Prompt 穩定性
-- 持續補強跨專案一致性、文件治理與導覽可讀性
-- 視實際使用情況逐步補充 CI、驗收與效果量測相關範本
+- 持續改善主流 GenAI Agent 的相容性與 Prompt 穩定性
+- 讓跨專案指引、文件治理與導覽方式更易讀
+- 在有實際需求時補充 CI、驗收與量測範本
+- 逐步釐清 Layer 0 → Layer 1 的銜接方式
 
 ## Contributing
 
-歡迎提交 PR。貢獻方向、提交前檢查、PR 撰寫建議請見 [CONTRIBUTING.md](CONTRIBUTING.md)。
+歡迎提交 PR。貢獻方向、提交前檢查、PR 撰寫建議請見 [CONTRIBUTING.zh-TW.md](CONTRIBUTING.zh-TW.md)。
 
 ---
 
 ## 延伸閱讀
 
-- [GUIDE.md](GUIDE.md) — 完整方法論（設計原則、防漂移、持續運作、業界佐證）
-- [DAILY-USAGE.md](DAILY-USAGE.md) — 長期使用者指南（Day-2+ 日常操作、IDE 配置、情境劇本）
-- [anti-patterns.md](anti-patterns.md) — 常見錯誤與修正方法
+- [GUIDE.zh-TW.md](GUIDE.zh-TW.md) — 較完整的方法與持續運作說明
+- [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) — 長期使用者指南（Day-2+ 日常操作、IDE 配置、情境劇本）
+- [anti-patterns.zh-TW.md](anti-patterns.zh-TW.md) — 常見錯誤與修正方法
+
+---
+
+## 參考資料
+
+1. [Stack Overflow Developer Survey 2024: AI](https://survey.stackoverflow.co/2024/ai/)
+2. [Stack Overflow Developer Survey 2025: AI](https://survey.stackoverflow.co/2025/ai/)
+3. [METR：Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)
+4. [AGENTS.md](https://agents.md/)
+5. [Simon Willison：Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/)
 
 ---
 
 ## License
-
-ZeroSpec 採用寬鬆授權的 MIT License，允許個人、團隊與企業在保留授權聲明的前提下自由使用、修改與散布。
 
 MIT License — see [LICENSE](LICENSE)

@@ -1,69 +1,83 @@
 # ZeroSpec
 
-> **ZeroSpec is a zero-dependency Markdown framework that helps AI agents understand your repository structure, rules, and source of truth before coding.**
+> **ZeroSpec is a zero-dependency Markdown baseline that gives AI coding agents the project context they need — architecture rules, module navigation, and source of truth — before they start editing files.**
 
 > **🌐 [台灣正體中文版](README.zh-TW.md)**
 
-**Version**: v0.4
+**Version**: v0.4.1
 **Status**: Active
 
 ---
 
-## What is ZeroSpec?
+## What Problem Does ZeroSpec Solve?
 
-ZeroSpec is a zero-dependency, pure-Markdown project baseline that organizes the context AI Agents actually need:
+If you've shipped features with Copilot, Cursor, Claude Code, or similar tools on a real codebase, these situations are familiar:
 
-- Project summary
-- Architecture constraints
+- The agent edits the wrong module because navigation docs have drifted from the actual structure
+- The code lands in the right file but quietly breaks architecture rules scattered across several documents
+- The response references a deprecated API, an old version, or an interface that is no longer the source of truth
+- You're maintaining separate guidance for each tool, and they are slowly diverging
+
+In many teams, these are less pure model failures and more context gaps — the project knowledge agents need is not in places they can reliably find.
+
+ZeroSpec puts that context in a predictable set of files before the agent starts working. Plain Markdown, no new runtime, no platform lock-in.
+
+## Why This Matters
+
+These are not edge cases.
+
+- In the [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/ai/), 66% said a major frustration is getting answers that are almost right, but not quite, and 45.2% said debugging AI-generated code is more time-consuming.
+- In METR's [2025 randomized controlled trial](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) of experienced open-source developers, participants completed tasks 19% slower when AI tools were allowed in that specific setting.
+- [AGENTS.md](https://agents.md/) is already used by more than 60k open-source projects and is stewarded by the Agentic AI Foundation under the Linux Foundation, which suggests the ecosystem is converging on open, predictable guidance files rather than tool-specific magic.
+
+Those sources do not prove that every team needs ZeroSpec. They do support a simpler point: context quality is a practical part of AI-assisted development, not just a prompting preference.
+
+As Simon Willison notes in [Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/), giving models better context is often more useful than treating every failure as a model-selection problem.
+
+## What ZeroSpec Does
+
+ZeroSpec standardizes the minimum repo context agents usually need before they start coding:
+
+Think of it as a pre-coding brief for AI agents: not a workflow engine, but a concise map of where things are and which rules are non-negotiable.
+
+- Project summary and architecture boundaries
 - Version source of truth
-- Module navigation
-- Docs governance rules
+- Domain-to-code navigation
+- Documentation governance rules
 
-Most AI Coding Agents read a guidance file (e.g. `AGENTS.md`) at the project root before starting a task. If that file lacks structure, is outdated, or buries critical rules in noise, typical failures include:
+It builds on the open [AGENTS.md](https://agents.md/) format instead of inventing a proprietary one, and keeps everything in plain Markdown so teams can review and update it with normal code review practices.
 
-- Targeting the wrong module or directory
-- Generating code that violates layer separation
-- Referencing stale versions, deprecated paths, or nonexistent interfaces
+From an SDD workflow perspective, ZeroSpec is a lightweight Layer 0 baseline: API changes trigger SPEC updates, architecture decisions trigger ADRs, and system snapshots trigger SA updates.
 
-ZeroSpec's goal: **Make your project instantly readable by AI Agents and consistently enforce team rules — at minimal maintenance cost.**
+## When to Use ZeroSpec
 
-**Good fit**:
+| Use ZeroSpec when                                                      | Skip ZeroSpec when                                                            |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| You need a stable, low-maintenance agent guidance baseline             | The repo is throwaway (POC, tutorial, one-off script)                         |
+| You want zero dependency and no platform lock-in                       | The project is content-first (notes/notebooks) with no long-lived codebase    |
+| Your team wants docs that evolve with delivery, not one-time artifacts | Architecture and team rules are still too unstable to define hard constraints |
+| You need Layer 0 context readiness before Layer 1 workflow tools       | A Layer 1 tool already provides sufficient context injection for your team    |
 
-- You want your project AI-readable and long-term maintainable
-- You prefer no extra CLI, framework, or platform lock-in
-- You need docs that keep pace with development — not a one-time artifact
-
-**Not a fit** (skip ZeroSpec):
-
-- **Throwaway scripts / POC / tutorials** — no long-term maintenance; AGENTS.md overhead exceeds benefit
-- **Research / notebook repos** — content-oriented projects need only a README
-- **Architecture still in flux** — wait until you can write at least 3 stable hard rules
-- **Already using a Layer 1 SDD tool with its own context injection** — ZeroSpec's core value is Agent auto-read; if already solved elsewhere, adding ZeroSpec increases maintenance burden
-
-### Core Features
-
-- **Zero dependency** — no tools, CLI, or runtime to install
-- **Low human effort** — AI scans the repo and drafts; humans review key decisions only
-- **Sustainable operation** — not a Day-1 artifact but ongoing update + review cycles
-- **Event-triggered expansion** — files created only when needed, no pre-built empty shells
-- **Aligned with AGENTS.md open standard** — builds on [AGENTS.md](https://agents.md/) (Agentic AI Foundation / Linux Foundation), adding SDD governance and on-demand document creation
-- **Cross-agent compatible** — works with GitHub Copilot, Codex, Claude, Gemini, Cursor, and more
-- **Composable** — serves as Layer 0 for higher-level workflow or spec management tools
-
-### Layer 0 Positioning
+## Layer 0 Positioning
 
 ZeroSpec is **Layer 0 (Context Readiness)**, not an execution engine:
 
 | Layer       | Responsibility                                                | Representative Tools |
 | ----------- | ------------------------------------------------------------- | -------------------- |
 | **Layer 0** | Make the project "AI-readable" — constraints, navigation, SoT | **ZeroSpec**         |
-| **Layer 1** | Make AI "execute by process" — workflows, phase gates         | OpenSpec, SpecKit    |
+| **Layer 1** | Make AI "execute by process" — workflows, phase gates         | OpenSpec, Spec Kit   |
 
-ZeroSpec SPECs = AI-readable interface contracts & business context (read before task). Layer 1 specs = execution flow specs (drive workflow engines). They serve different purposes and coexist without overlap.
+ZeroSpec artifacts are optimized for pre-task understanding. Layer 1 specs are optimized for workflow execution. They solve different problems and can coexist.
 
-### Content Generation: Three-Tier Model
+### How ZeroSpec Relates to SDD
 
-ZeroSpec's core design separates **who writes what**. See [GUIDE.md Section 0](GUIDE.md#0-what-is-zerospec).
+- **SDD-like**: ZeroSpec keeps SPEC / ADR / SA alive through event triggers.
+- **Not full workflow SDD**: ZeroSpec does not enforce phase gates, approvals, or execution states.
+- **Practical shorthand**: ZeroSpec is an **SDD-ready Layer 0 baseline**. Add Layer 1 tooling when you need strict process orchestration.
+
+## Content Model
+
+ZeroSpec separates ownership between AI and humans. See [GUIDE.md Section 0](GUIDE.md#0-what-is-zerospec).
 
 | Tier                             | Owner                      | Human Effort           |
 | -------------------------------- | -------------------------- | ---------------------- |
@@ -112,19 +126,9 @@ Full examples in [`examples/`](examples/): .NET dual-API, Java Library, Python P
 
 ---
 
-## 30-Second Quick Start
+## Quick Start
 
-For experienced users — detailed instructions in [Getting Started](#getting-started-under-30-minutes):
-
-1. Open Agent mode at your target project → paste [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md) → get a structured analysis (no files written)
-2. Same conversation → paste [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) → answer a few team decisions → generates `AGENTS.md` + `docs/README.md`
-3. Run a real small task to verify the Agent follows your architecture constraints
-
-> **GitHub Copilot users**: Copilot does not auto-read `AGENTS.md` by default. Use `@AGENTS.md` reference or create `.github/copilot-instructions.md`. See [DAILY-USAGE Section 2.2](DAILY-USAGE.md#22-coexistence-of-copilot-instructionsmd-and-agentsmd).
-
----
-
-## Prerequisites
+### Before You Begin
 
 **Target Project**
 - [ ] Cloned locally: `git clone <your-repo-url>`
@@ -147,18 +151,17 @@ For experienced users — detailed instructions in [Getting Started](#getting-st
 >
 > For steps that write files, avoid pure Plan mode. Analysis-only steps like `INIT-SCAN` can use Plan mode where supported.
 
-**Recommended LLM Models** (series names only — pick your plan's version)
+> **GitHub Copilot users**: Copilot may not auto-read `AGENTS.md` by default. Use `@AGENTS.md` reference or create `.github/copilot-instructions.md`. See [DAILY-USAGE Section 2.2](DAILY-USAGE.md#22-coexistence-of-copilot-instructionsmd-and-agentsmd).
 
-| Task Type                                 | Recommended Series               | Notes                                 |
-| ----------------------------------------- | -------------------------------- | ------------------------------------- |
-| Daily coding (CRUD, refactor, bug fix)    | Claude Sonnet / GPT / Gemini Pro | Speed–quality balance, daily default  |
-| Architecture analysis (INIT-SCAN / SA)    | Claude Opus / o-series           | Long context deep reasoning           |
-| Heavy code generation (INIT-BUILD / SPEC) | Claude Sonnet / GPT-Codex        | Code-output oriented, repo read/write |
-| Quick lookup, lightweight tasks           | Gemini Flash                     | Low latency, fast response            |
+> **Non-English projects**: Prompt Packs are in English, but output language auto-detects from your project. If your repo is English-first yet you want zh-TW (or another locale) output, see [DAILY-USAGE Section 5.8](DAILY-USAGE.md#58-specifying-output-language-eg-zh-tw).
 
-> Choose models with long context windows and repo read/write support.
+### 30-Second Path
 
----
+For the full walkthrough, jump to [Getting Started](#getting-started-under-30-minutes).
+
+1. Open Agent mode in your target project and paste [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md).
+2. In the same conversation, paste [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md).
+3. Review the generated `AGENTS.md` and `docs/README.md`, then validate with one small real task.
 
 ## Getting Started (Under 30 Minutes)
 
@@ -200,6 +203,8 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 | None of the above          | **Create nothing**                       |
 
 Monthly quick review + quarterly full review recommended. Details in [GUIDE.md Section 7](GUIDE.md#7-adoption-and-continuous-operation).
+
+If you want model-selection notes, multilingual workflow tips, or day-to-day operating patterns, keep the README short and use [DAILY-USAGE.md](DAILY-USAGE.md).
 
 ### Verification
 
@@ -275,9 +280,10 @@ zerospec/
 
 ## Roadmap
 
-- Improve compatibility and Prompt stability across mainstream GenAI Agents
-- Strengthen cross-project consistency, docs governance, and navigation readability
-- Gradually add CI, acceptance, and measurement templates based on real usage
+- Improve compatibility and Prompt stability across mainstream GenAI agents
+- Keep cross-project guidance, governance, and navigation patterns readable
+- Add CI, acceptance, and measurement templates where real usage justifies them
+- Clarify Layer 0 → Layer 1 integration guidance over time
 
 ## Contributing
 
@@ -287,9 +293,19 @@ PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Further Reading
 
-- [GUIDE.md](GUIDE.md) — Full methodology (design principles, drift prevention, continuous operation, industry evidence)
+- [GUIDE.md](GUIDE.md) — Detailed methodology, drift prevention, and continuous operating guidance
 - [DAILY-USAGE.md](DAILY-USAGE.md) — Day-2+ user guide (daily ops, IDE config, scenario playbooks)
 - [anti-patterns.md](anti-patterns.md) — Common mistakes and fixes
+
+---
+
+## References
+
+1. [Stack Overflow Developer Survey 2024: AI](https://survey.stackoverflow.co/2024/ai/)
+2. [Stack Overflow Developer Survey 2025: AI](https://survey.stackoverflow.co/2025/ai/)
+3. [METR: Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)
+4. [AGENTS.md](https://agents.md/)
+5. [Simon Willison: Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/)
 
 ---
 
