@@ -83,6 +83,6 @@ graph TD
 
 ## Related Documents
 
-- [`AGENTS.md`](../AGENTS.md)
+- [`AGENTS.md`](../../AGENTS.md)
 - [`docs/spec/SPEC-001_api-auth-and-rbac.md`](../spec/SPEC-001_api-auth-and-rbac.md)
 - [`docs/adr/ADR-001_dual-host-api-architecture.md`](../adr/ADR-001_dual-host-api-architecture.md)
