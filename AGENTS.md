@@ -18,7 +18,7 @@ Provides AI coding agents with project context (architecture rules, module navig
 
 ## Quick Constraints
 
-1. **Do NOT create standalone new files** for governance rules (except core entry files such as `AGENTS.md`) — integrate updates into existing docs (`GUIDE.md`, `DAILY-USAGE.md`, etc.)
+1. **Do NOT create standalone new files** for governance rules (except core entry files such as `AGENTS.md` and GitHub community health files such as `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `.github/ISSUE_TEMPLATE/`) — integrate updates into existing docs (`GUIDE.md`, `DAILY-USAGE.md`, etc.)
 2. **Do NOT copy Prompt Pack content** into `templates/prompts/*.prompt.md` — use `#file:` references only
 3. **Do NOT bind features to a single AI platform** — ZeroSpec core must remain tool-agnostic (Copilot, Cursor, Claude Code, Windsurf, JetBrains)
 4. **Always sync zh-TW versions** in the same PR as EN changes (`GUIDE.zh-TW.md`, `DAILY-USAGE.zh-TW.md`, `README.zh-TW.md`)
@@ -39,6 +39,7 @@ Provides AI coding agents with project context (architecture rules, module navig
 | Document templates            | `templates/ADR-TEMPLATE.md`, `SPEC-TEMPLATE.md`, `SA-TEMPLATE.md`, `DOCS-README-TEMPLATE.md` |
 | VS Code adapter (optional)    | `templates/prompts/*.prompt.md`                                               |
 | Platform pointer setup (optional) | `templates/pointers/` — `copilot-instructions.md`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules` |
+| OSS community health          | `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `.github/ISSUE_TEMPLATE/` |
 | Verification & CI             | `scripts/verify-zerospec.sh`, `scripts/verify-zerospec.ps1`, `.github/workflows/verify-zerospec.yml` |
 | Real-world examples           | `examples/minimal-day1/`, `examples/dotnet-dual-api/`, `examples/java-library/`, `examples/python-package/`, `examples/react-nx-monorepo/` |
 
@@ -69,6 +70,7 @@ Provides AI coding agents with project context (architecture rules, module navig
 
 - **PR adds/changes a Prompt Pack** → update `CHANGELOG.md` + check `DAILY-USAGE.md` for affected scenarios
 - **PR adds a new `templates/` file** → update `README.md` Repo Structure tree + `README.zh-TW.md`
+- **PR changes community health files** (`CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `.github/ISSUE_TEMPLATE/`) → sync README repo structure / contributor entry points in the same PR
 - **PR changes `scripts/`** → run verify script locally first; ensure Windows `.ps1` and shell `.sh` are in sync
 - **PR changes methodology** (e.g., bloat thresholds, GUIDE §3.4) → sync `GUIDE.zh-TW.md` in the same PR
 - **Any EN change** → sync zh-TW counterpart in the same commit

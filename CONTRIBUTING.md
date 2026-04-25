@@ -1,6 +1,6 @@
 # Contributing to ZeroSpec
 
-> Derived from: [CONTRIBUTING.zh-TW.md](CONTRIBUTING.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-23
+> Derived from: [CONTRIBUTING.zh-TW.md](CONTRIBUTING.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-25
 
 > **🌐 [台灣正體中文版](CONTRIBUTING.zh-TW.md)**
 
@@ -54,6 +54,8 @@ GitHub auto-populates the PR Template on submission — fill in each field.
 - For rule changes, explain **why** the new version is more stable
 - For content removal, confirm the remaining content still covers what's needed
 
-## Code of Conduct
+## Discussion Norms
 
 Discuss professionally, respectfully, and collaboratively. When opinions differ, use verifiable cases, real-world experience, and maintenance cost as decision criteria.
+
+For general community behavior expectations, see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

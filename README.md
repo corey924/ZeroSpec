@@ -240,11 +240,15 @@ Minimal CI template (GitHub Actions): `.github/workflows/verify-zerospec.yml`
 ```
 zerospec/
 ├── .github/
+│   ├── ISSUE_TEMPLATE/           ← Issue templates + chooser config
 │   ├── pull_request_template.md  ← PR description template
 │   └── workflows/
 │       └── verify-zerospec.yml   ← PR / push auto-verify (minimal CI)
 ├── AGENTS.md                    ← AI Navigation Guide (for contributors working on ZeroSpec itself)
 ├── CONTRIBUTING.md              ← Contribution guide
+├── CODE_OF_CONDUCT.md           ← Community behavior expectations
+├── SECURITY.md                  ← Private vulnerability reporting policy
+├── SUPPORT.md                   ← Where to ask questions, report bugs, and request changes
 ├── README.md                    ← You are reading this
 ├── GUIDE.md                     ← Full methodology (design, drift prevention, operations, evidence)
 ├── DAILY-USAGE.md               ← Day-2+ user guide (daily ops, IDE config, scenarios)
@@ -301,6 +305,7 @@ zerospec/
 ## Contributing
 
 PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Community expectations and reporting paths are documented in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), [SECURITY.md](SECURITY.md), and [SUPPORT.md](SUPPORT.md).
 
 ---
 

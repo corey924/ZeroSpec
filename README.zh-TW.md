@@ -241,11 +241,15 @@ ZeroSpec 內建跨平台驗收腳本，可快速檢查：
 ```
 zerospec/
 ├── .github/
+│   ├── ISSUE_TEMPLATE/           ← Issue template 與 chooser 設定
 │   ├── pull_request_template.md  ← PR 描述範本
 │   └── workflows/
 │       └── verify-zerospec.yml   ← PR / push 自動驗收（最小 CI）
 ├── AGENTS.md                    ← AI 導航指引（給在 ZeroSpec 本身工作的貢獻者）
 ├── CONTRIBUTING.md              ← 貢獻指南
+├── CODE_OF_CONDUCT.md           ← 社群互動與行為期待
+├── SECURITY.md                  ← 私下回報漏洞的安全性政策
+├── SUPPORT.md                   ← 該去哪裡提問、回報問題與提出建議
 ├── README.md                    ← 你正在讀的這份
 ├── GUIDE.md                     ← 完整方法論（設計原則、防漂移、持續運作、業界佐證）
 ├── DAILY-USAGE.md               ← 長期使用者指南（Day-2+ 日常操作、IDE 配置、情境劇本）
@@ -302,6 +306,7 @@ zerospec/
 ## Contributing
 
 歡迎提交 PR。貢獻方向、提交前檢查、PR 撰寫建議請見 [CONTRIBUTING.zh-TW.md](CONTRIBUTING.zh-TW.md)。
+社群互動與回報入口請見 [CODE_OF_CONDUCT.zh-TW.md](CODE_OF_CONDUCT.zh-TW.md)、[SECURITY.zh-TW.md](SECURITY.zh-TW.md)、[SUPPORT.zh-TW.md](SUPPORT.zh-TW.md)。
 
 ---
 
