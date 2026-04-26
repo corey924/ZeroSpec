@@ -34,6 +34,8 @@ Those sources do not prove that every team needs ZeroSpec. They do support a sim
 
 As Simon Willison notes in [Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/), giving models better context is often more useful than treating every failure as a model-selection problem.
 
+Anthropic's engineering team frames this broadly as [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — the discipline of curating the smallest set of high-signal tokens that lets an agent work reliably. ZeroSpec is one practical implementation of that principle at the repo level.
+
 ## What ZeroSpec Does
 
 ZeroSpec standardizes the minimum repo context agents usually need before they start coding:
@@ -314,6 +316,7 @@ Community expectations and reporting paths are documented in [CODE_OF_CONDUCT.md
 - [GUIDE.md](GUIDE.md) — Detailed methodology, drift prevention, and continuous operating guidance
 - [DAILY-USAGE.md](DAILY-USAGE.md) — Day-2+ user guide (daily ops, IDE config, scenario playbooks)
 - [anti-patterns.md](anti-patterns.md) — Common mistakes and fixes
+- [Why I Built ZeroSpec (Author's Blog, zh-TW)](https://coreynote.life/posts/2026/04/zerospec/) — Background story and motivation
 
 ---
 
@@ -324,6 +327,8 @@ Community expectations and reporting paths are documented in [CODE_OF_CONDUCT.md
 3. [METR: Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)
 4. [AGENTS.md](https://agents.md/)
 5. [Simon Willison: Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/)
+6. [Anthropic Engineering: Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+7. [GitHub Blog: 5 Tips for Writing Better Custom Instructions for Copilot](https://github.blog/ai-and-ml/github-copilot/5-tips-for-writing-better-custom-instructions-for-copilot/)
 
 ---
 

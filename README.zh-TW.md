@@ -34,6 +34,8 @@ ZeroSpec 在 Agent 開始動手前，把這些上下文放到一組可預測的�
 
 Simon Willison 在 [Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/) 也提到，當模型不了解你的程式庫或專案脈絡時，補對上下文通常比一味換模型更有效。
 
+Anthropic 的工程團隊把這件事系統化為「[Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)」——找到最小的一組高訊號 token，讓 Agent 每次進來都能拿到剛好夠用的地圖。ZeroSpec 是這個原則在 Repo 層級的一種實踐。
+
 ## ZeroSpec 的做法
 
 ZeroSpec 把 Agent 在動手前通常需要的最小上下文固定下來：
@@ -315,6 +317,7 @@ zerospec/
 - [GUIDE.zh-TW.md](GUIDE.zh-TW.md) — 較完整的方法與持續運作說明
 - [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) — 長期使用者指南（Day-2+ 日常操作、IDE 配置、情境劇本）
 - [anti-patterns.zh-TW.md](anti-patterns.zh-TW.md) — 常見錯誤與修正方法
+- [我為什麼做 ZeroSpec（作者 Blog）](https://coreynote.life/posts/2026/04/zerospec/) — 背景故事與動機
 
 ---
 
@@ -325,6 +328,8 @@ zerospec/
 3. [METR：Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)
 4. [AGENTS.md](https://agents.md/)
 5. [Simon Willison：Hallucinations in code are the least dangerous form of LLM mistakes](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/)
+6. [Anthropic Engineering：Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+7. [GitHub Blog：5 Tips for Writing Better Custom Instructions for Copilot](https://github.blog/ai-and-ml/github-copilot/5-tips-for-writing-better-custom-instructions-for-copilot/)
 
 ---
 
