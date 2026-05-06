@@ -28,7 +28,7 @@ These are not edge cases.
 
 - In the [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/ai/), 66% said a major frustration is getting answers that are almost right, but not quite, and 45.2% said debugging AI-generated code is more time-consuming.
 - In METR's [2025 randomized controlled trial](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) of experienced open-source developers, participants completed tasks 19% slower when AI tools were allowed in that specific setting.
-- [AGENTS.md](https://agents.md/) is already used by more than 60k open-source projects and is stewarded by the Agentic AI Foundation under the Linux Foundation, which suggests the ecosystem is converging on open, predictable guidance files rather than tool-specific magic.
+- [AGENTS.md](https://agents.md/) has become a common open guidance-file convention across AI-assisted development workflows, which suggests the ecosystem is converging on predictable context files rather than tool-specific magic.
 
 Those sources do not prove that every team needs ZeroSpec. They do support a simpler point: context quality is a practical part of AI-assisted development, not just a prompting preference.
 
@@ -163,7 +163,7 @@ Full examples in [`examples/`](examples/): .NET dual-API, Java Library, Python P
 
 > **Non-English projects**: Prompt Packs are in English, but output language auto-detects from your project. If your repo is English-first yet you want zh-TW (or another locale) output, see [DAILY-USAGE Section 5.8](DAILY-USAGE.md#58-specifying-output-language-eg-zh-tw).
 
-### 30-Second Path
+### Quick Path
 
 For the full walkthrough, jump to [Getting Started](#getting-started-under-30-minutes).
 
@@ -202,15 +202,15 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 
 ### After Adoption
 
-| Trigger Event                        | Prompt Pack / Method                                              |
-| ------------------------------------ | ----------------------------------------------------------------- |
-| API added/changed                    | [`prompts/SPEC.md`](prompts/SPEC.md)                             |
-| Architecture decision                | [`prompts/ADR.md`](prompts/ADR.md)                               |
-| System snapshot needed               | [`prompts/SA.md`](prompts/SA.md)                                 |
-| Project evolved, sync docs           | [`prompts/UPDATE.md`](prompts/UPDATE.md)                         |
-| Need platform pointer setup (optional) | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; JetBrains uses `AGENTS.md` directly |
-| Want one-click trigger shortcuts (optional VS Code adapter) | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/` |
-| None of the above                    | **Create nothing**                                               |
+| Trigger Event                                               | Prompt Pack / Method                                                                                                     |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| API added/changed                                           | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                     |
+| Architecture decision                                       | [`prompts/ADR.md`](prompts/ADR.md)                                                                                       |
+| System snapshot needed                                      | [`prompts/SA.md`](prompts/SA.md)                                                                                         |
+| Project evolved, sync docs                                  | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                 |
+| Need platform pointer setup (optional)                      | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; JetBrains uses `AGENTS.md` directly |
+| Want one-click trigger shortcuts (optional VS Code adapter) | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/`                          |
+| None of the above                                           | **Create nothing**                                                                                                       |
 
 > `templates/prompts/*.prompt.md` is an optional shortcut layer for VS Code prompt UIs. ZeroSpec core remains tool-agnostic: Cursor, Claude Code, Windsurf, and JetBrains users can use the same Prompt Packs via copy-paste/bookmark/symlink.
 
@@ -220,7 +220,11 @@ If you want model-selection notes, multilingual workflow tips, or day-to-day ope
 
 ### Verification
 
-ZeroSpec includes cross-platform verification scripts that check:
+ZeroSpec includes cross-platform verification scripts.
+
+These scripts verify the ZeroSpec repository itself. They do not validate the `AGENTS.md` or `docs/README.md` generated inside your target project.
+
+The checks include:
 
 - Core Prompt files exist (INIT-SCAN / INIT-BUILD / UPDATE)
 - SPEC/ADR/SA contain prerequisites
@@ -285,15 +289,17 @@ zerospec/
 
 ---
 
-## Acceptance Metrics
+## Suggested Adoption Metrics
 
-| Metric                               | Target   |
-| ------------------------------------ | -------- |
-| Day-1 human effort                   | ≤ 30 min |
-| Human-written content share (Tier C) | ≤ 20%    |
-| First-round merge rate               | ≥ 70%    |
-| Hard rule violation rate             | ≤ 10%    |
-| SPEC draft coverage after API change | ≥ 90%    |
+These are practical observation targets, not guarantees or SLAs. Measure them over real adoption windows and adjust for repo size and team workflow.
+
+| Metric                                 | Target   |
+| -------------------------------------- | -------- |
+| Day-1 human effort (small/medium repo) | ≤ 30 min |
+| Human-written content share (Tier C)   | ≤ 20%    |
+| First-round merge rate                 | ≥ 70%    |
+| Hard rule violation rate               | ≤ 10%    |
+| SPEC draft coverage after API change   | ≥ 90%    |
 
 ---
 

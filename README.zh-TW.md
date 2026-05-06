@@ -28,7 +28,7 @@ ZeroSpec 在 Agent 開始動手前，把這些上下文放到一組可預測的�
 
 - [Stack Overflow Developer Survey 2025](https://survey.stackoverflow.co/2025/ai/) 顯示，66% 的受訪者認為常見困擾是答案「幾乎對，但不完全對」，45.2% 認為除錯 AI 產生的程式碼更花時間。
 - METR 在 2025 年的[隨機對照研究](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)中，觀察到資深開源開發者在特定情境下使用 AI 工具時，完成任務反而慢了 19%。
-- [AGENTS.md](https://agents.md/) 已被 60k+ 開源專案採用，並由 Linux Foundation 旗下的 Agentic AI Foundation 維護，代表整個生態正在往開放、可預測的 agent guidance 格式收斂。
+- [AGENTS.md](https://agents.md/) 已成為 AI 輔助開發流程中常見的開放式指引檔慣例，代表整個生態正在往可預測的上下文檔案收斂，而不是依賴各工具各自的隱性魔法。
 
 這些資料不代表每個團隊都一定需要 ZeroSpec，但至少說明了一件事：AI 協作的成敗，往往不只取決於模型本身，也取決於專案上下文是否整理得足夠清楚。
 
@@ -163,7 +163,7 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 > **非英文專案提示**：Prompt Pack 以英文撰寫，但產出語言會自動偵測你的專案語境。若你的 Repo 以英文為主、但希望產出台灣正體中文，請見 [DAILY-USAGE.zh-TW.md §5.8](DAILY-USAGE.zh-TW.md#58-指定產出語言例如-zh-tw)。
 
-### 30 秒起步
+### 快速起步
 
 1. 在目標專案開啟 Agent 模式，貼上 [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)。
 2. 在同一對話貼上 [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md)。
@@ -200,15 +200,15 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 ### 導入後怎麼用？
 
-| 觸發事件               | 使用 Prompt Pack / 方式                                                                 |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| 新增/變更 API          | [`prompts/SPEC.md`](prompts/SPEC.md)                                                    |
-| 架構決策               | [`prompts/ADR.md`](prompts/ADR.md)                                                      |
-| 系統快照               | [`prompts/SA.md`](prompts/SA.md)                                                        |
-| 專案演進需同步文件     | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                |
-| 需要平台 pointer 設定（可選） | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；JetBrains 直接使用 `AGENTS.md` |
-| 想使用一鍵觸發捷徑（可選 VS Code adapter） | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/` |
-| 未觸發以上事件         | **不建立任何文件**                                                                      |
+| 觸發事件                                   | 使用 Prompt Pack / 方式                                                                                               |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| 新增/變更 API                              | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                  |
+| 架構決策                                   | [`prompts/ADR.md`](prompts/ADR.md)                                                                                    |
+| 系統快照                                   | [`prompts/SA.md`](prompts/SA.md)                                                                                      |
+| 專案演進需同步文件                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                              |
+| 需要平台 pointer 設定（可選）              | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；JetBrains 直接使用 `AGENTS.md` |
+| 想使用一鍵觸發捷徑（可選 VS Code adapter） | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/`                              |
+| 未觸發以上事件                             | **不建立任何文件**                                                                                                    |
 
 > `templates/prompts/*.prompt.md` 是提供 VS Code Prompt 介面的可選快捷層。ZeroSpec 核心仍維持跨工具：Cursor、Claude Code、Windsurf、JetBrains 也可透過複製貼上 / 書籤 / Symlink 使用同一套 Prompt Packs。
 
@@ -218,7 +218,11 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 ### 驗收方式
 
-ZeroSpec 內建跨平台驗收腳本，可快速檢查：
+ZeroSpec 內建跨平台驗收腳本。
+
+這些腳本用來驗證 ZeroSpec repo 本身，不會驗證你在目標專案產出的 `AGENTS.md` 或 `docs/README.md`。
+
+檢查項目包含：
 
 - 核心 Prompt 檔案是否完整（INIT-SCAN / INIT-BUILD / UPDATE）
 - SPEC/ADR/SA 是否包含前置條件
@@ -286,15 +290,17 @@ zerospec/
 
 ---
 
-## 驗收指標
+## 建議採用指標
 
-| 指標                       | 目標      |
-| -------------------------- | --------- |
-| Day-1 人工投入時間         | ≤ 30 分鐘 |
-| 人工新寫內容比例（C 類）   | ≤ 20%     |
-| 首次回合可合併率           | ≥ 70%     |
-| 架構硬規則違反率           | ≤ 10%     |
-| API 變更後 SPEC 草稿覆蓋率 | ≥ 90%     |
+這些是實務觀察目標，不是保證或 SLA。請依實際導入期間、repo 規模與團隊流程調整。
+
+| 指標                                 | 目標      |
+| ------------------------------------ | --------- |
+| Day-1 人工投入時間（小型/中型 repo） | ≤ 30 分鐘 |
+| 人工新寫內容比例（C 類）             | ≤ 20%     |
+| 首次回合可合併率                     | ≥ 70%     |
+| 架構硬規則違反率                     | ≤ 10%     |
+| API 變更後 SPEC 草稿覆蓋率           | ≥ 90%     |
 
 ---
 

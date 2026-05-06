@@ -57,4 +57,12 @@ Common mistakes discovered across multi-project ecosystems. Each entry includes 
 
 ---
 
+## AI Edit Hygiene
+
+| #   | Anti-Pattern                     | Problem                                                                                                                                                                                                      | Fix                                                                                                                                                                                                                                                         |
+| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 23  | **Reformatting untouched lines** | AI edits a few lines but also realigns tables, re-indents blocks, re-sorts imports, or strips trailing spaces across the whole file — git diff becomes unreadable; reviewers cannot identify the real change | Declare a `<formatting_policy>` in your AI instructions: detect original style, only touch the requested range, never run full-file formatters. Provide an explicit opt-in trigger (`#format` / `#reformat` / `please reformat`) for intentional reformats. |
+
+---
+
 *This list is updated as new patterns emerge. Contributions welcome.*
