@@ -74,12 +74,22 @@ Compare section by section and flag differences:
 2. **Candidate Documents**: Move established candidates from the candidate table to the document index
 3. **Classification**: Confirm whether new document types need to be added
 
+### Step 3.5: Sub-Index Check
+
+Count files matching `docs/spec/SPEC-*.md`.
+
+- If count **≥ 8** AND `docs/spec/README.md` does **not** exist → propose creating it using the ZeroSpec SPEC index template structure, populated with current SPEC metadata. Localize human-facing README content (headings, prose, table labels, scenarios, maintenance rule descriptions, and status meanings) to the detected repository language or explicit `Respond in {locale}` override. Keep file paths, code identifiers, SPEC filenames, commands, and links literal. Add a link row in `docs/README.md` pointing to the new sub-index.
+- If `docs/spec/README.md` already exists → verify its Document Index table lists all and only current SPEC files. Report missing, stale, renamed, or duplicate entries. Review "How to Choose" and "Maintenance Rules" for missing, stale, or duplicate scenario/maintenance mappings.
+
+This check applies to SPEC only. Other document categories do not have sub-index rules unless explicitly added later.
+
 ### Step 4: Output Diff Report
 
-Present differences as tables in the conversation (DO NOT write to files directly). Produce two reports:
+Present differences as tables in the conversation (DO NOT write to files directly). Produce the following reports as applicable:
 
 - **AGENTS.md diff**: Section-by-section (Project Summary, Quick Constraints, Domain-to-Code Map, Code Generation Rules, Docs Navigation, Common Commands, Related Projects, Docs Maintenance Reminders). Mark each as "Update / Add / No change" + explanation
 - **docs/README.md diff**: List document index and candidate document changes
+- **Sub-Index proposal** (only if Step 3.5 triggered): Present the proposed `docs/spec/README.md` creation or update content for user review
 
 ### Step 5: Write After Confirmation
 

@@ -46,6 +46,11 @@ SPEC is the primary reference for development and GenAI. Update SPEC directly on
 | -------- | ---- | ---------------- |
 | —        | —    | No documents yet |
 
+<!-- Sub-index trigger (per GUIDE §4.6):
+     When docs/spec/ contains ≥ 8 SPEC files, create docs/spec/README.md
+     using the ZeroSpec SPEC index template structure.
+     Keep this flat list AND link to the sub-index for situational lookup. -->
+
 <!-- Cross-system consensus (enable for multi-repo setups)
 ## Cross-System Consensus
 

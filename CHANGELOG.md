@@ -4,6 +4,21 @@ This file tracks the version history of the ZeroSpec framework.
 
 ---
 
+## v0.4.3 — 2026-05-07
+
+### New
+
+- `templates:` Added `templates/SPEC-INDEX-TEMPLATE.md` — thin sub-index skeleton for `docs/spec/README.md` when SPEC count reaches threshold (≥ 8 files)
+- `docs:` GUIDE §4.6 — Per-Directory Sub-Index: deterministic threshold trigger (≥ 8 SPEC files), maintenance responsibility split (UPDATE.md creates/reviews, SPEC.md adds or updates index rows), backward-compatible with existing flat list in `docs/README.md` (EN + zh-TW)
+- `docs:` README Repo Structure — added `SPEC-INDEX-TEMPLATE.md` entry (EN + zh-TW)
+- `prompts:` UPDATE.md Step 3.5 — Sub-Index Check: count SPEC files during periodic review, propose creation when threshold met, verify index completeness and navigation/maintenance mappings when sub-index exists
+- `prompts:` SPEC.md Post-Output Verification step 4 — add/update row in sub-index Document Index table (if sub-index exists); never creates sub-index
+- `prompts/templates:` Added localization guidance for human-facing `docs/spec/README.md` sub-index content while preserving file paths, code identifiers, SPEC filenames, commands, and links
+- `templates:` DOCS-README-TEMPLATE.md — added HTML comment noting §4.6 sub-index trigger rule
+- `docs:` anti-patterns #24 Document Scaling — warns against sub-index becoming thick specification (EN + zh-TW)
+
+---
+
 ## v0.4.2 — 2026-04-24
 
 ### New

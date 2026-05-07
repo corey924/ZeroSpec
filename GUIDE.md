@@ -363,6 +363,54 @@ Do not pre-create empty files. Instead, declare trigger conditions in `AGENTS.md
 ^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$
 ```
 
+### 4.6 Per-Directory Sub-Index (Threshold-Triggered)
+
+When a document category reaches the file-count threshold defined below, add a **thin sub-index** inside that category's directory to enable intent-driven navigation.
+
+#### Trigger Condition
+
+Create `docs/spec/README.md` when the directory contains **≥ 8** files matching `SPEC-*.md`.
+
+This threshold is a deterministic check (count files in directory) — not a subjective judgment. AI agents can evaluate it by listing the directory.
+
+#### Scope
+
+Currently defined for **SPEC only**. Other document categories do not have sub-index rules unless explicitly added later.
+
+#### What the Sub-Index Contains
+
+Use [`templates/SPEC-INDEX-TEMPLATE.md`](templates/SPEC-INDEX-TEMPLATE.md) as the skeleton. Required sections:
+
+1. **Purpose** — scope declaration + SoT reminder
+2. **Document Index** — table of all SPECs (name, subject, scope, audience, status)
+3. **How to Choose** — scenario-to-SPEC mapping (intent-driven, not filename-driven)
+4. **Maintenance Rules** — maps code change types to SPEC update obligations
+5. **Status Guide** — defines status labels used in the index
+
+**Prohibited content**: endpoint tables, DTO schemas, business rules, or any contract detail that belongs in individual SPECs. The sub-index is navigation, not specification.
+
+**Language rule**: localize human-facing README content (headings, explanatory prose, table labels, scenario descriptions, maintenance rule descriptions, and status meanings) to the repository's detected documentation language or explicit `Respond in {locale}` override. Keep file paths, code identifiers, SPEC filenames, commands, and links literal.
+
+#### Relationship with `docs/README.md`
+
+- `docs/README.md` **retains its flat SPEC list** (name + path + status) — this ensures backward compatibility and provides a single-glance overview.
+- `docs/README.md` **additionally links** to `docs/spec/README.md` for situational lookup.
+- Two layers serve different functions: top-level = quick positional lookup; sub-index = intent-driven navigation + maintenance mapping. This is not SoT duplication.
+
+#### Maintenance Responsibilities
+
+| Action                                       | Responsible Prompt                                                         |
+| -------------------------------------------- | -------------------------------------------------------------------------- |
+| **Create** the sub-index (first time)        | `UPDATE.md` — during periodic review, when threshold is met                |
+| **Add or update** a row when a SPEC changes  | `SPEC.md` — in Post-Output Verification (only if sub-index already exists) |
+| **Update** How to Choose / Maintenance Rules | `UPDATE.md` — during periodic review (holistic cross-SPEC perspective)     |
+
+`SPEC.md` never creates the sub-index structure. It only adds or updates rows in an existing one.
+
+#### Irreversibility
+
+Once created, the sub-index is not removed even if SPEC count later drops below the threshold. A short index causes no harm; removing it risks breaking existing navigation links.
+
 ---
 
 ## 5. Drift Prevention

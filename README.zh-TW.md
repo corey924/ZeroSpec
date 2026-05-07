@@ -4,7 +4,7 @@
 
 > **在 AI Coding Agent 動手前，先把它需要的專案上下文整理好：架構規則、模組導航、版本真相來源。零依賴，純 Markdown。**
 
-**版本**：v0.4.2
+**版本**：v0.4.3
 **狀態**：Active
 
 ---
@@ -272,6 +272,7 @@ zerospec/
 │   ├── SPEC-TEMPLATE.md         ← 直接可用的 SPEC 模板
 │   ├── SA-TEMPLATE.md           ← 直接可用的 SA 模板
 │   ├── DOCS-README-TEMPLATE.md  ← docs/README.md 文件治理模板
+│   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md 子索引模板（門檻觸發）
 │   ├── prompts/                 ← 可選：VS Code Prompt Files adapter（可複製到 .github/prompts/）
 │   └── pointers/                ← 可選：各平台 pointer 模板（Copilot / Claude Code / Cursor / Windsurf；JetBrains 直接使用 AGENTS.md）
 ├── scripts/

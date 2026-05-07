@@ -116,6 +116,9 @@ Generate or update a SPEC document for this API change.
 1. Verify that every class / method / API path referenced in the document actually exists in code
 2. Confirm `docs/README.md` document index includes the newly created SPEC
 3. If a matching entry exists in the candidate documents table, move it to the document index
+4. If `docs/spec/README.md` exists, add or update the corresponding row in its Document Index table (match by SPEC filename, e.g. `SPEC-003_…`). Do NOT create `docs/spec/README.md` — that is handled by the UPDATE Prompt when the threshold is reached. Do NOT modify the "How to Choose" section — that is maintained during periodic UPDATE reviews.
+5. For `docs/spec/README.md` row updates, preserve the index file's existing locale for human-facing text. Keep file paths, code identifiers, SPEC filenames, commands, and links literal.
+6. If `docs/spec/README.md` does **not** exist and `docs/spec/` now contains ≥ 8 SPEC files, append a note in your output: "Sub-index threshold reached (>= 8 SPECs). Run the UPDATE Prompt to create `docs/spec/README.md`." Do NOT create it yourself.
 
 ---END PROMPT---
 ````

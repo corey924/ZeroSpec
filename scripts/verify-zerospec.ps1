@@ -107,6 +107,7 @@ Assert-FileExists 'SUPPORT.md'
 Assert-FileExists 'SUPPORT.zh-TW.md'
 
 Assert-FileExists 'templates/DOCS-README-TEMPLATE.md'
+Assert-FileExists 'templates/SPEC-INDEX-TEMPLATE.md'
 Assert-FileExists 'templates/SPEC-TEMPLATE.md'
 Assert-FileExists 'templates/ADR-TEMPLATE.md'
 Assert-FileExists 'templates/SA-TEMPLATE.md'
@@ -225,6 +226,14 @@ Assert-Contains 'examples/python-package/AGENTS.md' '## Quick Constraints'
 Assert-Contains 'examples/react-nx-monorepo/AGENTS.md' '## Quick Constraints'
 
 Assert-NotContains 'GUIDE.md' '就就位'
+
+# Sub-index localization rules (v0.4.3)
+Assert-Contains 'GUIDE.md' 'Language rule'
+Assert-Contains 'GUIDE.zh-TW.md' '語言規則'
+Assert-Contains 'templates/SPEC-INDEX-TEMPLATE.md' 'localize human-facing prose'
+Assert-Contains 'prompts/UPDATE.md' 'Localize human-facing README content'
+Assert-Contains 'prompts/SPEC.md' 'existing locale'
+Assert-Contains 'prompts/SPEC.md' 'Sub-index threshold reached'
 
 Assert-Contains 'prompts/INIT-BUILD.md' 'design decisions for cross-module shared components'
 Assert-Contains 'prompts/INIT-BUILD.md' 'Length guideline'

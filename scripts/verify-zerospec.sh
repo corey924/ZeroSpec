@@ -130,6 +130,7 @@ assert_file_exists "SUPPORT.md"
 assert_file_exists "SUPPORT.zh-TW.md"
 
 assert_file_exists "templates/DOCS-README-TEMPLATE.md"
+assert_file_exists "templates/SPEC-INDEX-TEMPLATE.md"
 assert_file_exists "templates/SPEC-TEMPLATE.md"
 assert_file_exists "templates/ADR-TEMPLATE.md"
 assert_file_exists "templates/SA-TEMPLATE.md"
@@ -248,6 +249,14 @@ assert_grep "## Quick Constraints" "examples/python-package/AGENTS.md"
 assert_grep "## Quick Constraints" "examples/react-nx-monorepo/AGENTS.md"
 
 assert_no_grep "就就位" "GUIDE.md"
+
+# Sub-index localization rules (v0.4.3)
+assert_grep "Language rule" "GUIDE.md"
+assert_grep "語言規則" "GUIDE.zh-TW.md"
+assert_grep "localize human-facing prose" "templates/SPEC-INDEX-TEMPLATE.md"
+assert_grep "Localize human-facing README content" "prompts/UPDATE.md"
+assert_grep "existing locale" "prompts/SPEC.md"
+assert_grep "Sub-index threshold reached" "prompts/SPEC.md"
 
 assert_grep "design decisions for cross-module shared components" "prompts/INIT-BUILD.md"
 assert_grep "Length guideline" "prompts/INIT-BUILD.md"

@@ -4,7 +4,7 @@
 
 > **🌐 [台灣正體中文版](README.zh-TW.md)**
 
-**Version**: v0.4.2
+**Version**: v0.4.3
 **Status**: Active
 
 ---
@@ -271,6 +271,7 @@ zerospec/
 │   ├── SPEC-TEMPLATE.md         ← Ready-to-use SPEC template
 │   ├── SA-TEMPLATE.md           ← Ready-to-use SA template
 │   ├── DOCS-README-TEMPLATE.md  ← docs/README.md governance template
+│   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md sub-index template (threshold-triggered)
 │   ├── prompts/                 ← Optional: VS Code Prompt Files adapter (copy to .github/prompts/)
 │   └── pointers/                ← Optional: platform pointer templates (Copilot / Claude Code / Cursor / Windsurf; JetBrains uses AGENTS.md directly)
 ├── scripts/

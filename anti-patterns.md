@@ -65,4 +65,12 @@ Common mistakes discovered across multi-project ecosystems. Each entry includes 
 
 ---
 
+## Document Scaling
+
+| #   | Anti-Pattern                              | Problem                                                                                                                                            | Fix                                                                                                                                                                                                                                                                   |
+| --- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 24  | **Sub-index duplicates contract content** | A thin `docs/spec/README.md` index gradually absorbs endpoint tables, DTO schemas, or business rules from individual SPECs — creating a second SoT | Sub-index contains only navigation: Document Index table + "How to Choose" scenario map + Maintenance Rules mapping + Status Guide. All contract details stay in individual SPEC files ([GUIDE Section 4.6](GUIDE.md#46-per-directory-sub-index-threshold-triggered)) |
+
+---
+
 *This list is updated as new patterns emerge. Contributions welcome.*
