@@ -551,7 +551,20 @@ After INIT-BUILD, run two parallel tracks:
 | Cross-module technical decision | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`                  |
 | System snapshot needed          | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`              |
 | Project evolved, sync docs      | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | Updates `AGENTS.md` + `docs/README.md` |
+| Existing SPECs may have drifted | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | Drift report (no files written)        |
 | **None of the above**           | —                                                | **Create nothing**                     |
+
+#### SPEC Lifecycle: SPEC vs UPDATE vs DRIFT
+
+The three maintenance Prompt Packs have distinct but complementary roles:
+
+| Prompt      | When to use                                               | Writes files?    |
+| ----------- | --------------------------------------------------------- | ---------------- |
+| `SPEC.md`   | Creating or updating a SPEC for a specific API change     | Yes              |
+| `UPDATE.md` | Syncing `AGENTS.md` / `docs/README.md` navigation indices | Yes              |
+| `DRIFT.md`  | Checking whether existing SPEC content still matches code | No — report only |
+
+> Rule of thumb: `SPEC.md` when behavior changes, `UPDATE.md` when structure changes, `DRIFT.md` when you are unsure whether either was done.
 
 ### Step 5: Periodic Review
 
@@ -562,8 +575,9 @@ After INIT-BUILD, run two parallel tracks:
 - [ ] Does SPEC Changelog keep up with recent code changes?
 - [ ] Any new modules not covered by the map?
 - [ ] Any low-value rules that can be removed?
+- [ ] Optional: spot-check 1–2 high-churn SPECs with DRIFT Prompt
 
-> Use [`prompts/UPDATE.md`](prompts/UPDATE.md) for post-review updates.
+> Use [`prompts/UPDATE.md`](prompts/UPDATE.md) for navigation index updates. Use [`prompts/DRIFT.md`](prompts/DRIFT.md) to verify SPEC content accuracy.
 
 #### Full Review (quarterly)
 

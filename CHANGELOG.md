@@ -4,6 +4,24 @@ This file tracks the version history of the ZeroSpec framework.
 
 ---
 
+## v0.5.0 — 2026-05-16
+
+### Added
+
+- `prompts:` Added `prompts/DRIFT.md` — new Prompt Pack to detect drift between existing SPEC documents and current code. Produces a structured drift report with BREAKING / DRIFT / STALE severity levels. Read-only; does not write any files.
+- `templates:` Added `templates/prompts/zerospec-drift.prompt.md` — VS Code adapter for DRIFT Prompt Pack
+
+### Changed
+
+- `prompts:` `prompts/AUDIT.md` — Added Dimension 8 (Domain-to-Code Map Health: spot-check Controller/Package entries still exist) and Dimension 9 (Path Link Health: verify internal and cross-repo path references). Added **Actionable Fix List** to output format. Updated `## Limitations` and `## Relationship to Other Prompts` sections.
+- `docs:` `GUIDE.md` and `GUIDE.zh-TW.md` — Added SPEC / UPDATE / DRIFT lifecycle comparison table in §7 (event-trigger table includes DRIFT row)
+- `docs:` `DAILY-USAGE.md` and `DAILY-USAGE.zh-TW.md` — Added Scenario H (DRIFT usage pattern) and DRIFT step to monthly quick review (§6); §5.6 diagnosis guidance now includes Domain-to-Code Map staleness as investigation step
+- `docs:` `README.md` and `README.zh-TW.md` — Added DRIFT.md to Repo Structure and After Adoption trigger table
+- `docs:` `AGENTS.md` — Continuous maintenance row in Domain-to-Code Map now includes `prompts/DRIFT.md`
+- `docs:` `anti-patterns.md` and `anti-patterns.zh-TW.md` — Anti-pattern #16 "Build once, never update" now cross-references AUDIT Dimension 8-9 and DRIFT Prompt
+
+---
+
 ## v0.4.3 — 2026-05-07
 
 ### New

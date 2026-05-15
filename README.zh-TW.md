@@ -4,7 +4,7 @@
 
 > **在 AI Coding Agent 動手前，先把它需要的專案上下文整理好：架構規則、模組導航、版本真相來源。零依賴，純 Markdown。**
 
-**版本**：v0.4.3
+**版本**：v0.5.0
 **狀態**：Active
 
 ---
@@ -206,6 +206,7 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 | 架構決策                                   | [`prompts/ADR.md`](prompts/ADR.md)                                                                                    |
 | 系統快照                                   | [`prompts/SA.md`](prompts/SA.md)                                                                                      |
 | 專案演進需同步文件                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                              |
+| 驗證既有 SPEC 是否仍跟程式碼一致           | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                |
 | 需要平台 pointer 設定（可選）              | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；JetBrains 直接使用 `AGENTS.md` |
 | 想使用一鍵觸發捷徑（可選 VS Code adapter） | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/`                              |
 | 未觸發以上事件                             | **不建立任何文件**                                                                                                    |
@@ -266,6 +267,7 @@ zerospec/
 │   ├── ADR.md                   ← 觸發：架構決策 → 產 ADR
 │   ├── SA.md                    ← 觸發：系統快照 → 產 SA
 │   ├── AUDIT.md                 ← 觸發：稽核 AGENTS.md 品質（不寫檔）
+│   ├── DRIFT.md                 ← 觸發：驗證既有 SPEC 是否仍跟程式碼一致（不寫檔）
 │   └── UPDATE.md                ← 持續：更新 AGENTS.md + docs/README.md
 ├── templates/
 │   ├── ADR-TEMPLATE.md          ← 直接可用的 ADR 模板
@@ -274,6 +276,7 @@ zerospec/
 │   ├── DOCS-README-TEMPLATE.md  ← docs/README.md 文件治理模板
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md 子索引模板（門檻觸發）
 │   ├── prompts/                 ← 可選：VS Code Prompt Files adapter（可複製到 .github/prompts/）
+│   │   └── zerospec-drift.prompt.md ← DRIFT Prompt VS Code adapter
 │   └── pointers/                ← 可選：各平台 pointer 模板（Copilot / Claude Code / Cursor / Windsurf；JetBrains 直接使用 AGENTS.md）
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux 驗收腳本

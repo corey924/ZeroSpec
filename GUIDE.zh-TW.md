@@ -598,15 +598,28 @@ INIT-BUILD 完成後，你有兩條任務軌道並行：
 
 ### Step 4：事件觸發擴張
 
-| 觸發事件             | 使用 Prompt Pack                                 | 產生/更新文件                       |
-| -------------------- | ------------------------------------------------ | ----------------------------------- |
-| Day-1 初始化（分析） | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | 現況盤點報告（不寫檔）              |
-| Day-1 初始化（建置） | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`      |
-| 新增/變更對外 API    | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`             |
-| 跨模組技術二選一決策 | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`               |
-| 需要系統全貌快照     | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`           |
-| 專案演進需同步文件   | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | 更新 `AGENTS.md` + `docs/README.md` |
-| **未觸發以上事件**   | —                                                | **不建立任何文件**                  |
+| 觸發事件                     | 使用 Prompt Pack                                 | 產生/更新文件                       |
+| ---------------------------- | ------------------------------------------------ | ----------------------------------- |
+| Day-1 初始化（分析）         | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | 現況盤點報告（不寫檔）              |
+| Day-1 初始化（建置）         | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`      |
+| 新增/變更對外 API            | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`             |
+| 跨模組技術二選一決策         | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`               |
+| 需要系統全貌快照             | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`           |
+| 專案演進需同步文件           | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | 更新 `AGENTS.md` + `docs/README.md` |
+| 懷疑既有 SPEC 已與程式碼漂移 | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | 漂移報告（不寫檔）                  |
+| **未觸發以上事件**           | —                                                | **不建立任何文件**                  |
+
+#### SPEC 生命週期：SPEC vs UPDATE vs DRIFT 分工
+
+三個維護用 Prompt Pack 各有定位，彼此互補：
+
+| Prompt      | 適用時機                                     | 是否寫檔       |
+| ----------- | -------------------------------------------- | -------------- |
+| `SPEC.md`   | 為特定 API 變更建立或更新 SPEC               | 是             |
+| `UPDATE.md` | 同步 `AGENTS.md` / `docs/README.md` 導航索引 | 是             |
+| `DRIFT.md`  | 確認既有 SPEC 內容是否仍與程式碼一致         | 否（只產報告） |
+
+> 判斷原則：行為有變更用 `SPEC.md`；結構有變更用 `UPDATE.md`；不確定是否有人做過以上任一步驟用 `DRIFT.md`。
 
 ### Step 5：定期回顧
 
@@ -619,8 +632,9 @@ SDD 機制的持續運作不只依賴事件觸發，還需要定期回顧以確�
 - [ ] SPEC Changelog 是否跟上近期的程式碼變更？
 - [ ] 有無新模組未被對照表覆蓋？
 - [ ] 有無低價值規則可以刪除？
+- [ ] 選擇性：用 DRIFT Prompt 抽查 1–2 份高異動 SPEC
 
-> 使用 [`prompts/UPDATE.md`](prompts/UPDATE.md) 執行回顧後的更新。
+> 使用 [`prompts/UPDATE.md`](prompts/UPDATE.md) 更新導航索引。使用 [`prompts/DRIFT.md`](prompts/DRIFT.md) 驗證 SPEC 內容準確性。
 
 #### 完整回顧（建議每季一次）
 

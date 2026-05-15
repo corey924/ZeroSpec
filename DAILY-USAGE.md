@@ -74,14 +74,14 @@ ZeroSpec itself (`prompts/`, `templates/`, `GUIDE.md`) is a "toolbox," not a wor
 
 **Recommended approaches**:
 
-| Approach       | Description                                                                   | Best For                                     |
-| -------------- | ----------------------------------------------------------------------------- | -------------------------------------------- |
-| **Bookmark**   | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed         | Individual developers                        |
-| **Snippet**      | Save frequently used Prompt Packs as IDE User Snippets or Text Expander                                                                              | Power users                                  |
-| **Prompt Files** | Copy `templates/prompts/*.prompt.md` to your project's `.github/prompts/`; invoke the same Prompt Packs from supported VS Code prompt UIs             | VS Code users (optional adapter)             |
-| **Pointers**     | Copy the matching file from `templates/pointers/` to your project; connects `AGENTS.md` to your AI platform without duplication                      | All platforms (Day-1 setup)                  |
-| **Symlink**      | Create a `.zerospec/` symlink in target project pointing to ZeroSpec prompts/                                                                        | Multi-project ecosystems                     |
-| **Copy-paste**   | Simplest — open ZeroSpec README, follow the link, copy the Prompt                                                                                   | Everyone (recommended Day-1 starting method) |
+| Approach         | Description                                                                                                                               | Best For                                     |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Bookmark**     | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed                                                                     | Individual developers                        |
+| **Snippet**      | Save frequently used Prompt Packs as IDE User Snippets or Text Expander                                                                   | Power users                                  |
+| **Prompt Files** | Copy `templates/prompts/*.prompt.md` to your project's `.github/prompts/`; invoke the same Prompt Packs from supported VS Code prompt UIs | VS Code users (optional adapter)             |
+| **Pointers**     | Copy the matching file from `templates/pointers/` to your project; connects `AGENTS.md` to your AI platform without duplication           | All platforms (Day-1 setup)                  |
+| **Symlink**      | Create a `.zerospec/` symlink in target project pointing to ZeroSpec prompts/                                                             | Multi-project ecosystems                     |
+| **Copy-paste**   | Simplest — open ZeroSpec README, follow the link, copy the Prompt                                                                         | Everyone (recommended Day-1 starting method) |
 
 > **Do not** add the entire ZeroSpec folder to your target project's workspace. This causes the Agent to read irrelevant Markdown and wastes context.
 
@@ -357,6 +357,31 @@ Step 4 — Commit & SPEC (same conversation)
 
 **Why it matters**: AGENTS.md provides structural constraints but cannot replace task-level planning. The Explore phase helps the Agent understand the task boundary before acting, which is a practical guard against "plausible-looking code that misses edge cases."
 
+### Scenario H: Checking Whether an Existing SPEC Still Matches the Code
+
+Use this when you suspect a SPEC has drifted from the actual code, before a release, or during periodic review.
+
+```
+Trigger examples:
+- PR reviewer comments: "This SPEC still shows the old auth flow"
+- You refactored a module 2 months ago and don't know if the SPEC was updated
+- Monthly review: spot-check 1–2 SPECs for drift
+
+Workflow:
+1. Open prompts/DRIFT.md from ZeroSpec, copy the Prompt
+2. Open Agent mode in your target project
+3. Optionally specify: "Check drift for: docs/spec/SPEC-001_auth.md"
+   (Leave blank to check all docs/spec/SPEC-*.md)
+4. Paste Prompt → Agent scans code vs SPEC → drift report produced (no files written)
+5. Review severity:
+   - BREAKING → update SPEC immediately using SPEC Prompt (Bugfix Variant)
+   - DRIFT    → include SPEC update in next feature PR
+   - STALE    → add a Changelog entry with approximate date
+   - CLEAN    → no action needed
+```
+
+**Key constraint**: DRIFT does **not** write files. It only produces a report — you decide which findings need action.
+
 ---
 
 ## 5. Real Problems in Long-Term Maintenance
@@ -442,6 +467,7 @@ If a document has never been referenced since creation, it probably should not e
 1. **AGENTS.md too long / core rules buried in noise**: File is noticeably long with generic knowledge the AI already has → core rules fall into the attention dilution zone
 2. **Rule description is ambiguous**: Same rule described inconsistently in two places, or wording too abstract to verify (e.g. "write clean code")
 3. **Conversation too long / context diluted**: Beyond 15–20 rounds, AGENTS.md attention weight is diluted by subsequent conversation output
+4. **Domain-to-Code Map entries are stale**: The map references deleted Controllers or renamed packages — run AUDIT Dimension 8 to spot-check entries, or use DRIFT Prompt to verify SPEC content consistency
 
 **Diagnostic flow**:
 
@@ -520,6 +546,10 @@ Steps:
 
 4. If gaps found → copy UPDATE Prompt → paste into Agent → get diff report
 5. Confirm → write → commit → done
+
+6. Optional: spot-check 1–2 high-churn SPECs with DRIFT Prompt
+   → Were there behavioral changes this month that haven't been reflected in the SPEC?
+   → BREAKING findings → update SPEC before next release
 ```
 
 ### Quarterly Full Review (30 minutes)

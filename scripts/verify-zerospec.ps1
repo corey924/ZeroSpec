@@ -94,6 +94,7 @@ Assert-FileExists 'prompts/SPEC.md'
 Assert-FileExists 'prompts/ADR.md'
 Assert-FileExists 'prompts/SA.md'
 Assert-FileExists 'prompts/AUDIT.md'
+Assert-FileExists 'prompts/DRIFT.md'
 Assert-FileExists '.github/pull_request_template.md'
 Assert-FileExists '.github/ISSUE_TEMPLATE/config.yml'
 Assert-FileExists '.github/ISSUE_TEMPLATE/bug-report.md'
@@ -123,6 +124,7 @@ Assert-FirstLineStartsWithHeader 'prompts/SPEC.md'
 Assert-FirstLineStartsWithHeader 'prompts/ADR.md'
 Assert-FirstLineStartsWithHeader 'prompts/SA.md'
 Assert-FirstLineStartsWithHeader 'prompts/AUDIT.md'
+Assert-FirstLineStartsWithHeader 'prompts/DRIFT.md'
 Assert-FirstLineStartsWithHeader 'templates/DOCS-README-TEMPLATE.md'
 Assert-FirstLineStartsWithHeader 'templates/SA-TEMPLATE.md'
 Assert-FirstLineStartsWithHeader 'examples/minimal-day1/AGENTS.md'
@@ -133,6 +135,9 @@ Assert-Contains 'prompts/ADR.md' '## Prerequisites'
 Assert-Contains 'prompts/SA.md' '## Prerequisites'
 Assert-Contains 'prompts/AUDIT.md' '^## Limitations$'
 Assert-NotContains 'prompts/AUDIT.md' '^## 限制$'
+Assert-Contains 'prompts/AUDIT.md' '### 8\. Domain-to-Code Map'
+Assert-Contains 'prompts/AUDIT.md' '### 9\.'
+Assert-Contains 'prompts/AUDIT.md' 'Actionable Fix List'
 
 Assert-Contains '.github/pull_request_template.md' '^## Background / Problem$'
 Assert-Contains '.github/pull_request_template.md' '^## SDD Sync Checklist$'
@@ -244,6 +249,7 @@ Assert-MatchCount 'prompts/UPDATE.md' '^---BEGIN PROMPT---$' 1
 Assert-MatchCount 'prompts/SPEC.md' '^---BEGIN PROMPT---$' 1
 Assert-MatchCount 'prompts/ADR.md' '^---BEGIN PROMPT---$' 1
 Assert-MatchCount 'prompts/SA.md' '^---BEGIN PROMPT---$' 1
+Assert-MatchCount 'prompts/DRIFT.md' '^---BEGIN PROMPT---$' 1
 
 Assert-MatchCount 'prompts/INIT-SCAN.md' '^---END PROMPT---$' 1
 Assert-MatchCount 'prompts/INIT-BUILD.md' '^---END PROMPT---$' 1
@@ -251,6 +257,7 @@ Assert-MatchCount 'prompts/UPDATE.md' '^---END PROMPT---$' 1
 Assert-MatchCount 'prompts/SPEC.md' '^---END PROMPT---$' 1
 Assert-MatchCount 'prompts/ADR.md' '^---END PROMPT---$' 1
 Assert-MatchCount 'prompts/SA.md' '^---END PROMPT---$' 1
+Assert-MatchCount 'prompts/DRIFT.md' '^---END PROMPT---$' 1
 
 Assert-MatchCount 'prompts/INIT-SCAN.md' '^````$' 2
 Assert-MatchCount 'prompts/INIT-BUILD.md' '^````$' 2
@@ -258,6 +265,12 @@ Assert-MatchCount 'prompts/UPDATE.md' '^````$' 2
 Assert-MatchCount 'prompts/SPEC.md' '^````$' 2
 Assert-MatchCount 'prompts/ADR.md' '^````$' 2
 Assert-MatchCount 'prompts/SA.md' '^````$' 2
+Assert-MatchCount 'prompts/DRIFT.md' '^````$' 2
+
+# DRIFT.md required sections
+Assert-Contains 'prompts/DRIFT.md' '^## Trigger Conditions$'
+Assert-Contains 'prompts/DRIFT.md' '^## Prerequisites$'
+Assert-Contains 'prompts/DRIFT.md' '^## Relationship to Other Prompts$'
 
 Assert-NotContains 'prompts/SPEC.md' 'templates/DOCS-README-TEMPLATE\.md'
 Assert-NotContains 'prompts/ADR.md' 'templates/DOCS-README-TEMPLATE\.md'

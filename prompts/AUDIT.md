@@ -111,6 +111,27 @@ AGENTS.md is injected into every Agent conversation's system context; longer con
 - **Moderate**: Noticeable but acceptable — review removal candidates from Dimension 4
 - **High**: Clearly impacting context — prioritize trimming and deduplication
 
+### 8. Domain-to-Code Map Health
+
+Spot-check that entries in the Domain-to-Code Map still exist in the codebase or documentation tree:
+
+- Pick 3–5 representative entries (Controller, Service, package, primary file, or directory) from the map
+- Verify each still exists by direct path lookup, file search, glob expansion, or package/class declaration search
+- Report: `✅ found`, `⚠️ not verified (no direct file access)`, or `❌ not found` for each spot-checked entry
+- If ≥ 2 entries cannot be confirmed, flag as WARN; if ≥ 1 entry is confirmed absent, flag as FAIL
+
+> Note: This dimension has limited accuracy without direct file-system access. If Agent cannot browse files freely, mark spot-checked entries as `⚠️ not verified` and note in the report.
+
+### 9. Path Link Health
+
+Check whether paths referenced in AGENTS.md resolve correctly:
+
+- **Internal doc links** (`docs/`, `templates/`, relative markdown links): Do the target files exist?
+- **Cross-repo relative paths** (`../other-repo/`, `../../shared/`): Are they resolvable from the current workspace root? If not, note and flag as WARN.
+- **Broken links**: Any path reference that clearly does not exist → flag as FAIL
+
+> Note: For cross-repo paths, use workspace context to determine whether the sibling repo is present. If it cannot be confirmed, mark as `⚠️ not verified` rather than FAIL.
+
 ## Output Format
 
 Produce the report in Markdown:
@@ -156,11 +177,38 @@ Total lines: {n}
 - Assessment: {Low / Moderate / High}
 - Notes: {brief explanation}
 
+### 8. Domain-to-Code Map Health
+| Entry (file / class / package) | Status                                 |
+| ------------------------------ | -------------------------------------- |
+| `XxxController`                | ✅ found / ⚠️ not verified / ❌ not found |
+
+### 9. Path Link Health
+| Path Referenced | Target Exists?                |
+| --------------- | ----------------------------- |
+| `docs/spec/...` | ✅ / ⚠️ not verified / ❌ broken |
+
 ## Suggested Trim List (by priority)
 
 1. **Must fix** (FAIL-level): ...
 2. **Should fix** (WARN-level): ...
 3. **Optional** (INFO): ...
+
+## Actionable Fix List
+
+For each finding, indicate the recommended follow-up action:
+
+| #   | Finding                                            | Severity | Recommended Action                              |
+| --- | -------------------------------------------------- | -------- | ----------------------------------------------- |
+| 1   | Domain-to-code map entry `XxxController` not found | FAIL     | Update map manually or run UPDATE Prompt        |
+| 2   | Broken link `docs/spec/SPEC-003.md`                | FAIL     | Create the missing SPEC or remove the reference |
+| 3   | Unverifiable rule "write clean code"               | WARN     | Rewrite to a specific, testable constraint      |
+| 4   | SPEC content may be stale after map/path changes   | INFO     | Run DRIFT Prompt on related SPECs               |
+
+Action codes:
+- **UPDATE**: Run [`prompts/UPDATE.md`](UPDATE.md) to sync AGENTS.md
+- **SPEC**: Run [`prompts/SPEC.md`](SPEC.md) to create or update a SPEC
+- **DRIFT**: Run [`prompts/DRIFT.md`](DRIFT.md) to verify SPEC content matches code
+- **Manual**: Requires human judgment — cannot be automated
 
 ## Not Recommended to Change
 
@@ -169,9 +217,9 @@ Explicitly list items that "look like they should change but actually shouldn't"
 
 ## Health Score Criteria
 
-- **PASS**: Mainline length within recommended range; few unverifiable rules and no obvious conflicts; top section dominated by core information
-- **WARN**: Mainline slightly long, or unverifiable rules / duplicates starting to accumulate; top section has some non-core content
-- **FAIL**: Content clearly too long, or many unverifiable rules / mutual conflicts; top section dominated by non-core content, already impacting task comprehension
+- **PASS**: Mainline length within recommended range; few unverifiable rules and no obvious conflicts; top section dominated by core information; no confirmed broken Domain-to-Code Map entries or internal links
+- **WARN**: Mainline slightly long, unverifiable rules / duplicates starting to accumulate, top section has some non-core content, or multiple map/path entries cannot be verified
+- **FAIL**: Content clearly too long, many unverifiable rules / mutual conflicts, top section dominated by non-core content, or confirmed stale map entries / broken internal links already impact task comprehension
 
 ---END PROMPT---
 ````
@@ -184,7 +232,10 @@ AUDIT only produces a report — no files are modified. If the report is WARN or
 
 1. **First, trim removal candidates** (Dimension 4) — highest impact for effort
 2. **Then, rewrite unverifiable rules** (Dimension 2) — improves Agent compliance rate
-3. **Finally, fill missing required fields** (Dimension 5) — if Quick Constraints are missing, run UPDATE Prompt to extract them from Code Generation Rules
+3. **Fix confirmed map/path issues** (Dimensions 8–9) — stale navigation and broken links mislead Agents more than missing prose
+4. **Finally, fill missing required fields** (Dimension 5) — if Quick Constraints are missing, run UPDATE Prompt to extract them from Code Generation Rules
+
+If Dimensions 8–9 are clean but a related SPEC may still describe old behavior, run [DRIFT Prompt](DRIFT.md) before editing SPEC content.
 
 If these actions involve file writes, use [UPDATE Prompt](UPDATE.md) with the audit report as input context, so UPDATE applies the report's recommendations to the actual AGENTS.md.
 
@@ -192,17 +243,21 @@ If these actions involve file writes, use [UPDATE Prompt](UPDATE.md) with the au
 
 ## Relationship to Other Prompts
 
-| Prompt     | Action         | This Prompt's Role                                                  |
-| ---------- | -------------- | ------------------------------------------------------------------- |
-| INIT-SCAN  | Read + Analyze | Similar, but SCAN covers the whole repo; AUDIT focuses on AGENTS.md |
-| INIT-BUILD | Write files    | AUDIT does not write — only recommends                              |
-| UPDATE     | Write files    | AUDIT output can serve as input for UPDATE                          |
-| SPEC / ADR | Write files    | Unrelated                                                           |
+| Prompt     | Action         | This Prompt's Role                                                   |
+| ---------- | -------------- | -------------------------------------------------------------------- |
+| INIT-SCAN  | Read + Analyze | Similar, but SCAN covers the whole repo; AUDIT focuses on AGENTS.md  |
+| INIT-BUILD | Write files    | AUDIT does not write — only recommends                               |
+| UPDATE     | Write files    | AUDIT output can serve as input for UPDATE                           |
+| DRIFT      | Read + Report  | Use when AUDIT suggests valid navigation but stale SPEC behavior     |
+| SPEC       | Write files    | Use only after deciding that SPEC content needs creation or update   |
+| ADR        | Write files    | Unrelated unless AUDIT reveals missing architecture decision context |
 
 ---
 
 ## Limitations
 
-- This Prompt can only diagnose `AGENTS.md` itself; it cannot evaluate actual Agent compliance rate.
+- This Prompt can only diagnose `AGENTS.md` and the paths it references; it cannot evaluate actual Agent compliance rate.
 - Actual compliance rate requires long-term observation of PR review history or repeated real-task sampling.
 - If there is ambiguity in the report's "verifiable / not verifiable" judgment, use user experience as the final reference.
+- **Dimension 8 (Domain-to-Code Map Health)**: Accuracy depends on whether the Agent can directly browse the filesystem. Without file access, entries are marked `⚠️ not verified` — treat as a prompt for manual spot-check, not a confirmed failure.
+- **Dimension 9 (Path Link Health)**: Cross-repo relative paths can only be verified if the sibling repository is present in the current workspace. Paths outside the workspace are marked `⚠️ not verified`.

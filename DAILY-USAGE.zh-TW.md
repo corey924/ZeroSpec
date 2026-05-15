@@ -72,14 +72,14 @@ ZeroSpec 本體（`prompts/`、`templates/`、`GUIDE.md`）是「工具箱」，
 
 **建議做法**：
 
-| 方式         | 說明                                                          | 適合誰                         |
-| ------------ | ------------------------------------------------------------- | ------------------------------ |
-| **書籤式**   | 瀏覽器或 IDE 書籤 ZeroSpec 資料夾，需要時點開複製 Prompt      | 個人開發者                     |
-| **Snippet**      | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander                                                       | 頻繁使用者                     |
+| 方式             | 說明                                                                                                                      | 適合誰                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **書籤式**       | 瀏覽器或 IDE 書籤 ZeroSpec 資料夾，需要時點開複製 Prompt                                                                  | 個人開發者                     |
+| **Snippet**      | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander                                                             | 頻繁使用者                     |
 | **Prompt Files** | 將 `templates/prompts/*.prompt.md` 複製到專案的 `.github/prompts/`；可在支援的 VS Code Prompt 介面呼叫同一套 Prompt Packs | VS Code 使用者（可選 adapter） |
-| **Pointers**     | 從 `templates/pointers/` 複製對應平台的模板到你的專案，讓 AGENTS.md 與 AI 平台直接對接，不複製內容 | 所有平台（Day-1 設定）         |
-| **Symlink**      | 在目標專案建一個 `.zerospec/` symlink 指向 ZeroSpec prompts/                                                        | 多專案生態圈                   |
-| **複製貼上** | 最簡單——需要時開 ZeroSpec README，按連結找到 Prompt，複製貼入 | 所有人（Day-1 推薦的起步方式） |
+| **Pointers**     | 從 `templates/pointers/` 複製對應平台的模板到你的專案，讓 AGENTS.md 與 AI 平台直接對接，不複製內容                        | 所有平台（Day-1 設定）         |
+| **Symlink**      | 在目標專案建一個 `.zerospec/` symlink 指向 ZeroSpec prompts/                                                              | 多專案生態圈                   |
+| **複製貼上**     | 最簡單——需要時開 ZeroSpec README，按連結找到 Prompt，複製貼入                                                             | 所有人（Day-1 推薦的起步方式） |
 
 > **不建議**：把 ZeroSpec 整個資料夾加進目標專案的 workspace。這會讓 Agent 讀到不相關的 markdown，浪費 context。
 
@@ -368,6 +368,31 @@ Step 4 — Commit & SPEC（同對話）
 
 **為什麼值得做**：AGENTS.md 能提供結構約束，但無法替代任務層級的計畫；Explore 階段能讓 Agent 在動手前認清本次任務的邊界，這通常是降低「生出貌似正確但遺漏 edge case」風險的實用做法。
 
+### 劇本 H：確認現有 SPEC 是否仍與程式碼一致
+
+在懷疑 SPEC 已漂移、版本發布前、或定期回顧時使用。
+
+```
+觸發範例：
+- PR reviewer 回饋：「這份 SPEC 描述的還是舊的認證流程」
+- 兩個月前做了模組重構，不確定 SPEC 是否跟著更新過
+- 月度回顧：抽查 1–2 份高異動 SPEC 確認漂移狀況
+
+工作流程：
+1. 從 ZeroSpec 開啟 prompts/DRIFT.md，複製 Prompt
+2. 在目標專案開啟 Agent 模式
+3. 選擇性指定：「Check drift for: docs/spec/SPEC-001_auth.md」
+   （留空則檢查全部 docs/spec/SPEC-*.md）
+4. 貼入 Prompt → Agent 掃描程式碼 vs SPEC → 產出漂移報告（不寫任何檔案）
+5. 依嚴重度處理：
+   - BREAKING → 立即用 SPEC Prompt 更新（Bugfix Variant 格式）
+   - DRIFT    → 在下一個 feature PR 一起帶入 SPEC 更新
+   - STALE    → 在 Changelog 補上約略日期與說明
+   - CLEAN    → 無需動作
+```
+
+**關鍵限制**：DRIFT **不寫任何檔案**，只產出報告——由你判斷哪些發現需要後續處理。
+
 ---
 
 ## 5. 長期維護會遇到的真實問題
@@ -453,6 +478,7 @@ Step 4 — Commit & SPEC（同對話）
 1. **AGENTS.md 過長 / 核心規則被噪音埋沒**：檔案明顯偏長且含大量 AI 本來就會的通用常識 → 核心規則落在注意力稀釋區
 2. **規則描述有歧義**：同一條規則在 AGENTS.md 兩處描述不一致，或語句抽象到 AI 無法驗證（如「寫乾淨程式碼」）
 3. **對話已過長 / context 稀釋**：超過 15–20 輪的長對話，AGENTS.md 的注意力權重被後續對話輸出稀釋
+4. **領域對照表已過期**：對照表中的 Controller 或 Package 路徑已刪除或改名——用 AUDIT Dimension 8 抽查，或用 DRIFT Prompt 確認 SPEC 內容與程式碼是否一致
 
 **診斷流程**：
 
@@ -531,6 +557,10 @@ Step 4 — Commit & SPEC（同對話）
 
 4. 如果有落差 → 複製 UPDATE Prompt → 貼入 Agent → 讓它產差異報告
 5. 確認 → 寫入 → commit → done
+
+6. 選擇性：用 DRIFT Prompt 抽查 1–2 份高異動 SPEC
+   → 這個月是否有行為變更但 SPEC 還沒跟上？
+   → 有 BREAKING 發現 → 在下個版本發布前更新 SPEC
 ```
 
 ### 季度完整回顧（30 分鐘）

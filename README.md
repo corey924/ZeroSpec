@@ -4,7 +4,7 @@
 
 > **🌐 [台灣正體中文版](README.zh-TW.md)**
 
-**Version**: v0.4.3
+**Version**: v0.5.0
 **Status**: Active
 
 ---
@@ -208,6 +208,7 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 | Architecture decision                                       | [`prompts/ADR.md`](prompts/ADR.md)                                                                                       |
 | System snapshot needed                                      | [`prompts/SA.md`](prompts/SA.md)                                                                                         |
 | Project evolved, sync docs                                  | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                 |
+| Verify existing SPECs still match code                      | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                   |
 | Need platform pointer setup (optional)                      | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; JetBrains uses `AGENTS.md` directly |
 | Want one-click trigger shortcuts (optional VS Code adapter) | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/`                          |
 | None of the above                                           | **Create nothing**                                                                                                       |
@@ -265,6 +266,7 @@ zerospec/
 │   ├── ADR.md                   ← Trigger: architecture decision → produce ADR
 │   ├── SA.md                    ← Trigger: system snapshot → produce SA
 │   ├── AUDIT.md                 ← Trigger: audit AGENTS.md quality (no files written)
+│   ├── DRIFT.md                 ← Trigger: verify existing SPECs still match code (no files written)
 │   └── UPDATE.md                ← Ongoing: update AGENTS.md + docs/README.md
 ├── templates/
 │   ├── ADR-TEMPLATE.md          ← Ready-to-use ADR template
@@ -273,6 +275,7 @@ zerospec/
 │   ├── DOCS-README-TEMPLATE.md  ← docs/README.md governance template
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md sub-index template (threshold-triggered)
 │   ├── prompts/                 ← Optional: VS Code Prompt Files adapter (copy to .github/prompts/)
+│   │   └── zerospec-drift.prompt.md ← DRIFT Prompt VS Code adapter
 │   └── pointers/                ← Optional: platform pointer templates (Copilot / Claude Code / Cursor / Windsurf; JetBrains uses AGENTS.md directly)
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux verification script

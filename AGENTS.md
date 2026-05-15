@@ -32,7 +32,7 @@ Provides AI coding agents with project context (architecture rules, module navig
 | Domain                            | Primary Files                                                                                                                              |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | Bootstrap / onboarding            | `prompts/INIT-SCAN.md`, `prompts/INIT-BUILD.md`                                                                                            |
-| Continuous maintenance            | `prompts/UPDATE.md`, `prompts/AUDIT.md`                                                                                                    |
+| Continuous maintenance            | `prompts/UPDATE.md`, `prompts/AUDIT.md`, `prompts/DRIFT.md`                                                                                |
 | Document types (SPEC/ADR/SA)      | `prompts/SPEC.md`, `prompts/ADR.md`, `prompts/SA.md`                                                                                       |
 | Methodology & design rules        | `GUIDE.md` + `GUIDE.zh-TW.md`                                                                                                              |
 | Daily usage & IDE config          | `DAILY-USAGE.md` + `DAILY-USAGE.zh-TW.md`                                                                                                  |

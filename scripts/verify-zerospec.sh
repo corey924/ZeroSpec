@@ -117,6 +117,7 @@ assert_file_exists "prompts/SPEC.md"
 assert_file_exists "prompts/ADR.md"
 assert_file_exists "prompts/SA.md"
 assert_file_exists "prompts/AUDIT.md"
+assert_file_exists "prompts/DRIFT.md"
 assert_file_exists ".github/pull_request_template.md"
 assert_file_exists ".github/ISSUE_TEMPLATE/config.yml"
 assert_file_exists ".github/ISSUE_TEMPLATE/bug-report.md"
@@ -146,6 +147,7 @@ assert_first_line_starts_with_header "prompts/SPEC.md"
 assert_first_line_starts_with_header "prompts/ADR.md"
 assert_first_line_starts_with_header "prompts/SA.md"
 assert_first_line_starts_with_header "prompts/AUDIT.md"
+assert_first_line_starts_with_header "prompts/DRIFT.md"
 assert_first_line_starts_with_header "templates/DOCS-README-TEMPLATE.md"
 assert_first_line_starts_with_header "templates/SA-TEMPLATE.md"
 assert_first_line_starts_with_header "examples/minimal-day1/AGENTS.md"
@@ -156,6 +158,9 @@ assert_grep "## Prerequisites" "prompts/ADR.md"
 assert_grep "## Prerequisites" "prompts/SA.md"
 assert_grep "^## Limitations$" "prompts/AUDIT.md"
 assert_no_grep "^## 限制$" "prompts/AUDIT.md"
+assert_grep "### 8\. Domain-to-Code Map" "prompts/AUDIT.md"
+assert_grep "### 9\." "prompts/AUDIT.md"
+assert_grep "Actionable Fix List" "prompts/AUDIT.md"
 
 assert_grep "^## Background / Problem$" ".github/pull_request_template.md"
 assert_grep "^## SDD Sync Checklist$" ".github/pull_request_template.md"
@@ -267,6 +272,7 @@ assert_count_eq "^---BEGIN PROMPT---$" "prompts/UPDATE.md" 1
 assert_count_eq "^---BEGIN PROMPT---$" "prompts/SPEC.md" 1
 assert_count_eq "^---BEGIN PROMPT---$" "prompts/ADR.md" 1
 assert_count_eq "^---BEGIN PROMPT---$" "prompts/SA.md" 1
+assert_count_eq "^---BEGIN PROMPT---$" "prompts/DRIFT.md" 1
 
 assert_count_eq "^---END PROMPT---$" "prompts/INIT-SCAN.md" 1
 assert_count_eq "^---END PROMPT---$" "prompts/INIT-BUILD.md" 1
@@ -274,6 +280,7 @@ assert_count_eq "^---END PROMPT---$" "prompts/UPDATE.md" 1
 assert_count_eq "^---END PROMPT---$" "prompts/SPEC.md" 1
 assert_count_eq "^---END PROMPT---$" "prompts/ADR.md" 1
 assert_count_eq "^---END PROMPT---$" "prompts/SA.md" 1
+assert_count_eq "^---END PROMPT---$" "prompts/DRIFT.md" 1
 
 assert_count_eq "^\`\`\`\`$" "prompts/INIT-SCAN.md" 2
 assert_count_eq "^\`\`\`\`$" "prompts/INIT-BUILD.md" 2
@@ -281,6 +288,12 @@ assert_count_eq "^\`\`\`\`$" "prompts/UPDATE.md" 2
 assert_count_eq "^\`\`\`\`$" "prompts/SPEC.md" 2
 assert_count_eq "^\`\`\`\`$" "prompts/ADR.md" 2
 assert_count_eq "^\`\`\`\`$" "prompts/SA.md" 2
+assert_count_eq "^\`\`\`\`$" "prompts/DRIFT.md" 2
+
+# DRIFT.md required sections
+assert_grep "^## Trigger Conditions$" "prompts/DRIFT.md"
+assert_grep "^## Prerequisites$" "prompts/DRIFT.md"
+assert_grep "^## Relationship to Other Prompts$" "prompts/DRIFT.md"
 
 assert_no_grep "templates/DOCS-README-TEMPLATE\\.md" "prompts/SPEC.md"
 assert_no_grep "templates/DOCS-README-TEMPLATE\\.md" "prompts/ADR.md"
