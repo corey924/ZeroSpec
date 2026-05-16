@@ -5,7 +5,7 @@ set -euo pipefail
 # Keep a predictable PATH in restricted CI shells.
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
 
-for required_cmd in dirname grep cut head; do
+for required_cmd in dirname grep cut head cmp; do
   if ! command -v "$required_cmd" >/dev/null 2>&1; then
     echo "FAIL: Required command not found in PATH: $required_cmd"
     exit 1
@@ -82,6 +82,20 @@ assert_count_eq() {
     pass "Count matched: $file / $pattern = $expected"
   else
     fail "Count mismatch: $file / $pattern, expected $expected, actual $actual"
+  fi
+}
+
+assert_files_equal() {
+  local expected="$1"
+  local actual="$2"
+  if [[ ! -f "$expected" || ! -f "$actual" ]]; then
+    fail "Cannot compare missing files: $expected / $actual"
+    return
+  fi
+  if cmp -s "$expected" "$actual"; then
+    pass "Files match: $expected == $actual"
+  else
+    fail "Files differ: $expected != $actual"
   fi
 }
 
@@ -315,6 +329,30 @@ assert_file_exists "GUIDE.zh-TW.md"
 assert_file_exists "DAILY-USAGE.zh-TW.md"
 assert_file_exists "anti-patterns.zh-TW.md"
 assert_file_exists "CONTRIBUTING.zh-TW.md"
+
+# Skill-style adapter assets (v0.5.1)
+assert_file_exists "skills/zerospec/SKILL.md"
+assert_file_exists "skills/README.md"
+assert_file_exists "scripts/sync-skills.sh"
+assert_file_exists "scripts/sync-skills.ps1"
+assert_file_exists "skills/zerospec/prompts/INIT-SCAN.md"
+assert_file_exists "skills/zerospec/prompts/INIT-BUILD.md"
+assert_file_exists "skills/zerospec/prompts/UPDATE.md"
+assert_file_exists "skills/zerospec/prompts/AUDIT.md"
+assert_file_exists "skills/zerospec/prompts/DRIFT.md"
+assert_file_exists "skills/zerospec/prompts/SPEC.md"
+assert_file_exists "skills/zerospec/prompts/ADR.md"
+assert_file_exists "skills/zerospec/prompts/SA.md"
+assert_grep "^name: zerospec$" "skills/zerospec/SKILL.md"
+assert_grep "Route Table" "skills/zerospec/SKILL.md"
+assert_grep "Self-Review" "skills/zerospec/SKILL.md"
+assert_grep "prompts/AUDIT\.md" "skills/zerospec/SKILL.md"
+assert_grep "sync-skills" "skills/README.md"
+assert_grep "sync-skills\.sh --install" "skills/README.md"
+assert_grep "sync-skills\.ps1 -Install" "skills/README.md"
+for prompt_file in INIT-SCAN.md INIT-BUILD.md UPDATE.md AUDIT.md DRIFT.md SPEC.md ADR.md SA.md; do
+  assert_files_equal "prompts/$prompt_file" "skills/zerospec/prompts/$prompt_file"
+done
 
 # === Bloat Check (warning only — does not affect PASS/FAIL) ===
 echo "=== Bloat Check (warning only) ==="

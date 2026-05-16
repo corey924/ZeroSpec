@@ -68,6 +68,22 @@ function Assert-MatchCount([string]$Path, [string]$Pattern, [int]$ExpectedCount)
     }
 }
 
+function Assert-FilesEqual([string]$ExpectedPath, [string]$ActualPath) {
+    if (-not (Test-Path -Path $ExpectedPath -PathType Leaf) -or -not (Test-Path -Path $ActualPath -PathType Leaf)) {
+        Fail "Cannot compare missing files: $ExpectedPath / $ActualPath"
+        return
+    }
+
+    $expected = Get-Content -Path $ExpectedPath -Raw
+    $actual = Get-Content -Path $ActualPath -Raw
+    if ($expected -eq $actual) {
+        Pass "Files match: $ExpectedPath == $ActualPath"
+    }
+    else {
+        Fail "Files differ: $ExpectedPath != $ActualPath"
+    }
+}
+
 function Assert-LineOrder([string]$Path, [string]$FirstPattern, [string]$SecondPattern, [string]$RuleName) {
     $firstMatch = Select-String -Path $Path -Pattern $FirstPattern | Select-Object -First 1
     $secondMatch = Select-String -Path $Path -Pattern $SecondPattern | Select-Object -First 1
@@ -292,6 +308,30 @@ Assert-FileExists 'GUIDE.zh-TW.md'
 Assert-FileExists 'DAILY-USAGE.zh-TW.md'
 Assert-FileExists 'anti-patterns.zh-TW.md'
 Assert-FileExists 'CONTRIBUTING.zh-TW.md'
+
+# Skill-style adapter assets (v0.5.1)
+Assert-FileExists 'skills/zerospec/SKILL.md'
+Assert-FileExists 'skills/README.md'
+Assert-FileExists 'scripts/sync-skills.sh'
+Assert-FileExists 'scripts/sync-skills.ps1'
+Assert-FileExists 'skills/zerospec/prompts/INIT-SCAN.md'
+Assert-FileExists 'skills/zerospec/prompts/INIT-BUILD.md'
+Assert-FileExists 'skills/zerospec/prompts/UPDATE.md'
+Assert-FileExists 'skills/zerospec/prompts/AUDIT.md'
+Assert-FileExists 'skills/zerospec/prompts/DRIFT.md'
+Assert-FileExists 'skills/zerospec/prompts/SPEC.md'
+Assert-FileExists 'skills/zerospec/prompts/ADR.md'
+Assert-FileExists 'skills/zerospec/prompts/SA.md'
+Assert-Contains 'skills/zerospec/SKILL.md' '^name: zerospec$'
+Assert-Contains 'skills/zerospec/SKILL.md' 'Route Table'
+Assert-Contains 'skills/zerospec/SKILL.md' 'Self-Review'
+Assert-Contains 'skills/zerospec/SKILL.md' 'prompts/AUDIT\.md'
+Assert-Contains 'skills/README.md' 'sync-skills'
+Assert-Contains 'skills/README.md' 'sync-skills\.sh --install'
+Assert-Contains 'skills/README.md' 'sync-skills\.ps1 -Install'
+@('INIT-SCAN.md', 'INIT-BUILD.md', 'UPDATE.md', 'AUDIT.md', 'DRIFT.md', 'SPEC.md', 'ADR.md', 'SA.md') | ForEach-Object {
+    Assert-FilesEqual "prompts/$_" "skills/zerospec/prompts/$_"
+}
 
 # === Bloat Check (warning only — does not affect PASS/FAIL) ===
 Write-Host '=== Bloat Check (warning only) ==='

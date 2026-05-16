@@ -4,7 +4,7 @@
 
 > **在 AI Coding Agent 動手前，先把它需要的專案上下文整理好：架構規則、模組導航、版本真相來源。零依賴，純 Markdown。**
 
-**版本**：v0.5.0
+**版本**：v0.5.1
 **狀態**：Active
 
 ---
@@ -140,32 +140,34 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 **目標專案**
 - [ ] 已 clone 至本機：`git clone <your-repo-url>`
-- [ ] 以 IDE 開啟**目標專案的根目錄**
+- [ ] 以 IDE 或 CLI 在**目標專案根目錄**啟動
 
 > ZeroSpec 獨立存放即可，**不需要加入你的目標 Repo**。
 > Bootstrap 完成後，你的 Repo 只新增 `AGENTS.md` 和 `docs/README.md` 兩個檔案。
 
 **AI Agent 外掛**（以下擇一，必須具備 Repo 讀寫能力）
 
-| 工具                     | 啟用方式                                       |
-| ------------------------ | ---------------------------------------------- |
-| GitHub Copilot (VS Code) | 切換至 **Agent 模式**（確認 `#codebase` 可用） |
-| Cursor                   | 使用 **Composer — Agent**（非 Chat 模式）      |
-| Claude Code              | 預設即具備讀寫能力                             |
-| Windsurf                 | 使用 **Cascade 模式**                          |
-| JetBrains AI Assistant   | 開啟 **Attach project files** 選項             |
+| 工具                     | 啟用方式                                                                    |
+| ------------------------ | --------------------------------------------------------------------------- |
+| GitHub Copilot (VS Code) | 切換至 **Agent 模式**（確認 `#codebase` 可用）                              |
+| Cursor                   | 使用 **Composer — Agent**（非 Chat 模式）                                   |
+| Codex CLI                | 在專案根目錄啟動；根據 [agents.md](https://agents.md/) 慣例讀取 `AGENTS.md` |
+| Generic CLI              | 在專案根目錄啟動，貼入 Prompt Pack 內容                                     |
+| Claude Code              | 預設即具備讀寫能力                                                          |
+| Windsurf                 | 使用 **Cascade 模式**                                                       |
+| JetBrains AI Assistant   | 開啟 **Attach project files** 選項                                          |
 
-> 不適用：ChatGPT / Claude.ai 網頁版（無法讀取本機 Repo）
+> 不建議：無法完整存取本機 Repo 的環境（例如 ChatGPT / Claude.ai 網頁版）
 >
 > 若需要實際寫入檔案，請避免使用純 Plan 模式；`INIT-SCAN` 這類只做分析、不寫檔的步驟，則可視平台能力使用。
 
 > GitHub Copilot 用戶：Copilot 不一定自動讀 `AGENTS.md`，需用 `@AGENTS.md` 引用或建立 `.github/copilot-instructions.md`，詳見 [DAILY-USAGE.zh-TW.md §2.2](DAILY-USAGE.zh-TW.md#22-githubcopilot-instructionsmd-與-agentsmd-的共存)。
 
-> **非英文專案提示**：Prompt Pack 以英文撰寫，但產出語言會自動偵測你的專案語境。若你的 Repo 以英文為主、但希望產出台灣正體中文，請見 [DAILY-USAGE.zh-TW.md §5.8](DAILY-USAGE.zh-TW.md#58-指定產出語言例如-zh-tw)。
+> **非英文專案提示**：Prompt Pack 以英文撰寫，產出語言通常會依專案語境判斷。若產出語言不符合預期，請在第一句明確指定目標語系（例如：`請用 zh-TW 回覆`）。若你的 Repo 以英文為主、但希望產出台灣正體中文，請見 [DAILY-USAGE.zh-TW.md §5.8](DAILY-USAGE.zh-TW.md#58-指定產出語言例如-zh-tw)。
 
 ### 快速起步
 
-1. 在目標專案開啟 Agent 模式，貼上 [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)。
+1. 在目標專案啟動 AI Agent（IDE 的 Agent 模式或在根目錄啟動 CLI session），貼上 [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)。
 2. 在同一對話貼上 [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md)。
 3. 審核產出的 `AGENTS.md` 與 `docs/README.md`，再用一個真實小任務驗證。
 
@@ -174,7 +176,7 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 ### Step 1：分析現況（INIT-SCAN）
 
 1. 開啟 [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)，複製 Prompt
-2. IDE 切換至**目標專案根目錄**，開啟 **Agent 模式**
+2. IDE 切換至**目標專案根目錄**，開啟 **Agent 模式**（CLI 工具則直接在根目錄啟動 CLI Agent）
 3. 貼入 Prompt → AI 掃描 Repo → 產出結構化現況盤點（不寫檔）
 4. 確認分析結果、回答 2–3 個待確認問題（約 5–10 分鐘）
 
@@ -200,18 +202,19 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 ### 導入後怎麼用？
 
-| 觸發事件                                   | 使用 Prompt Pack / 方式                                                                                               |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| 新增/變更 API                              | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                  |
-| 架構決策                                   | [`prompts/ADR.md`](prompts/ADR.md)                                                                                    |
-| 系統快照                                   | [`prompts/SA.md`](prompts/SA.md)                                                                                      |
-| 專案演進需同步文件                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                              |
-| 驗證既有 SPEC 是否仍跟程式碼一致           | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                |
-| 需要平台 pointer 設定（可選）              | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；JetBrains 直接使用 `AGENTS.md` |
-| 想使用一鍵觸發捷徑（可選 VS Code adapter） | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/`                              |
-| 未觸發以上事件                             | **不建立任何文件**                                                                                                    |
+| 觸發事件                                   | 使用 Prompt Pack / 方式                                                                                                                                                     |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 新增/變更 API                              | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                        |
+| 架構決策                                   | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                          |
+| 系統快照                                   | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                            |
+| 專案演進需同步文件                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                    |
+| 驗證既有 SPEC 是否仍跟程式碼一致           | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                      |
+| 需要平台 pointer 設定（可選）              | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；Codex CLI、JetBrains、generic CLI 支援時直接使用 `AGENTS.md`                         |
+| 想使用一鍵觸發捷徑（可選 VS Code adapter） | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/`（⚠️ 需讓 `#file:prompts/` 可解析；見 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md)） |
+| 想在 Claude Code 使用 Skill-style 捷徑     | macOS/Linux：`bash scripts/sync-skills.sh --install`；Windows：`pwsh -File scripts/sync-skills.ps1 -Install`（見 [`skills/README.md`](skills/README.md)）                   |
+| 未觸發以上事件                             | **不建立任何文件**                                                                                                                                                          |
 
-> `templates/prompts/*.prompt.md` 是提供 VS Code Prompt 介面的可選快捷層。ZeroSpec 核心仍維持跨工具：Cursor、Claude Code、Windsurf、JetBrains 也可透過複製貼上 / 書籤 / Symlink 使用同一套 Prompt Packs。
+> `templates/prompts/*.prompt.md` 是提供 VS Code Prompt 介面的可選快捷層。ZeroSpec 核心仍維持跨工具：Cursor、Codex CLI、Claude Code、Windsurf、JetBrains 也可透過複製貼上 / 書籤 / Symlink 使用同一套 Prompt Packs。
 
 建議每月做一次快速回顧、每季做一次完整回顧，詳細做法見 [GUIDE.zh-TW.md §7](GUIDE.zh-TW.md#7-導入與持續運作流程)。
 
@@ -232,7 +235,7 @@ ZeroSpec 內建跨平台驗收腳本。
 執行方式：
 
 - macOS / Linux：`bash scripts/verify-zerospec.sh`
-- Windows（PowerShell）：`powershell -ExecutionPolicy Bypass -File .\scripts\verify-zerospec.ps1`
+- Windows（PowerShell）：`pwsh -File scripts/verify-zerospec.ps1`
 
 腳本會輸出 PASS / FAIL 摘要；若有任何失敗，會回傳非 0 結束碼，適合手動驗收或 CI 使用。
 
@@ -277,10 +280,17 @@ zerospec/
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md 子索引模板（門檻觸發）
 │   ├── prompts/                 ← 可選：VS Code Prompt Files adapter（可複製到 .github/prompts/）
 │   │   └── zerospec-drift.prompt.md ← DRIFT Prompt VS Code adapter
-│   └── pointers/                ← 可選：各平台 pointer 模板（Copilot / Claude Code / Cursor / Windsurf；JetBrains 直接使用 AGENTS.md）
+│   └── pointers/                ← 可選：各平台 pointer 模板（Copilot / Claude Code / Cursor / Windsurf；Codex CLI、JetBrains、generic CLI 通常直接使用 AGENTS.md）
+├── skills/
+│   ├── README.md                ← Adapter 資產指南（跨工具路徑選擇與安裝說明）
+│   └── zerospec/
+│       ├── SKILL.md             ← Skill-style Router（已用 Claude Code 驗證）
+│       └── prompts/             ← Prompt 子檔（由 sync-skills.sh / sync-skills.ps1 從 prompts/ 同步）
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux 驗收腳本
-│   └── verify-zerospec.ps1      ← Windows PowerShell 驗收腳本
+│   ├── verify-zerospec.ps1      ← Windows PowerShell 驗收腳本
+│   ├── sync-skills.sh           ← macOS/Linux：同步 prompts/ → skills/ 並可選擇安裝
+│   └── sync-skills.ps1          ← Windows PowerShell：同步 prompts/ → skills/ 並可選擇安裝
 ├── examples/
 │   ├── minimal-day1/            ← Day-1 最小產出範例（起步長這樣）
 │   ├── dotnet-dual-api/         ← .NET 雙 API Host 範例

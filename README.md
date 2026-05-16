@@ -4,7 +4,7 @@
 
 > **🌐 [台灣正體中文版](README.zh-TW.md)**
 
-**Version**: v0.5.0
+**Version**: v0.5.1
 **Status**: Active
 
 ---
@@ -140,34 +140,36 @@ Full examples in [`examples/`](examples/): .NET dual-API, Java Library, Python P
 
 **Target Project**
 - [ ] Cloned locally: `git clone <your-repo-url>`
-- [ ] Opened at the **project root** in your IDE
+- [ ] Opened at the **project root** in your IDE or terminal (CLI tools)
 
 > ZeroSpec lives separately — **it does NOT go into your target repo.**
 > After bootstrap, your repo gains only `AGENTS.md` and `docs/README.md`.
 
 **AI Agent** (pick one — must have repo read/write capability)
 
-| Tool                     | Activation                                           |
-| ------------------------ | ---------------------------------------------------- |
-| GitHub Copilot (VS Code) | Switch to **Agent mode** (confirm `#codebase` works) |
-| Cursor                   | Use **Composer — Agent** (not Chat mode)             |
-| Claude Code              | Read/write enabled by default                        |
-| Windsurf                 | Use **Cascade mode**                                 |
-| JetBrains AI Assistant   | Enable **Attach project files**                      |
+| Tool                     | Activation                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| GitHub Copilot (VS Code) | Switch to **Agent mode** (confirm `#codebase` works)                                              |
+| Cursor                   | Use **Composer — Agent** (not Chat mode)                                                          |
+| Codex CLI                | Start at project root; reads `AGENTS.md` at root (per [agents.md](https://agents.md/) convention) |
+| Generic CLI              | Start at project root; paste Prompt Pack content                                                  |
+| Claude Code              | Read/write enabled by default                                                                     |
+| Windsurf                 | Use **Cascade mode**                                                                              |
+| JetBrains AI Assistant   | Enable **Attach project files**                                                                   |
 
-> Not supported: ChatGPT / Claude.ai web (cannot access local repos).
+> Not recommended: environments that cannot access local repos end-to-end (for example ChatGPT / Claude.ai web).
 >
 > For steps that write files, avoid pure Plan mode. Analysis-only steps like `INIT-SCAN` can use Plan mode where supported.
 
 > **GitHub Copilot users**: Copilot may not auto-read `AGENTS.md` by default. Use `@AGENTS.md` reference or create `.github/copilot-instructions.md`. See [DAILY-USAGE Section 2.2](DAILY-USAGE.md#22-coexistence-of-copilot-instructionsmd-and-agentsmd).
 
-> **Non-English projects**: Prompt Packs are in English, but output language auto-detects from your project. If your repo is English-first yet you want zh-TW (or another locale) output, see [DAILY-USAGE Section 5.8](DAILY-USAGE.md#58-specifying-output-language-eg-zh-tw).
+> **Non-English projects**: Prompt Packs are in English, and output language often follows project context. If the output locale is not what you expect, explicitly request your target locale in the first instruction (for example: `Respond in zh-TW`). For English-first repos that need zh-TW (or another locale), see [DAILY-USAGE Section 5.8](DAILY-USAGE.md#58-specifying-output-language-eg-zh-tw).
 
 ### Quick Path
 
 For the full walkthrough, jump to [Getting Started](#getting-started-under-30-minutes).
 
-1. Open Agent mode in your target project and paste [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md).
+1. Open your AI agent in the target project (IDE Agent mode or a CLI session at project root) and paste [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md).
 2. In the same conversation, paste [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md).
 3. Review the generated `AGENTS.md` and `docs/README.md`, then validate with one small real task.
 
@@ -176,7 +178,7 @@ For the full walkthrough, jump to [Getting Started](#getting-started-under-30-mi
 ### Step 1: Analyze Current State (INIT-SCAN)
 
 1. Open [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md), copy the Prompt
-2. Switch IDE to **target project root**, open **Agent mode**
+2. Switch IDE to **target project root**, open **Agent mode** (or start a CLI session at the project root)
 3. Paste Prompt → AI scans repo → produces structured analysis (no files written)
 4. Confirm results, answer 2–3 clarification questions (~5–10 min)
 
@@ -202,18 +204,19 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 
 ### After Adoption
 
-| Trigger Event                                               | Prompt Pack / Method                                                                                                     |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| API added/changed                                           | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                     |
-| Architecture decision                                       | [`prompts/ADR.md`](prompts/ADR.md)                                                                                       |
-| System snapshot needed                                      | [`prompts/SA.md`](prompts/SA.md)                                                                                         |
-| Project evolved, sync docs                                  | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                 |
-| Verify existing SPECs still match code                      | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                   |
-| Need platform pointer setup (optional)                      | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; JetBrains uses `AGENTS.md` directly |
-| Want one-click trigger shortcuts (optional VS Code adapter) | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/`                          |
-| None of the above                                           | **Create nothing**                                                                                                       |
+| Trigger Event                                               | Prompt Pack / Method                                                                                                                                                           |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| API added/changed                                           | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                           |
+| Architecture decision                                       | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                             |
+| System snapshot needed                                      | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                               |
+| Project evolved, sync docs                                  | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                       |
+| Verify existing SPECs still match code                      | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                         |
+| Need platform pointer setup (optional)                      | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; Codex CLI, JetBrains, and generic CLI use `AGENTS.md` directly when supported             |
+| Want one-click trigger shortcuts (optional VS Code adapter) | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/` (⚠️ requires `#file:prompts/` to resolve; see [DAILY-USAGE.md](DAILY-USAGE.md)) |
+| Want a skill-style shortcut for Claude Code                 | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install` (see [`skills/README.md`](skills/README.md))                      |
+| None of the above                                           | **Create nothing**                                                                                                                                                             |
 
-> `templates/prompts/*.prompt.md` is an optional shortcut layer for VS Code prompt UIs. ZeroSpec core remains tool-agnostic: Cursor, Claude Code, Windsurf, and JetBrains users can use the same Prompt Packs via copy-paste/bookmark/symlink.
+> `templates/prompts/*.prompt.md` is an optional shortcut layer for VS Code prompt UIs. ZeroSpec core remains tool-agnostic: Cursor, Codex CLI, Claude Code, Windsurf, and JetBrains users can use the same Prompt Packs via copy-paste/bookmark/symlink.
 
 Monthly quick review + quarterly full review recommended. Details in [GUIDE.md Section 7](GUIDE.md#7-adoption-and-continuous-operation).
 
@@ -234,7 +237,7 @@ The checks include:
 Run:
 
 - macOS / Linux: `bash scripts/verify-zerospec.sh`
-- Windows (PowerShell): `powershell -ExecutionPolicy Bypass -File .\scripts\verify-zerospec.ps1`
+- Windows (PowerShell): `pwsh -File scripts/verify-zerospec.ps1`
 
 Scripts output PASS/FAIL summary. Any failure returns non-zero exit code — suitable for manual checks or CI.
 
@@ -276,10 +279,17 @@ zerospec/
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md sub-index template (threshold-triggered)
 │   ├── prompts/                 ← Optional: VS Code Prompt Files adapter (copy to .github/prompts/)
 │   │   └── zerospec-drift.prompt.md ← DRIFT Prompt VS Code adapter
-│   └── pointers/                ← Optional: platform pointer templates (Copilot / Claude Code / Cursor / Windsurf; JetBrains uses AGENTS.md directly)
+│   └── pointers/                ← Optional: platform pointer templates (Copilot / Claude Code / Cursor / Windsurf; Codex CLI, JetBrains, and generic CLI usually use AGENTS.md directly)
+├── skills/
+│   ├── README.md                ← Adapter assets guide (cross-tool path selection + install instructions)
+│   └── zerospec/
+│       ├── SKILL.md             ← Skill-style Router (verified with Claude Code)
+│       └── prompts/             ← Prompt sub-files (synced from prompts/ via sync-skills.sh / sync-skills.ps1)
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux verification script
-│   └── verify-zerospec.ps1      ← Windows PowerShell verification script
+│   ├── verify-zerospec.ps1      ← Windows PowerShell verification script
+│   ├── sync-skills.sh           ← macOS/Linux: sync prompts/ → skills/ and optionally install
+│   └── sync-skills.ps1          ← Windows PowerShell: sync prompts/ → skills/ and optionally install
 ├── examples/
 │   ├── minimal-day1/            ← Day-1 minimal output (starting point)
 │   ├── dotnet-dual-api/         ← .NET dual API Host example

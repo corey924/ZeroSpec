@@ -4,6 +4,24 @@ This file tracks the version history of the ZeroSpec framework.
 
 ---
 
+## v0.5.1 — 2026-05-16
+
+### Added
+
+- `skills:` New `skills/zerospec/` skill-style Router — the first optional Platform Adapter implementation, while `prompts/*.md` remains the canonical cross-tool interface. Packages all 8 Prompt Packs for tools that support `SKILL.md`-style loading; verified with Claude Code. Includes a built-in Self-Review Matrix that runs silently before each output.
+- `skills:` `skills/zerospec/prompts/` — 8 prompt sub-files, kept in sync with `prompts/` via the new sync script
+- `skills:` `skills/README.md` — install guide + Phase 0 verification checklist (3 tests to validate sub-file reading, trigger accuracy, Self-Review follow-through)
+- `scripts:` `scripts/sync-skills.sh` and `scripts/sync-skills.ps1` — cross-platform sync scripts: default (sync only), install (sync + install to `~/.claude/skills/`), check (drift detection, exit 1 on drift). Unknown arguments fail fast; stale prompt sub-files are removed during sync.
+
+### Changed
+
+- `docs:` `README.md` and `README.zh-TW.md` — Added Codex CLI / Generic CLI entry, OS-specific skill sync commands, and `skills/` + sync scripts to Repo Structure
+- `docs:` `DAILY-USAGE.md` and `DAILY-USAGE.zh-TW.md` — Added Codex CLI / Generic CLI guidance, Fastest First Run matrix, Prompt Files path prerequisite, and Optional Tool Adapters subsection under §2.2
+- `docs:` `AGENTS.md` — Domain-to-Code Map: added skill-style adapter row; Code Generation Rules: added `skills/zerospec/prompts/` sync rule; Common Commands: added macOS/Linux and Windows sync commands; Docs Maintenance: prompt-pack PR now includes sync step
+- `ci:` `scripts/verify-zerospec.sh` and `scripts/verify-zerospec.ps1` — Added checks for `skills/` structure and prompt-copy parity between `prompts/` and `skills/zerospec/prompts/`
+
+---
+
 ## v0.5.0 — 2026-05-16
 
 ### Added

@@ -65,8 +65,22 @@ Different AI platforms read different guidance files at startup or task start. T
 | **Claude Code**              | `CLAUDE.md`                                     | ✅                                                                    | `@AGENTS.md` at top of CLAUDE.md (Claude Code import syntax)        |
 | **Windsurf**                 | `AGENTS.md`                                     | ✅                                                                    | Use directly                                                        |
 | **JetBrains AI Assistant**   | `AGENTS.md`                                     | ✅ (requires Attach project files enabled)                            | Use directly                                                        |
+| **Codex CLI / Generic CLI**  | `AGENTS.md` (when supported)                    | Codex ✅ / generic varies                                             | Use `AGENTS.md` when supported; otherwise paste Prompt Pack content |
 
-> Each platform is covered in detail in §2.2 (Copilot / Claude Code) and §2.4 (multi-root). This table is the at-a-glance reference.
+> Entry files and optional adapters are covered in §2.2; multi-root behavior is covered in §2.4. This table is the at-a-glance reference.
+
+#### Fastest First Run (by Tool)
+
+Pick your tool and follow 3 steps to experience ZeroSpec on any existing project:
+
+| Tool                    | Step 1                                    | Step 2                                                                     | Step 3 (Verify)                                 |
+| ----------------------- | ----------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------- |
+| **GitHub Copilot**      | Open Agent mode at project root           | Paste `prompts/INIT-SCAN.md` content                                       | Confirm AI references real file paths in output |
+| **Cursor**              | Open Composer Agent at project root       | Paste `prompts/INIT-SCAN.md` content                                       | Same                                            |
+| **Claude Code**         | `cd` to project root, start session       | Type "Run ZeroSpec audit" (if skill installed) or paste `prompts/AUDIT.md` | Confirm audit dimensions match your project     |
+| **Windsurf**            | Open Cascade at project root              | Paste `prompts/INIT-SCAN.md` content                                       | Same                                            |
+| **JetBrains**           | Enable Attach project files, open AI chat | Paste `prompts/INIT-SCAN.md` content                                       | Same                                            |
+| **Codex CLI / Generic** | Start the CLI at project root             | Paste `prompts/INIT-SCAN.md` content into the prompt                       | Confirm output cites real project paths         |
 
 ### 2.1 ZeroSpec Repo Does NOT Need to Stay Open
 
@@ -74,18 +88,19 @@ ZeroSpec itself (`prompts/`, `templates/`, `GUIDE.md`) is a "toolbox," not a wor
 
 **Recommended approaches**:
 
-| Approach         | Description                                                                                                                               | Best For                                     |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **Bookmark**     | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed                                                                     | Individual developers                        |
-| **Snippet**      | Save frequently used Prompt Packs as IDE User Snippets or Text Expander                                                                   | Power users                                  |
-| **Prompt Files** | Copy `templates/prompts/*.prompt.md` to your project's `.github/prompts/`; invoke the same Prompt Packs from supported VS Code prompt UIs | VS Code users (optional adapter)             |
-| **Pointers**     | Copy the matching file from `templates/pointers/` to your project; connects `AGENTS.md` to your AI platform without duplication           | All platforms (Day-1 setup)                  |
-| **Symlink**      | Create a `.zerospec/` symlink in target project pointing to ZeroSpec prompts/                                                             | Multi-project ecosystems                     |
-| **Copy-paste**   | Simplest — open ZeroSpec README, follow the link, copy the Prompt                                                                         | Everyone (recommended Day-1 starting method) |
+| Approach                | Description                                                                                                                               | Best For                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Bookmark**            | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed                                                                     | Individual developers                        |
+| **Snippet**             | Save frequently used Prompt Packs as IDE User Snippets or Text Expander                                                                   | Power users                                  |
+| **Prompt Files**        | Copy `templates/prompts/*.prompt.md` to your project's `.github/prompts/`; invoke the same Prompt Packs from supported VS Code prompt UIs | VS Code users (optional adapter)             |
+| **Skill-style Adapter** | Install via `sync-skills.sh` or `sync-skills.ps1`; invoke by intent globally                                                              | Claude Code / SKILL.md-capable tools         |
+| **Pointers**            | Copy the matching file from `templates/pointers/` to your project; connects `AGENTS.md` to your AI platform without duplication           | All platforms (Day-1 setup)                  |
+| **Symlink**             | Expose ZeroSpec `prompts/` to the target project as `prompts/` (copy or symlink)                                                          | VS Code Prompt Files / multi-project teams   |
+| **Copy-paste**          | Simplest — open ZeroSpec README, follow the link, copy the Prompt                                                                         | Everyone (recommended Day-1 starting method) |
 
 > **Do not** add the entire ZeroSpec folder to your target project's workspace. This causes the Agent to read irrelevant Markdown and wastes context.
 
-> **Prompt Files setup**: These files rely on `#file:prompts/XXX.md`. Keep ZeroSpec in the same workspace (multi-root) or use a `.zerospec/` symlink so paths resolve. Pick one setup only.
+> **⚠️ Prompt Files setup**: These adapters use `#file:prompts/XXX.md`. Ensure that path resolves by keeping ZeroSpec open in the same VS Code multi-root workspace, or by copying/symlinking ZeroSpec's `prompts/` directory into the target project as `prompts/`. If it does not resolve, use the fallback text inside each `.prompt.md` and paste the source prompt manually.
 
 ### 2.2 Coexistence of `copilot-instructions.md` and `AGENTS.md`
 
@@ -118,6 +133,21 @@ Claude Code reads `CLAUDE.md` by default, not `AGENTS.md`. To reuse ZeroSpec's A
 - No copy needed → avoids dual-maintenance drift
 - Other Agents (Copilot / Cursor / Codex / Windsurf) continue reading AGENTS.md
 - Put Claude Code–only rules (e.g. Plan mode triggers) after the import
+
+#### Optional Tool Adapters
+
+The canonical interface is still `prompts/*.md`: every tool can use the Prompt Packs by copy-paste,
+bookmark, or CLI stdin. Use adapters only when they reduce repeated manual work.
+
+| Tool                     | Optional Adapter                | Notes                                                                                                        |
+| ------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| GitHub Copilot (VS Code) | `templates/prompts/*.prompt.md` | Requires `#file:prompts/` to resolve; manual paste remains the fallback                                      |
+| Claude Code              | `skills/zerospec/` Router Skill | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install` |
+| Codex CLI / Generic CLI  | None required                   | Use `AGENTS.md` when supported; otherwise paste `prompts/*.md` directly                                      |
+
+After installing the Claude Code skill, say `"Run ZeroSpec audit on this project"` — Claude reads the
+right prompt automatically and applies a built-in Self-Review before outputting results. See
+[`skills/README.md`](skills/README.md) for cross-platform sync commands and the Claude Code verification checklist.
 
 ### 2.3 Plan Mode vs Agent Mode
 

@@ -63,8 +63,22 @@ ZeroSpec 導入後，日常開發通常就是在保留 `AGENTS.md` 的前提下�
 | **Claude Code**              | `CLAUDE.md`                                     | ✅                                                            | CLAUDE.md 首行加 `@AGENTS.md`（Claude Code import 語法） |
 | **Windsurf**                 | `AGENTS.md`                                     | ✅                                                            | 直接使用                                                 |
 | **JetBrains AI Assistant**   | `AGENTS.md`                                     | ✅（需開啟 Attach project files）                             | 直接使用                                                 |
+| **Codex CLI / Generic CLI**  | `AGENTS.md`（工具支援時）                       | Codex ✅ / generic 依工具而定                                 | 支援時使用 `AGENTS.md`；否則直接貼入 Prompt Pack 內容    |
 
-> 各平台的詳細操作說明請見 §2.2（Copilot / Claude Code）與 §2.4（Multi-root Workspace）。本表為一覽式速查參考。
+> 入口檔與可選 adapter 詳見 §2.2；multi-root 行為詳見 §2.4。本表為一覽式速查參考。
+
+#### 各工具最快體驗路徑（Fastest First Run）
+
+選擇你使用的工具，照 3 步驟在任何現有專案體驗 ZeroSpec：
+
+| 工具                    | Step 1                                  | Step 2                                                           | Step 3（驗證）                  |
+| ----------------------- | --------------------------------------- | ---------------------------------------------------------------- | ------------------------------- |
+| **GitHub Copilot**      | 在專案根目錄開啟 Agent mode             | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 確認 AI 產出的路徑是真實檔案    |
+| **Cursor**              | 在專案根目錄開啟 Composer Agent         | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 同上                            |
+| **Claude Code**         | `cd` 到專案根目錄，啟動 session         | 說「幫我跑 ZeroSpec audit」（skill 已裝）或貼 `prompts/AUDIT.md` | 確認 audit 維度對應專案實際狀況 |
+| **Windsurf**            | 在專案根目錄開啟 Cascade                | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 同上                            |
+| **JetBrains**           | 啟用 Attach project files，開啟 AI chat | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 同上                            |
+| **Codex CLI / Generic** | 在專案根目錄啟動 CLI                    | 將 `prompts/INIT-SCAN.md` 內容貼入 prompt                        | 確認輸出引用真實專案路徑        |
 
 ### 2.1 ZeroSpec Repo 不需要常駐打開
 
@@ -72,18 +86,19 @@ ZeroSpec 本體（`prompts/`、`templates/`、`GUIDE.md`）是「工具箱」，
 
 **建議做法**：
 
-| 方式             | 說明                                                                                                                      | 適合誰                         |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| **書籤式**       | 瀏覽器或 IDE 書籤 ZeroSpec 資料夾，需要時點開複製 Prompt                                                                  | 個人開發者                     |
-| **Snippet**      | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander                                                             | 頻繁使用者                     |
-| **Prompt Files** | 將 `templates/prompts/*.prompt.md` 複製到專案的 `.github/prompts/`；可在支援的 VS Code Prompt 介面呼叫同一套 Prompt Packs | VS Code 使用者（可選 adapter） |
-| **Pointers**     | 從 `templates/pointers/` 複製對應平台的模板到你的專案，讓 AGENTS.md 與 AI 平台直接對接，不複製內容                        | 所有平台（Day-1 設定）         |
-| **Symlink**      | 在目標專案建一個 `.zerospec/` symlink 指向 ZeroSpec prompts/                                                              | 多專案生態圈                   |
-| **複製貼上**     | 最簡單——需要時開 ZeroSpec README，按連結找到 Prompt，複製貼入                                                             | 所有人（Day-1 推薦的起步方式） |
+| 方式                    | 說明                                                                                                                      | 適合誰                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| **書籤式**              | 瀏覽器或 IDE 書籤 ZeroSpec 資料夾，需要時點開複製 Prompt                                                                  | 個人開發者                         |
+| **Snippet**             | 把常用 Prompt Pack 收進 IDE 的 User Snippets 或 Text Expander                                                             | 頻繁使用者                         |
+| **Prompt Files**        | 將 `templates/prompts/*.prompt.md` 複製到專案的 `.github/prompts/`；可在支援的 VS Code Prompt 介面呼叫同一套 Prompt Packs | VS Code 使用者（可選 adapter）     |
+| **Skill-style Adapter** | 透過 `sync-skills.sh` 或 `sync-skills.ps1` 安裝，之後可全域以意圖觸發                                                     | Claude Code / 支援 SKILL.md 的工具 |
+| **Pointers**            | 從 `templates/pointers/` 複製對應平台的模板到你的專案，讓 AGENTS.md 與 AI 平台直接對接，不複製內容                        | 所有平台（Day-1 設定）             |
+| **Symlink**             | 將 ZeroSpec `prompts/` 暴露到目標專案的 `prompts/`（複製或 symlink）                                                      | VS Code Prompt Files / 多專案團隊  |
+| **複製貼上**            | 最簡單——需要時開 ZeroSpec README，按連結找到 Prompt，複製貼入                                                             | 所有人（Day-1 推薦的起步方式）     |
 
 > **不建議**：把 ZeroSpec 整個資料夾加進目標專案的 workspace。這會讓 Agent 讀到不相關的 markdown，浪費 context。
 
-> **Prompt Files 設定**：這些檔案依賴 `#file:prompts/XXX.md`。請確保 ZeroSpec 與目標專案在同一個 workspace（multi-root），或使用 `.zerospec/` symlink 讓路徑可解析。**擇一配置即可**。
+> **⚠️ Prompt Files 設定**：這些 adapter 使用 `#file:prompts/XXX.md`。請確保該路徑可解析：可在同一個 VS Code multi-root workspace 開啟 ZeroSpec，或將 ZeroSpec 的 `prompts/` 目錄複製 / symlink 到目標專案並命名為 `prompts/`。若路徑無法解析，請依各 `.prompt.md` 內的 fallback 說明，手動貼入來源 Prompt。
 
 ### 2.2 `.github/copilot-instructions.md` 與 `AGENTS.md` 的共存
 
@@ -116,6 +131,18 @@ Claude Code 預設只讀 `CLAUDE.md`，不會讀 `AGENTS.md`。若你希望同�
 - 不需要複製一份 AGENTS.md → CLAUDE.md，避免兩處維護的漂移風險
 - 其他 Agent（Copilot / Cursor / Codex / Windsurf）仍照常讀 AGENTS.md
 - 若有只適用 Claude Code 的規則（例如 Plan 模式觸發條件），放在 import 之後即可
+
+#### 可選工具 Adapter
+
+ZeroSpec 的標準入口仍是 `prompts/*.md`：任何工具都可以用複製貼上、書籤或 CLI stdin 使用 Prompt Packs。Adapter 只在能減少重複手動操作時才需要。
+
+| 工具                     | 可選 Adapter                    | 備註                                                                                                         |
+| ------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| GitHub Copilot (VS Code) | `templates/prompts/*.prompt.md` | 需讓 `#file:prompts/` 可解析；手動貼上仍是 fallback                                                          |
+| Claude Code              | `skills/zerospec/` Router Skill | macOS/Linux：`bash scripts/sync-skills.sh --install`；Windows：`pwsh -File scripts/sync-skills.ps1 -Install` |
+| Codex CLI / Generic CLI  | 不需要                          | 支援時使用 `AGENTS.md`；否則直接貼入 `prompts/*.md`                                                          |
+
+安裝 Claude Code skill 後，只要說 `"幫我跑 ZeroSpec audit"` 即可，Claude 會自動讀取對應 Prompt，並在輸出前執行內建自審（Self-Review）。跨平台同步指令與 Claude Code 驗證清單見 [`skills/README.md`](skills/README.md)。
 
 ### 2.3 Plan 模式 vs Agent 模式的選用時機
 
