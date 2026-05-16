@@ -3,11 +3,9 @@
 > This guide describes how engineers integrate ZeroSpec's SDD practices into daily development after Day-1 initialization.
 > For teams that have completed INIT-SCAN + INIT-BUILD and have `AGENTS.md` + `docs/README.md` in place.
 
-> Derived from: [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-23
-
 > **🌐 [台灣正體中文版](DAILY-USAGE.zh-TW.md)**
 
-**Version**: v0.4 — 2026-04-23
+**Version source**: [README.md](README.md) (`**Version**`)
 **Audience**: Individual developers or small teams that have adopted ZeroSpec
 
 ---
@@ -73,14 +71,14 @@ Different AI platforms read different guidance files at startup or task start. T
 
 Pick your tool and follow 3 steps to experience ZeroSpec on any existing project:
 
-| Tool                    | Step 1                                    | Step 2                                                                     | Step 3 (Verify)                                 |
-| ----------------------- | ----------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------- |
-| **GitHub Copilot**      | Open Agent mode at project root           | Paste `prompts/INIT-SCAN.md` content                                       | Confirm AI references real file paths in output |
-| **Cursor**              | Open Composer Agent at project root       | Paste `prompts/INIT-SCAN.md` content                                       | Same                                            |
-| **Claude Code**         | `cd` to project root, start session       | Type "Run ZeroSpec audit" (if skill installed) or paste `prompts/AUDIT.md` | Confirm audit dimensions match your project     |
-| **Windsurf**            | Open Cascade at project root              | Paste `prompts/INIT-SCAN.md` content                                       | Same                                            |
-| **JetBrains**           | Enable Attach project files, open AI chat | Paste `prompts/INIT-SCAN.md` content                                       | Same                                            |
-| **Codex CLI / Generic** | Start the CLI at project root             | Paste `prompts/INIT-SCAN.md` content into the prompt                       | Confirm output cites real project paths         |
+| Tool                    | Step 1                                    | Step 2                                                                                            | Step 3 (Verify)                                 |
+| ----------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| **GitHub Copilot**      | Open Agent mode at project root           | Paste `prompts/INIT-SCAN.md` content                                                              | Confirm AI references real file paths in output |
+| **Cursor**              | Open Composer Agent at project root       | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
+| **Claude Code**         | `cd` to project root, start session       | Say "Run ZeroSpec init-scan on this project" (if skill installed) or paste `prompts/INIT-SCAN.md` | Confirm output cites real project paths         |
+| **Windsurf**            | Open Cascade at project root              | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
+| **JetBrains**           | Enable Attach project files, open AI chat | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
+| **Codex CLI / Generic** | Start the CLI at project root             | Paste `prompts/INIT-SCAN.md` content into the prompt                                              | Confirm output cites real project paths         |
 
 ### 2.1 ZeroSpec Repo Does NOT Need to Stay Open
 
@@ -145,7 +143,7 @@ bookmark, or CLI stdin. Use adapters only when they reduce repeated manual work.
 | Claude Code              | `skills/zerospec/` Router Skill | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install` |
 | Codex CLI / Generic CLI  | None required                   | Use `AGENTS.md` when supported; otherwise paste `prompts/*.md` directly                                      |
 
-After installing the Claude Code skill, say `"Run ZeroSpec audit on this project"` — Claude reads the
+After installing the Claude Code skill, say `"Run ZeroSpec init-scan on this project"` for first-time onboarding, or `"Run ZeroSpec audit on this project"` when `AGENTS.md` already exists. Claude reads the
 right prompt automatically and applies a built-in Self-Review before outputting results. See
 [`skills/README.md`](skills/README.md) for cross-platform sync commands and the Claude Code verification checklist.
 

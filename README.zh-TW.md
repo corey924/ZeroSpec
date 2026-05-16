@@ -278,8 +278,8 @@ zerospec/
 │   ├── SA-TEMPLATE.md           ← 直接可用的 SA 模板
 │   ├── DOCS-README-TEMPLATE.md  ← docs/README.md 文件治理模板
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md 子索引模板（門檻觸發）
-│   ├── prompts/                 ← 可選：VS Code Prompt Files adapter（可複製到 .github/prompts/）
-│   │   └── zerospec-drift.prompt.md ← DRIFT Prompt VS Code adapter
+│   ├── prompts/                 ← 可選：VS Code Prompt Files adapters（可複製到 .github/prompts/）
+│   │   └── *.prompt.md          ← 只引用 prompts/*.md 的輕量 adapter
 │   └── pointers/                ← 可選：各平台 pointer 模板（Copilot / Claude Code / Cursor / Windsurf；Codex CLI、JetBrains、generic CLI 通常直接使用 AGENTS.md）
 ├── skills/
 │   ├── README.md                ← Adapter 資產指南（跨工具路徑選擇與安裝說明）

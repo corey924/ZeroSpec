@@ -17,8 +17,10 @@ This file tracks the version history of the ZeroSpec framework.
 
 - `docs:` `README.md` and `README.zh-TW.md` — Added Codex CLI / Generic CLI entry, OS-specific skill sync commands, and `skills/` + sync scripts to Repo Structure
 - `docs:` `DAILY-USAGE.md` and `DAILY-USAGE.zh-TW.md` — Added Codex CLI / Generic CLI guidance, Fastest First Run matrix, Prompt Files path prerequisite, and Optional Tool Adapters subsection under §2.2
+- `docs:` Clarified Day-2 guide version source, first-run Claude Code path (`init-scan` before `audit`), and README Prompt Files adapter tree
 - `docs:` `AGENTS.md` — Domain-to-Code Map: added skill-style adapter row; Code Generation Rules: added `skills/zerospec/prompts/` sync rule; Common Commands: added macOS/Linux and Windows sync commands; Docs Maintenance: prompt-pack PR now includes sync step
 - `ci:` `scripts/verify-zerospec.sh` and `scripts/verify-zerospec.ps1` — Added checks for `skills/` structure and prompt-copy parity between `prompts/` and `skills/zerospec/prompts/`
+- `ci:` Lychee link check now excludes generated `skills/zerospec/prompts/` copies while continuing to validate canonical `prompts/*.md`; verification scripts assert the exclusion remains in place
 
 ---
 

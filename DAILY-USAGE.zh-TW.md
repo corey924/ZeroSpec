@@ -5,7 +5,7 @@
 > 本文件描述 ZeroSpec 在 Day-1 初始化之後，工程師日常開發中如何「自然地」與 SDD 機制共存。
 > 適合已完成 INIT-SCAN + INIT-BUILD、手邊有 `AGENTS.md` + `docs/README.md` 的團隊。
 
-**版本**：v0.4 — 2026-04-24
+**版本來源**：[README.md](README.md) 的 `**Version**`
 **對象**：已導入 ZeroSpec 的個人開發者或小型團隊
 
 ---
@@ -71,14 +71,14 @@ ZeroSpec 導入後，日常開發通常就是在保留 `AGENTS.md` 的前提下�
 
 選擇你使用的工具，照 3 步驟在任何現有專案體驗 ZeroSpec：
 
-| 工具                    | Step 1                                  | Step 2                                                           | Step 3（驗證）                  |
-| ----------------------- | --------------------------------------- | ---------------------------------------------------------------- | ------------------------------- |
-| **GitHub Copilot**      | 在專案根目錄開啟 Agent mode             | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 確認 AI 產出的路徑是真實檔案    |
-| **Cursor**              | 在專案根目錄開啟 Composer Agent         | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 同上                            |
-| **Claude Code**         | `cd` 到專案根目錄，啟動 session         | 說「幫我跑 ZeroSpec audit」（skill 已裝）或貼 `prompts/AUDIT.md` | 確認 audit 維度對應專案實際狀況 |
-| **Windsurf**            | 在專案根目錄開啟 Cascade                | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 同上                            |
-| **JetBrains**           | 啟用 Attach project files，開啟 AI chat | 貼入 `prompts/INIT-SCAN.md` 內容                                 | 同上                            |
-| **Codex CLI / Generic** | 在專案根目錄啟動 CLI                    | 將 `prompts/INIT-SCAN.md` 內容貼入 prompt                        | 確認輸出引用真實專案路徑        |
+| 工具                    | Step 1                                  | Step 2                                                                   | Step 3（驗證）               |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------------------------ | ---------------------------- |
+| **GitHub Copilot**      | 在專案根目錄開啟 Agent mode             | 貼入 `prompts/INIT-SCAN.md` 內容                                         | 確認 AI 產出的路徑是真實檔案 |
+| **Cursor**              | 在專案根目錄開啟 Composer Agent         | 貼入 `prompts/INIT-SCAN.md` 內容                                         | 同上                         |
+| **Claude Code**         | `cd` 到專案根目錄，啟動 session         | 說「幫我跑 ZeroSpec init-scan」（skill 已裝）或貼 `prompts/INIT-SCAN.md` | 確認輸出引用真實專案路徑     |
+| **Windsurf**            | 在專案根目錄開啟 Cascade                | 貼入 `prompts/INIT-SCAN.md` 內容                                         | 同上                         |
+| **JetBrains**           | 啟用 Attach project files，開啟 AI chat | 貼入 `prompts/INIT-SCAN.md` 內容                                         | 同上                         |
+| **Codex CLI / Generic** | 在專案根目錄啟動 CLI                    | 將 `prompts/INIT-SCAN.md` 內容貼入 prompt                                | 確認輸出引用真實專案路徑     |
 
 ### 2.1 ZeroSpec Repo 不需要常駐打開
 
@@ -142,7 +142,7 @@ ZeroSpec 的標準入口仍是 `prompts/*.md`：任何工具都可以用複製�
 | Claude Code              | `skills/zerospec/` Router Skill | macOS/Linux：`bash scripts/sync-skills.sh --install`；Windows：`pwsh -File scripts/sync-skills.ps1 -Install` |
 | Codex CLI / Generic CLI  | 不需要                          | 支援時使用 `AGENTS.md`；否則直接貼入 `prompts/*.md`                                                          |
 
-安裝 Claude Code skill 後，只要說 `"幫我跑 ZeroSpec audit"` 即可，Claude 會自動讀取對應 Prompt，並在輸出前執行內建自審（Self-Review）。跨平台同步指令與 Claude Code 驗證清單見 [`skills/README.md`](skills/README.md)。
+安裝 Claude Code skill 後，第一次導入可說 `"幫我跑 ZeroSpec init-scan"`；專案已經有 `AGENTS.md` 時再說 `"幫我跑 ZeroSpec audit"`。Claude 會自動讀取對應 Prompt，並在輸出前執行內建自審（Self-Review）。跨平台同步指令與 Claude Code 驗證清單見 [`skills/README.md`](skills/README.md)。
 
 ### 2.3 Plan 模式 vs Agent 模式的選用時機
 

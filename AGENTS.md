@@ -80,6 +80,7 @@ Provides AI coding agents with project context (architecture rules, module navig
 - **PR adds/changes a Prompt Pack** — update `CHANGELOG.md` + run `bash scripts/sync-skills.sh` or `pwsh -File scripts/sync-skills.ps1` to keep `skills/zerospec/prompts/` in sync + update `skills/zerospec/SKILL.md` Route Table if a new pack is added + check `DAILY-USAGE.md` for affected scenarios
 - **PR adds a new `templates/` file** → update `README.md` Repo Structure tree + `README.zh-TW.md`
 - **PR changes community health files** (`CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `.github/ISSUE_TEMPLATE/`) → sync README repo structure / contributor entry points in the same PR
+- **PR changes skill adapter or link checks** → keep Lychee excluding `skills/zerospec/prompts/`; canonical `prompts/*.md` links are still checked and copy parity is verified by scripts
 - **PR changes `scripts/`** → run verify script locally first; ensure Windows `.ps1` and shell `.sh` are in sync
 - **PR changes methodology** (e.g., bloat thresholds, GUIDE §3.4) → sync `GUIDE.zh-TW.md` in the same PR
 - **Any EN change** → sync zh-TW counterpart in the same commit

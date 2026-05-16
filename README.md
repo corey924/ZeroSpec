@@ -277,8 +277,8 @@ zerospec/
 │   ├── SA-TEMPLATE.md           ← Ready-to-use SA template
 │   ├── DOCS-README-TEMPLATE.md  ← docs/README.md governance template
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md sub-index template (threshold-triggered)
-│   ├── prompts/                 ← Optional: VS Code Prompt Files adapter (copy to .github/prompts/)
-│   │   └── zerospec-drift.prompt.md ← DRIFT Prompt VS Code adapter
+│   ├── prompts/                 ← Optional: VS Code Prompt Files adapters (copy to .github/prompts/)
+│   │   └── *.prompt.md          ← Thin adapters that reference prompts/*.md
 │   └── pointers/                ← Optional: platform pointer templates (Copilot / Claude Code / Cursor / Windsurf; Codex CLI, JetBrains, and generic CLI usually use AGENTS.md directly)
 ├── skills/
 │   ├── README.md                ← Adapter assets guide (cross-tool path selection + install instructions)
