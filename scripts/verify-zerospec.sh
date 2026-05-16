@@ -353,6 +353,7 @@ assert_grep "sync-skills\.ps1 -Install" "skills/README.md"
 for prompt_file in INIT-SCAN.md INIT-BUILD.md UPDATE.md AUDIT.md DRIFT.md SPEC.md ADR.md SA.md; do
   assert_files_equal "prompts/$prompt_file" "skills/zerospec/prompts/$prompt_file"
 done
+assert_grep "exclude-path skills/zerospec/prompts" ".github/workflows/verify-zerospec.yml"
 
 # === Bloat Check (warning only — does not affect PASS/FAIL) ===
 echo "=== Bloat Check (warning only) ==="

@@ -332,6 +332,7 @@ Assert-Contains 'skills/README.md' 'sync-skills\.ps1 -Install'
 @('INIT-SCAN.md', 'INIT-BUILD.md', 'UPDATE.md', 'AUDIT.md', 'DRIFT.md', 'SPEC.md', 'ADR.md', 'SA.md') | ForEach-Object {
     Assert-FilesEqual "prompts/$_" "skills/zerospec/prompts/$_"
 }
+Assert-Contains '.github/workflows/verify-zerospec.yml' 'exclude-path skills/zerospec/prompts'
 
 # === Bloat Check (warning only — does not affect PASS/FAIL) ===
 Write-Host '=== Bloat Check (warning only) ==='
