@@ -192,6 +192,10 @@ Assert-Contains 'DAILY-USAGE.md' '10[–-]15 rounds'
 
 Assert-Contains 'prompts/UPDATE.md' 'Quick Constraints as a pinned projection of C3 decisions'
 Assert-Contains 'prompts/UPDATE.md' 'write only after user confirmation'
+Assert-Contains 'prompts/UPDATE.md' 'Code-to-Docs Map'
+Assert-Contains 'prompts/UPDATE.md' 'mandatory post-edit checklist'
+Assert-Contains 'AGENTS.md' '^## Code-to-Docs Map$'
+Assert-Contains 'AGENTS.md' '^## Post-Edit Self-Check$'
 
 Assert-LineOrder 'prompts/INIT-BUILD.md' '^## Quick Constraints$' '^## Domain-to-Code Map$' 'INIT-BUILD: Quick Constraints before Domain-to-Code Map'
 Assert-LineOrder 'prompts/INIT-BUILD.md' '^## Domain-to-Code Map$' '^## GenAI Docs Navigation$' 'INIT-BUILD: Domain-to-Code Map before GenAI Docs Navigation'
@@ -326,13 +330,47 @@ Assert-Contains 'skills/zerospec/SKILL.md' '^name: zerospec$'
 Assert-Contains 'skills/zerospec/SKILL.md' 'Route Table'
 Assert-Contains 'skills/zerospec/SKILL.md' 'Self-Review'
 Assert-Contains 'skills/zerospec/SKILL.md' 'prompts/AUDIT\.md'
+Assert-Contains 'skills/zerospec/SKILL.md' '^\| impl\s+\|'
 Assert-Contains 'skills/README.md' 'sync-skills'
 Assert-Contains 'skills/README.md' 'sync-skills\.sh --install'
 Assert-Contains 'skills/README.md' 'sync-skills\.ps1 -Install'
-@('INIT-SCAN.md', 'INIT-BUILD.md', 'UPDATE.md', 'AUDIT.md', 'DRIFT.md', 'SPEC.md', 'ADR.md', 'SA.md') | ForEach-Object {
+@('INIT-SCAN.md', 'INIT-BUILD.md', 'UPDATE.md', 'AUDIT.md', 'DRIFT.md', 'IMPL.md', 'SPEC.md', 'ADR.md', 'SA.md') | ForEach-Object {
     Assert-FilesEqual "prompts/$_" "skills/zerospec/prompts/$_"
 }
 Assert-Contains '.github/workflows/verify-zerospec.yml' 'exclude-path skills/zerospec/prompts'
+
+# IMPL prompt pack (v0.5.2)
+Assert-FileExists 'prompts/IMPL.md'
+Assert-FileExists 'skills/zerospec/prompts/IMPL.md'
+Assert-MatchCount 'prompts/IMPL.md' '^---BEGIN PROMPT---$' 1
+Assert-MatchCount 'prompts/IMPL.md' '^---END PROMPT---$' 1
+Assert-MatchCount 'prompts/IMPL.md' '^````$' 2
+Assert-Contains 'prompts/IMPL.md' '^## Trigger Conditions$'
+Assert-Contains 'prompts/IMPL.md' '^## Relationship to Other Prompts$'
+Assert-FirstLineStartsWithHeader 'prompts/IMPL.md'
+
+# Spec-Aware Coding Discipline: INIT-BUILD template and AGENTS.md dogfood (v0.5.2)
+Assert-Contains 'prompts/INIT-BUILD.md' 'assess whether.*docs/spec/'
+Assert-Contains 'prompts/INIT-BUILD.md' 'Forcing Function'
+Assert-Contains 'prompts/INIT-BUILD.md' 'Post-Edit Self-Check'
+Assert-Contains 'AGENTS.md' 'assess whether.*docs/spec/'
+
+# PR template (v0.5.2)
+Assert-FileExists 'templates/pull_request_template.md'
+Assert-Contains 'templates/pull_request_template.md' 'Docs Sync Checklist'
+
+# Post-Edit Self-Check in examples (v0.5.2 — warn only, does not affect PASS/FAIL)
+Write-Host '=== Post-Edit Self-Check presence in examples (warning only) ==='
+@('examples/minimal-day1/AGENTS.md', 'examples/minimal-day1/AGENTS.zh-TW.md',
+    'examples/dotnet-dual-api/AGENTS.md', 'examples/dotnet-dual-api/AGENTS.zh-TW.md',
+    'examples/java-library/AGENTS.md', 'examples/java-library/AGENTS.zh-TW.md',
+    'examples/python-package/AGENTS.md', 'examples/python-package/AGENTS.zh-TW.md',
+    'examples/react-nx-monorepo/AGENTS.md', 'examples/react-nx-monorepo/AGENTS.zh-TW.md') | ForEach-Object {
+    $content = Get-Content $_ -Raw -ErrorAction SilentlyContinue
+    if ($null -eq $content -or $content -notmatch '## (Post-Edit Self-Check|完成前自我檢查)') {
+        Write-Host "WARNING: '$_' is missing Post-Edit Self-Check section."
+    }
+}
 
 # === Bloat Check (warning only — does not affect PASS/FAIL) ===
 Write-Host '=== Bloat Check (warning only) ==='

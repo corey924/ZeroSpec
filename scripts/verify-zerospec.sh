@@ -213,6 +213,10 @@ assert_grep "10[–-]15 rounds" "DAILY-USAGE.md"
 
 assert_grep "Quick Constraints as a pinned projection of C3 decisions" "prompts/UPDATE.md"
 assert_grep "write only after user confirmation" "prompts/UPDATE.md"
+assert_grep "Code-to-Docs Map" "prompts/UPDATE.md"
+assert_grep "mandatory post-edit checklist" "prompts/UPDATE.md"
+assert_grep "^## Code-to-Docs Map$" "AGENTS.md"
+assert_grep "^## Post-Edit Self-Check$" "AGENTS.md"
 
 assert_order "^## Quick Constraints$" "^## Domain-to-Code Map$" "prompts/INIT-BUILD.md" "INIT-BUILD: Quick Constraints before Domain-to-Code Map"
 assert_order "^## Domain-to-Code Map$" "^## GenAI Docs Navigation$" "prompts/INIT-BUILD.md" "INIT-BUILD: Domain-to-Code Map before GenAI Docs Navigation"
@@ -347,13 +351,48 @@ assert_grep "^name: zerospec$" "skills/zerospec/SKILL.md"
 assert_grep "Route Table" "skills/zerospec/SKILL.md"
 assert_grep "Self-Review" "skills/zerospec/SKILL.md"
 assert_grep "prompts/AUDIT\.md" "skills/zerospec/SKILL.md"
+assert_grep "^\| impl[[:space:]]+\|" "skills/zerospec/SKILL.md"
 assert_grep "sync-skills" "skills/README.md"
 assert_grep "sync-skills\.sh --install" "skills/README.md"
 assert_grep "sync-skills\.ps1 -Install" "skills/README.md"
-for prompt_file in INIT-SCAN.md INIT-BUILD.md UPDATE.md AUDIT.md DRIFT.md SPEC.md ADR.md SA.md; do
+for prompt_file in INIT-SCAN.md INIT-BUILD.md UPDATE.md AUDIT.md DRIFT.md IMPL.md SPEC.md ADR.md SA.md; do
   assert_files_equal "prompts/$prompt_file" "skills/zerospec/prompts/$prompt_file"
 done
 assert_grep "exclude-path skills/zerospec/prompts" ".github/workflows/verify-zerospec.yml"
+
+# IMPL prompt pack (v0.5.2)
+assert_file_exists "prompts/IMPL.md"
+assert_file_exists "skills/zerospec/prompts/IMPL.md"
+assert_count_eq "^---BEGIN PROMPT---$" "prompts/IMPL.md" 1
+assert_count_eq "^---END PROMPT---$" "prompts/IMPL.md" 1
+assert_count_eq "^\`\`\`\`$" "prompts/IMPL.md" 2
+assert_grep "^## Trigger Conditions$" "prompts/IMPL.md"
+assert_grep "^## Relationship to Other Prompts$" "prompts/IMPL.md"
+assert_first_line_starts_with_header "prompts/IMPL.md"
+
+# Spec-Aware Coding Discipline: INIT-BUILD template and AGENTS.md dogfood (v0.5.2)
+assert_grep "assess whether.*docs/spec/" "prompts/INIT-BUILD.md"
+assert_grep "Forcing Function" "prompts/INIT-BUILD.md"
+assert_grep "Post-Edit Self-Check" "prompts/INIT-BUILD.md"
+assert_grep "assess whether.*docs/spec/" "AGENTS.md"
+
+# PR template (v0.5.2)
+assert_file_exists "templates/pull_request_template.md"
+assert_grep "Docs Sync Checklist" "templates/pull_request_template.md"
+
+# Post-Edit Self-Check in examples (v0.5.2 — warn only, does not affect PASS/FAIL)
+echo "=== Post-Edit Self-Check presence in examples (warning only) ==="
+for example_agents in examples/minimal-day1/AGENTS.md examples/minimal-day1/AGENTS.zh-TW.md \
+                      examples/dotnet-dual-api/AGENTS.md examples/dotnet-dual-api/AGENTS.zh-TW.md \
+                      examples/java-library/AGENTS.md examples/java-library/AGENTS.zh-TW.md \
+                      examples/python-package/AGENTS.md examples/python-package/AGENTS.zh-TW.md \
+                      examples/react-nx-monorepo/AGENTS.md examples/react-nx-monorepo/AGENTS.zh-TW.md; do
+  if [[ -f "$example_agents" ]]; then
+    if ! grep -Eq "## (Post-Edit Self-Check|完成前自我檢查)" "$example_agents"; then
+      echo "WARNING: '$example_agents' is missing Post-Edit Self-Check section."
+    fi
+  fi
+done
 
 # === Bloat Check (warning only — does not affect PASS/FAIL) ===
 echo "=== Bloat Check (warning only) ==="
