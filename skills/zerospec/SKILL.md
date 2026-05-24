@@ -28,12 +28,13 @@ Match the user's request to one row in the Route Table:
 | Update an existing AGENTS.md             | update AGENTS.md, sync ZeroSpec docs, ZeroSpec docs out of date, zerospec update | [prompts/UPDATE.md](prompts/UPDATE.md)         |
 | Evaluate AGENTS.md quality               | audit AGENTS.md, zerospec audit, score AGENTS.md, grade ZeroSpec docs            | [prompts/AUDIT.md](prompts/AUDIT.md)           |
 | Check SPEC vs code drift                 | ZeroSpec SPEC drift, SPEC vs code, spec stale, zerospec drift                    | [prompts/DRIFT.md](prompts/DRIFT.md)           |
+| Implement complex multi-module coding with SPEC sync | zerospec impl, multi-module impl, SPEC sync while coding, coding guardrail | [prompts/IMPL.md](prompts/IMPL.md) |
 | Write a SPEC document                    | write ZeroSpec SPEC, zerospec spec, ZeroSpec API interface contract              | [prompts/SPEC.md](prompts/SPEC.md)             |
 | Write an ADR                             | write ZeroSpec ADR, ZeroSpec architecture decision record                        | [prompts/ADR.md](prompts/ADR.md)               |
 | Write a System Analysis document         | write ZeroSpec SA, ZeroSpec system analysis document                             | [prompts/SA.md](prompts/SA.md)                 |
 
 If the request does not match any row, ask: **"Which ZeroSpec task do you want to run?"**
-and list the 8 options above.
+and list the 9 options above.
 
 ---
 
@@ -57,6 +58,7 @@ Fix any issues before outputting the final result — do **not** show the checkl
 | update     | ① Changes reflect actual code evolution ② No contradictions with existing doc content ③ No paragraph bloat (old content trimmed when new content added)       |
 | audit      | ① Score totals match dimension-by-dimension analysis ② Every Fix item references a dimension ③ No over- or under-scoring                                      |
 | drift      | ① Every DRIFTED verdict cites a specific file path or line ② CLEAN verdicts have no overlooked inconsistencies ③ Severity levels are justified                |
+| impl       | ① Affected code areas and SPECs are identified before coding ② `### Docs Impact` appears after code-changing output ③ SPEC update/no-update reasons are explicit |
 | spec       | ① All described endpoints/behaviors are covered ② No fabricated request or response fields ③ Changelog format consistent with existing SPECs                  |
 | adr        | ① Options pros/cons are unbiased and complete ② No missing alternatives ③ Conclusion follows logically from the analysis                                      |
 | sa         | ① System boundary matches actual architecture ② No missing module dependencies ③ No implementation details (architecture level only)                          |

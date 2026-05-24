@@ -18,12 +18,13 @@ Provides AI coding agents with project context (architecture rules, module navig
 
 ## Quick Constraints
 
-1. **Do NOT create standalone new files** for governance rules (except core entry files such as `AGENTS.md` and GitHub community health files such as `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `.github/ISSUE_TEMPLATE/`) — integrate updates into existing docs (`GUIDE.md`, `DAILY-USAGE.md`, etc.)
-2. **Do NOT copy Prompt Pack content** into `templates/prompts/*.prompt.md` — use `#file:` references only
-3. **Do NOT bind features to a single AI platform** — ZeroSpec core must remain tool-agnostic (Copilot, Cursor, Codex CLI, Claude Code, Windsurf, JetBrains, generic CLI)
-4. **Always sync zh-TW counterparts** in the same PR as EN changes (README, GUIDE, DAILY-USAGE, anti-patterns, community docs, and examples when paired files exist)
-5. **Run verification before every PR** (`bash scripts/verify-zerospec.sh` or `pwsh -File scripts/verify-zerospec.ps1`) — FAIL blocks merge
-6. **Keep EN docs English-only** except language-switch links, quoted examples, or intentional multilingual guidance
+1. **Before touching any code or docs, assess whether `docs/spec/` is affected.** If yes, update or create the relevant SPEC in the same PR. If a new SPEC is needed, use `prompts/SPEC.md`.
+2. **Do NOT create standalone new files** for governance rules (except core entry files such as `AGENTS.md` and GitHub community health files such as `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `.github/ISSUE_TEMPLATE/`) — integrate updates into existing docs (`GUIDE.md`, `DAILY-USAGE.md`, etc.)
+3. **Do NOT copy Prompt Pack content** into `templates/prompts/*.prompt.md` — use `#file:` references only
+4. **Do NOT bind features to a single AI platform** — ZeroSpec core must remain tool-agnostic (Copilot, Cursor, Codex CLI, Claude Code, Windsurf, JetBrains, generic CLI)
+5. **Always sync zh-TW counterparts** in the same PR as EN changes (README, GUIDE, DAILY-USAGE, anti-patterns, community docs, and examples when paired files exist)
+6. **Run verification before every PR** (`bash scripts/verify-zerospec.sh` or `pwsh -File scripts/verify-zerospec.ps1`) — FAIL blocks merge
+7. **Keep EN docs English-only** except language-switch links, quoted examples, or intentional multilingual guidance
 
 ---
 
@@ -84,3 +85,30 @@ Provides AI coding agents with project context (architecture rules, module navig
 - **PR changes `scripts/`** → run verify script locally first; ensure Windows `.ps1` and shell `.sh` are in sync
 - **PR changes methodology** (e.g., bloat thresholds, GUIDE §3.4) → sync `GUIDE.zh-TW.md` in the same PR
 - **Any EN change** → sync zh-TW counterpart in the same commit
+
+---
+
+## Code-to-Docs Map
+
+Use this map after every code or documentation edit. List changed paths, map them to the owning docs below, then update or explicitly mark each candidate as "No update needed" with a reason.
+
+| Changed Path | Docs / Artifacts to Check | Notes |
+| --- | --- | --- |
+| `prompts/*.md` | `CHANGELOG.md`, `skills/zerospec/prompts/`, `skills/zerospec/SKILL.md`, `DAILY-USAGE.md`, `GUIDE.md` | Sync skill prompt copies after prompt changes; update route tables and user docs only when behavior or scenarios change |
+| `templates/*.md`, `templates/prompts/*.prompt.md`, `templates/pointers/*` | `README.md`, `README.zh-TW.md`, `DAILY-USAGE.md`, `DAILY-USAGE.zh-TW.md` | Keep repo structure, setup, and adapter guidance accurate |
+| `scripts/*.sh`, `scripts/*.ps1` | Matching shell/PowerShell script, `README.md`, `README.zh-TW.md`, `DAILY-USAGE.md`, `CHANGELOG.md` | Keep cross-platform behavior in sync; update docs only for user-facing command or behavior changes |
+| `skills/zerospec/**` | `skills/README.md`, `README.md`, `README.zh-TW.md`, `CHANGELOG.md` | Generated prompt copies must match canonical `prompts/*.md` |
+| `.github/workflows/**`, `.github/ISSUE_TEMPLATE/**`, `.github/pull_request_template.md` | `README.md`, `README.zh-TW.md`, `CONTRIBUTING.md`, `CONTRIBUTING.zh-TW.md`, `CHANGELOG.md` | Update contributor entry points when workflow or template expectations change |
+| `GUIDE.md`, `DAILY-USAGE.md`, `anti-patterns.md`, community docs | Matching `*.zh-TW.md`, `README.md`, `CHANGELOG.md` | English docs are primary; zh-TW counterpart must stay synchronized |
+| `examples/**/AGENTS.md`, `examples/**/docs/**/*.md`, `examples/**/README.md` | Matching zh-TW example files, verify scripts | Example docs and zh-TW indexes must stay consistent |
+| `CHANGELOG.md` release entry | `README.md`, `README.zh-TW.md` | Update version headers for released version entries |
+
+## Post-Edit Self-Check
+
+Before declaring work complete:
+
+1. List changed files from the current diff.
+2. Cross-reference every changed file with the Code-to-Docs Map.
+3. For each candidate doc or artifact, state `Update needed` or `No update needed` with a reason.
+4. Run the relevant verification command (`bash scripts/verify-zerospec.sh` or `pwsh -File scripts/verify-zerospec.ps1`) when ZeroSpec files changed.
+5. If prompt files changed, run the relevant sync script and verify prompt-copy parity.

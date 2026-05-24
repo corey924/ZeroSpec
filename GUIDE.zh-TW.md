@@ -386,6 +386,8 @@ AI 模型對文件開頭的注意力權重最高，隨位置遞減。在長對�
 
 **最低維護規則**：凡 PR 涉及介面或行為異動，使用 [SPEC Prompt Pack](prompts/SPEC.md) 讓 AI 產生/更新 SPEC 草稿，人審核後合併。
 
+**開發時銜接**：在專案的 `AGENTS.md` 加入 `## Post-Edit Self-Check` 段落作為輕量的就地檢查——AI 評估 SPEC 影響，並在每次含程式碼異動的回覆末尾附上 `### Docs Impact` 區塊。複雜多模組任務（3+ Controller/handler 檔案或影響 2+ SPEC）請改用 [IMPL Prompt Pack](prompts/IMPL.md)，取得明確的逐步同步指引。
+
 ### 4.3 ADR 觸發條件的 ✅/❌ 範例
 
 用明確的正反例降低 AI 誤判率：
@@ -603,23 +605,25 @@ INIT-BUILD 完成後，你有兩條任務軌道並行：
 | Day-1 初始化（分析）         | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | 現況盤點報告（不寫檔）              |
 | Day-1 初始化（建置）         | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`      |
 | 新增/變更對外 API            | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`             |
+| 複雜多模組開發（3+ Controller/handler 檔案或影響 2+ SPEC） | [`prompts/IMPL.md`](prompts/IMPL.md) | 程式碼變更 + `### Docs Impact` 區塊 |
 | 跨模組技術二選一決策         | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`               |
 | 需要系統全貌快照             | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`           |
 | 專案演進需同步文件           | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | 更新 `AGENTS.md` + `docs/README.md` |
 | 懷疑既有 SPEC 已與程式碼漂移 | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | 漂移報告（不寫檔）                  |
 | **未觸發以上事件**           | —                                                | **不建立任何文件**                  |
 
-#### SPEC 生命週期：SPEC vs UPDATE vs DRIFT 分工
+#### SPEC 生命週期：SPEC vs IMPL vs UPDATE vs DRIFT 分工
 
-三個維護用 Prompt Pack 各有定位，彼此互補：
+各維護用 Prompt Pack 各有定位，彼此互補：
 
 | Prompt      | 適用時機                                     | 是否寫檔       |
 | ----------- | -------------------------------------------- | -------------- |
 | `SPEC.md`   | 為特定 API 變更建立或更新 SPEC               | 是             |
+| `IMPL.md`   | 複雜多模組開發（3+ Controller/handler 檔案或 2+ SPEC）——含就地 SPEC 同步指引 | 是（程式碼 + SPEC） |
 | `UPDATE.md` | 同步 `AGENTS.md` / `docs/README.md` 導航索引 | 是             |
 | `DRIFT.md`  | 確認既有 SPEC 內容是否仍與程式碼一致         | 否（只產報告） |
 
-> 判斷原則：行為有變更用 `SPEC.md`；結構有變更用 `UPDATE.md`；不確定是否有人做過以上任一步驟用 `DRIFT.md`。
+> 判斷原則：行為有變更用 `SPEC.md`；大型多模組任務用 `IMPL.md`；結構有變更用 `UPDATE.md`；不確定是否有人做過以上步驟用 `DRIFT.md`。
 
 ### Step 5：定期回顧
 

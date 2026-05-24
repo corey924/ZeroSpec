@@ -83,6 +83,51 @@ Count files matching `docs/spec/SPEC-*.md`.
 
 This check applies to SPEC only. Other document categories do not have sub-index rules unless explicitly added later.
 
+### Step 3.7: Code-to-Docs Map Check
+
+Check whether `AGENTS.md` contains a **Code-to-Docs Map** section (or equivalent) that maps source path patterns to owning documentation.
+
+- If the section **exists** → verify it covers the project's main code areas (service layer, host config, DB models/migrations, public API, external integrations, deployment config). Report any gaps as "Update" items.
+- If the section **does not exist** → propose adding one. Use the template below as a starting point. Do not write without user confirmation.
+
+Minimum Code-to-Docs Map template:
+
+| Changed path pattern | Docs to check | Notes |
+| --- | --- | --- |
+| `{service layer}` — new file or responsibility change | SA (domain-and-service-map) | Add relevant SPEC if external integration |
+| `{host config}` — Program.cs / DI / middleware | SA (runtime-architecture) | |
+| `{config files}` — structure change | SA (runtime-architecture), INFRA | |
+| `{DB model / migration}` | SA (domain-and-service-map), relevant SPEC | |
+| New public-facing interface / endpoint | Relevant SPEC + Changelog | |
+| External integration behavior change | Relevant SPEC | |
+| Deployment / CI/CD / infra topology change | INFRA | |
+| Cross-module either/or architectural decision | New or updated ADR | |
+
+After confirming the map exists or is proposed, remind the user that AI agents should use the Code-to-Docs Map as a **mandatory post-edit checklist**: list changed files → cross-reference the map → state "needs update / no update (reason)" for each candidate doc — before declaring the coding task complete.
+
+### Step 3.8: Post-Edit Self-Check Audit
+
+Check whether `AGENTS.md` contains a **Post-Edit Self-Check** section.
+
+- If the section **exists** → verify it includes: (a) instructions to list changed files, (b) cross-reference with Code-to-Docs Map, (c) a **Forcing Function** requiring AI to output a `### Docs Impact` block after any response containing code changes. Report any missing elements as "Update" items.
+- If the section **does not exist** → propose adding one. Use the template below as a starting point. Do not write without user confirmation.
+
+Minimum Post-Edit Self-Check template:
+
+```
+## Post-Edit Self-Check
+Before declaring work complete:
+1. List changed files from the current diff.
+2. Cross-reference every changed file with the Code-to-Docs Map (if present).
+3. For each candidate doc, state `Update needed` or `No update needed` with a reason.
+4. If interface, schema, permission, or business rules changed, update the relevant SPEC.
+5. Run any applicable build/test command to confirm no regressions.
+
+**Forcing Function**: AI agents MUST append a `### Docs Impact` block at the end of any
+response containing code changes, listing: (a) affected `docs/spec/` files and their update
+status; (b) reason if no update is needed.
+```
+
 ### Step 4: Output Diff Report
 
 Present differences as tables in the conversation (DO NOT write to files directly). Produce the following reports as applicable:
@@ -90,6 +135,8 @@ Present differences as tables in the conversation (DO NOT write to files directl
 - **AGENTS.md diff**: Section-by-section (Project Summary, Quick Constraints, Domain-to-Code Map, Code Generation Rules, Docs Navigation, Common Commands, Related Projects, Docs Maintenance Reminders). Mark each as "Update / Add / No change" + explanation
 - **docs/README.md diff**: List document index and candidate document changes
 - **Sub-Index proposal** (only if Step 3.5 triggered): Present the proposed `docs/spec/README.md` creation or update content for user review
+- **Code-to-Docs Map check**: State whether the map exists, whether its path patterns cover the changed areas, and any proposed additions
+- **Post-Edit Self-Check check**: State whether the section exists and whether it includes changed-file listing, Code-to-Docs Map cross-reference, and the `### Docs Impact` Forcing Function
 
 ### Step 5: Write After Confirmation
 

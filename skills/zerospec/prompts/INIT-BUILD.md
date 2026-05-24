@@ -87,8 +87,11 @@ Combine all content into two files:
 {A-class version source of truth declaration}
 
 ## Quick Constraints
-Extract 5–8 hard rules from "Code Generation Rules" below (violations cause PR rejection or system errors). Place them here as concise bullet points.
-{Top 5–8 hard rules from C3, one per line}
+The **first item MUST always be copied verbatim** (or localized per `Respond in {locale}` if the user requested a specific locale):
+1. **At task start**: if the task spans 3+ Controllers/handlers or affects 2+ SPEC documents, suggest using the IMPL Prompt Pack (`prompts/IMPL.md`) before proceeding. **At task end**: assess whether `docs/spec/` needs updating (triggers: new endpoint, request/response schema change, permission change, business rule change, behavioral bugfix). If yes → update SPEC + Changelog in the same changeset. If no → state the reason explicitly.
+<!-- zh-TW localization hint: 「任務開始時先評估範圍：若涉及 3+ Controller/handler 檔案或影響 2+ SPEC，建議先啟用 IMPL Prompt Pack（prompts/IMPL.md）再動工。任務結束前：必須評估 docs/spec/ 是否需要更新（觸發情境：新端點、Request/Response schema 改動、Permission 改動、Business Rule 改動、行為性 bugfix）。是 → 同一變更集更新 SPEC + Changelog；否 → 明確說明理由。」 -->
+Then add 4–7 more rules extracted from "Code Generation Rules" below (violations cause PR rejection or system errors):
+{Additional rules from C3, one per line}
 
 ## Domain-to-Code Map
 {B-class domain-to-code map}
@@ -109,6 +112,24 @@ Extract 5–8 hard rules from "Code Generation Rules" below (violations cause PR
 ## Docs Maintenance Reminders
 {C7 docs sync trigger conditions}
 - Docs governance rules: see `docs/README.md`
+
+## Post-Edit Self-Check
+Before declaring work complete:
+1. List changed files from the current diff.
+2. Cross-reference every changed file with the Code-to-Docs Map (if present).
+3. For each candidate doc, state `Update needed` or `No update needed` with a reason.
+4. If interface, schema, permission, or business rules changed, update the relevant SPEC.
+5. Run any applicable build/test command to confirm no regressions.
+
+**Forcing Function**: AI agents MUST append a `### Docs Impact` block at the end of any response containing code changes. Evaluate document impact per `docs/README.md › AI Auto-Trigger Heuristics`:
+
+### Docs Impact
+- **SPEC**: [Updated SPEC-001 § ... / No update — reason]
+- **ADR**: [Proposing ADR-00x for ... / No decision point]
+- **SA**: [No structural change / Proposing SA scope: ...]
+- **INFRA**: [Updated INFRA-001 / No infra change]
+
+<!-- zh-TW localization hint: 在回覆中包含程式碼異動時，必須以「### Docs Impact」區塊結尾，依 docs/README.md › AI Auto-Trigger Heuristics 逐項評估 SPEC / ADR / SA / INFRA 四類文件的影響狀態。 -->
 ```
 
 > **Length guideline**: Keep AGENTS.md within 150–300 lines. If it exceeds 300 lines, move low-frequency sections to docs/ sub-documents and reference them in the navigation table.
@@ -119,7 +140,7 @@ Extract 5–8 hard rules from "Code Generation Rules" below (violations cause PR
 # {project name} — Docs Governance Hub
 
 > This file defines the layering rules, naming conventions, and maintenance triggers for project documentation.
-> GenAI Agents MUST read this file before performing any documentation task.
+> GenAI Agents MUST read this file before documentation tasks, and when `AGENTS.md` Docs Impact checks point here.
 
 ## SDD Document Classification
 
@@ -142,6 +163,32 @@ SPEC is the primary reference for development and GenAI. Update SPEC directly on
 
 - ✅ Needs ADR: architecture layering strategy, auth scheme design (e.g., JWT dual-token), either/or tech decision (e.g., Kafka vs Event Hubs), design decisions for cross-module shared components
 - ❌ No ADR needed: adding a CRUD API, changing cache TTL defaults, simple bug fix
+
+## SA Trigger Conditions
+
+> SA is a system-level snapshot. Unlike SPEC (mandatory on every interface change), SA is created on-demand when global understanding is lacking.
+
+- ✅ Suggest SA: entering a Brownfield codebase with no current architecture overview, cross-module boundaries shifting (3+ modules restructured), team members repeatedly asking "how does this system work?", or recent architecture-level changes not reflected in existing docs
+- ❌ No SA needed: routine feature work within a single module, adding endpoints, bug fixes
+- ⚠️ AI action: **Propose** the SA topic and scope — do NOT silently generate. Wait for human confirmation before using the SA Prompt Pack.
+
+## AI Auto-Trigger Heuristics (Zero-Dependency)
+
+> GenAI Agents MUST autonomously assess document needs during every coding task.
+> This table is the **single decision matrix** — no external tooling required.
+
+| Signal Detected in Task | Document to Create/Update | AI Action Mode |
+| :--- | :--- | :--- |
+| New/modified endpoint, handler, or public API; Request/Response schema change; permission or business rule change; behavioral bugfix | **SPEC** | **Mandatory**: update in the same changeset. |
+| Cross-module either/or tech decision; new third-party integration choice; shared pattern introduction | **ADR** | **Propose**: explain alternatives, draft ADR after human approval. |
+| Brownfield codebase with no current architecture overview; large-scale module restructure (3+ modules); team onboarding gaps | **SA** | **Propose**: suggest scope, wait for human confirmation. |
+| Deployment topology, runtime configuration, IaC, or CI/CD release behavior changes | **INFRA** | **Mandatory** when deployment behavior changes. |
+| None of the above signals detected | — | State "No doc update needed" with reason in `### Docs Impact`. |
+
+### Route Selection
+
+- **Best Route (built-in, zero-dependency)**: Use the `AGENTS.md` Post-Edit Self-Check + `### Docs Impact` Forcing Function. It is designed to work with mainstream LLMs (Claude, GPT, Gemini) without runtime tooling.
+- **Fallback Route (optional)**: If your AI platform repeatedly skips the `### Docs Impact` block or cannot keep `docs/README.md` in context, consider installing the ZeroSpec Agent-Skill to add explicit routing in the toolchain.
 
 ## Candidate Documents (Lazy Evaluation)
 

@@ -4,7 +4,7 @@
 
 > **在 AI Coding Agent 動手前，先把它需要的專案上下文整理好：架構規則、模組導航、版本真相來源。零依賴，純 Markdown。**
 
-**版本**：v0.5.1
+**版本**：v0.5.2
 **狀態**：Active
 
 ---
@@ -207,6 +207,7 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 | 新增/變更 API                              | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                        |
 | 架構決策                                   | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                          |
 | 系統快照                                   | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                            |
+| 多模組開發任務（3+ Controller/handler 檔案或 2+ SPEC） | [`prompts/IMPL.md`](prompts/IMPL.md)                                                                                                                                        |
 | 專案演進需同步文件                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                    |
 | 驗證既有 SPEC 是否仍跟程式碼一致           | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                      |
 | 需要平台 pointer 設定（可選）              | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；Codex CLI、JetBrains、generic CLI 支援時直接使用 `AGENTS.md`                         |
@@ -271,6 +272,7 @@ zerospec/
 │   ├── SA.md                    ← 觸發：系統快照 → 產 SA
 │   ├── AUDIT.md                 ← 觸發：稽核 AGENTS.md 品質（不寫檔）
 │   ├── DRIFT.md                 ← 觸發：驗證既有 SPEC 是否仍跟程式碼一致（不寫檔）
+│   ├── IMPL.md                  ← 觸發：複雜多模組開發 → 實作並同步 SPEC
 │   └── UPDATE.md                ← 持續：更新 AGENTS.md + docs/README.md
 ├── templates/
 │   ├── ADR-TEMPLATE.md          ← 直接可用的 ADR 模板

@@ -61,3 +61,14 @@
 - **API contract or behavior change**: update `docs/spec/` SPEC and Changelog
 - **Architecture decision**: add `docs/adr/` ADR
 - Docs governance rules: `docs/README.md`
+
+## Post-Edit Self-Check
+
+Before declaring work complete:
+1. List changed files from the current diff.
+2. Cross-reference every changed file with the Code-to-Docs Map above.
+3. For each candidate doc, state `Update needed` or `No update needed` with a reason.
+4. If interface, schema, permission, or business rules changed, update the relevant SPEC.
+5. Run `dotnet build` and `dotnet test` to confirm no regressions.
+
+**Forcing Function**: AI agents MUST append a `### Docs Impact` block at the end of any response containing code changes, listing: (a) affected `docs/spec/` files and their update status; (b) reason if no update is needed.

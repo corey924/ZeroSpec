@@ -13,6 +13,20 @@
 
 ---
 
+## Quick Self-Assessment
+
+Before using this prompt, answer these five questions. If **any** answer is yes, proceed with the SPEC prompt:
+
+1. Does this change **add, remove, or rename** an API endpoint?
+2. Does this change modify the **request or response schema** (fields, types, required/optional)?
+3. Does this change affect **permission requirements** for any endpoint?
+4. Does this change modify a **business rule** or state-machine behavior?
+5. Is this a **bug fix that changes external behavior** (callers or clients will observe different output)?
+
+If all answers are **no**, no SPEC update is needed — but state this explicitly in your reply.
+
+---
+
 ## How to Use
 
 1. Confirm a trigger condition is met

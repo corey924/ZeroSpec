@@ -422,6 +422,33 @@ Step 4 — Commit & SPEC（同對話）
 
 ---
 
+### 情境 I：多模組 Coding 同步 SPEC——何時使用 IMPL.md
+
+當一個開發任務預計會碰到多個 Controller 並同時影響多份 SPEC 時，請使用 [IMPL Prompt Pack](prompts/IMPL.md)。它加入明確的逐步守衛，避免 AI 完成程式碼後悄悄跳過文件同步。
+
+```
+觸發範例：
+- 「新增 Group Management 模組」——3 個新 Controller、SPEC-002 與 SPEC-003 同時異動
+- 「重構 Auth 層」——AuthController、PermissionService、UserRepository 全部要改
+- 任何你明知會跨 2 份以上 docs/spec/ 的任務
+
+何時用 IMPL vs 只靠 AGENTS.md Post-Edit Self-Check：
+- 1 個 Controller、1 份 SPEC 異動  → AGENTS.md Post-Edit Self-Check 就夠了
+- 3+ Controller/handler、2+ SPEC → 改用 IMPL.md 取得明確的逐步同步指引
+
+工作流程：
+1. 從 ZeroSpec 開啟 prompts/IMPL.md，複製 Prompt
+2. 在 Prompt 上方或下方描述任務（哪個模組、哪些變更）
+3. Agent 先輸出計畫：受影響的程式碼區域 → 對應的 SPEC 文件（coding 前）
+4. 你審閱計畫——修改或拒絕後 Agent 再實作
+5. Agent 實作程式碼，接著對每份受影響的 SPEC 執行 Step 3 SPEC Sync
+6. 每次回覆末尾都會出現 ### Docs Impact 區塊，列出所有受影響 SPEC 及更新狀態
+```
+
+**為什麼重要**：沒有 IMPL.md，多模組任務可能在程式碼端成功完成，同時讓 2–3 份 SPEC 悄悄過時。強制輸出（Forcing Function）的 `### Docs Impact` 區塊讓評估結果在每一個回覆中都可見。
+
+---
+
 ## 5. 長期維護會遇到的真實問題
 
 ### 5.1 「我忘了要更新 SPEC」
@@ -429,7 +456,7 @@ Step 4 — Commit & SPEC（同對話）
 **根因**：事件觸發依賴人的自覺，沒有自動提醒。
 
 **緩解策略**：
-- **最低成本**：在 PR template 加一行 Checklist：`- [ ] 若涉及 API 變更，是否已用 SPEC Prompt 更新 SPEC？`
+- **最低成本**：在 PR template 加一行 Checklist：`- [ ] 若涉及 API 變更，是否已用 SPEC Prompt 更新 SPEC？`。可直接複製現成的 [`templates/pull_request_template.md`](templates/pull_request_template.md) 到你的專案 `.github/pull_request_template.md`。
 - **中等成本**：PR Review 時養成習慣——看到 Controller 變更就問「SPEC 有更新嗎？」
 - **高成本**：CI 腳本自動偵測 Controller 檔案變更但 `docs/spec/` 無對應修改，發出警告
 

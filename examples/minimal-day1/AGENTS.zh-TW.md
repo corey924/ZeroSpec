@@ -62,3 +62,14 @@
 - **PR 涉及 API 契約或行為異動**：同步更新 `docs/spec/` 對應 SPEC 與 Changelog
 - **PR 涉及架構決策**：新增 `docs/adr/` 對應 ADR
 - 文件治理規則詳見 `docs/README.md`
+
+## 完成前自我檢查（Post-Edit Self-Check）
+
+宣告任務完成前，必須：
+1. 列出本次 diff 涉及的所有異動檔案。
+2. 對照上方「程式碼 → 文件對照表」（Code-to-Docs Map），找出每份候選文件。
+3. 對每份候選文件回答：`需要更新` 或 `不需要更新（原因）`。
+4. 若介面、schema、Permission 或 Business Rule 有異動，更新對應 SPEC。
+5. 執行 `dotnet build` 與 `dotnet test` 確認無回歸錯誤。
+
+**強制輸出（Forcing Function）**：AI agent 在任何含程式碼異動的回覆末尾，必須附上 `### Docs Impact` 區塊，列出：(a) 受影響的 `docs/spec/` 檔案及更新狀態；(b) 不需要更新時的說明理由。

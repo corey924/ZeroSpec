@@ -1,7 +1,7 @@
 # {Project Name} — Docs Governance Hub
 
 > This file defines the layering rules, naming conventions, and maintenance triggers for project documentation.
-> GenAI Agents MUST read this file before performing any documentation task.
+> GenAI Agents MUST read this file before documentation tasks, and when `AGENTS.md` Docs Impact checks point here.
 >
 > Copy this template to `docs/README.md` and replace `{placeholders}` before use.
 
@@ -27,6 +27,32 @@ SPEC is the primary reference for development and GenAI. Update SPEC directly on
 
 - ✅ Needs ADR: architecture layering strategy, auth scheme design (e.g., JWT dual-token), either/or tech decision (e.g., Kafka vs Event Hubs), design decisions for cross-module shared components
 - ❌ No ADR needed: adding a CRUD API, changing cache TTL defaults, simple bug fix
+
+## SA Trigger Conditions
+
+> SA is a system-level snapshot. Unlike SPEC (mandatory on every interface change), SA is created on-demand when global understanding is lacking.
+
+- ✅ Suggest SA: entering a Brownfield codebase with no current architecture overview, cross-module boundaries shifting (3+ modules restructured), team members repeatedly asking "how does this system work?", or recent architecture-level changes not reflected in existing docs
+- ❌ No SA needed: routine feature work within a single module, adding endpoints, bug fixes
+- ⚠️ AI action: **Propose** the SA topic and scope — do NOT silently generate. Wait for human confirmation before using the SA Prompt Pack.
+
+## AI Auto-Trigger Heuristics (Zero-Dependency)
+
+> GenAI Agents MUST autonomously assess document needs during every coding task.
+> This table is the **single decision matrix** — no external tooling required.
+
+| Signal Detected in Task | Document to Create/Update | AI Action Mode |
+| :--- | :--- | :--- |
+| New/modified endpoint, handler, or public API; Request/Response schema change; permission or business rule change; behavioral bugfix | **SPEC** | **Mandatory**: update in the same changeset. |
+| Cross-module either/or tech decision; new third-party integration choice; shared pattern introduction | **ADR** | **Propose**: explain alternatives, draft ADR after human approval. |
+| Brownfield codebase with no current architecture overview; large-scale module restructure (3+ modules); team onboarding gaps | **SA** | **Propose**: suggest scope, wait for human confirmation. |
+| Deployment topology, runtime configuration, IaC, or CI/CD release behavior changes | **INFRA** | **Mandatory** when deployment behavior changes. |
+| None of the above signals detected | — | State "No doc update needed" with reason in `### Docs Impact`. |
+
+### Route Selection
+
+- **Best Route (built-in, zero-dependency)**: Use the `AGENTS.md` Post-Edit Self-Check + `### Docs Impact` Forcing Function. It is designed to work with mainstream LLMs (Claude, GPT, Gemini) without runtime tooling.
+- **Fallback Route (optional)**: If your AI platform repeatedly skips the `### Docs Impact` block or cannot keep `docs/README.md` in context, consider installing the ZeroSpec Agent-Skill to add explicit routing in the toolchain.
 
 ## Candidate Documents (Lazy Evaluation)
 

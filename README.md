@@ -4,7 +4,7 @@
 
 > **🌐 [台灣正體中文版](README.zh-TW.md)**
 
-**Version**: v0.5.1
+**Version**: v0.5.2
 **Status**: Active
 
 ---
@@ -209,6 +209,7 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 | API added/changed                                           | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                           |
 | Architecture decision                                       | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                             |
 | System snapshot needed                                      | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                               |
+| Multi-module coding task (3+ Controllers/handlers or 2+ SPECs) | [`prompts/IMPL.md`](prompts/IMPL.md)                                                                                                                                        |
 | Project evolved, sync docs                                  | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                       |
 | Verify existing SPECs still match code                      | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                         |
 | Need platform pointer setup (optional)                      | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; Codex CLI, JetBrains, and generic CLI use `AGENTS.md` directly when supported             |
@@ -270,6 +271,7 @@ zerospec/
 │   ├── SA.md                    ← Trigger: system snapshot → produce SA
 │   ├── AUDIT.md                 ← Trigger: audit AGENTS.md quality (no files written)
 │   ├── DRIFT.md                 ← Trigger: verify existing SPECs still match code (no files written)
+│   ├── IMPL.md                  ← Trigger: complex coding task → implement with SPEC sync
 │   └── UPDATE.md                ← Ongoing: update AGENTS.md + docs/README.md
 ├── templates/
 │   ├── ADR-TEMPLATE.md          ← Ready-to-use ADR template

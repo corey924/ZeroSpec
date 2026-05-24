@@ -4,6 +4,30 @@ This file tracks the version history of the ZeroSpec framework.
 
 ---
 
+## v0.5.2 — 2026-05-24
+
+### Added
+
+- `prompts:` `prompts/IMPL.md` — new Layer 2 Prompt Pack for complex multi-module coding tasks (3+ Controllers/handlers or 2+ SPECs affected). Requires affected SPEC planning before coding and a `### Docs Impact` block after code-changing responses.
+- `templates:` `templates/pull_request_template.md` — downstream PR template with Docs Sync Checklist and `### Docs Impact` paste slot.
+- `docs:` `AGENTS.md` — added ZeroSpec's own Code-to-Docs Map, fixed first Quick Constraints item for SPEC impact assessment, and Post-Edit Self-Check so the framework dogfoods the drift-prevention rule it recommends.
+- `docs:` All 5 example AGENTS.md files (EN + zh-TW) — added compact Post-Edit Self-Check sections with project-specific verification commands.
+- `docs:` `anti-patterns.md` and `anti-patterns.zh-TW.md` — added #25 `Code-without-SPEC-assessment`.
+
+### Changed
+
+- `prompts:` `prompts/INIT-BUILD.md` — Quick Constraints item 1 in the AGENTS.md template now covers two lifecycle checkpoints: at task start, assess scope and suggest IMPL Prompt Pack if 3+ Controllers/handlers or 2+ SPECs; at task end, assess document impact through a `### Docs Impact` Forcing Function that references the `docs/README.md` AI Auto-Trigger Heuristics matrix.
+- `templates:` `templates/DOCS-README-TEMPLATE.md` — added SA Trigger Conditions and AI Auto-Trigger Heuristics (Zero-Dependency) with Best Route / Fallback Route guidance, helping mainstream LLMs (Claude, GPT, Gemini) decide when to grow SPEC, ADR, SA, or INFRA without manually invoking each Prompt Pack.
+- `prompts:` `prompts/UPDATE.md` — added Step 3.7 Code-to-Docs Map Check and Step 3.8 Post-Edit Self-Check Audit so periodic updates verify both mapping and final-response forcing behavior.
+- `prompts:` `prompts/SPEC.md` — added a Quick Self-Assessment section outside the prompt block to help users decide whether SPEC is the right prompt.
+- `templates:` pointer templates (`copilot-instructions.md`, `CLAUDE.md`, `.cursorrules`, `.windsurfrules`) now include short self-contained Spec-Aware Coding Discipline fallback rules, with a conditional IMPL Prompt Pack routing hint for 3+ Controllers/handlers or 2+ SPEC tasks.
+- `docs:` `GUIDE.md`, `GUIDE.zh-TW.md`, `DAILY-USAGE.md`, and `DAILY-USAGE.zh-TW.md` now clarify the roles of always-on AGENTS.md checks, IMPL.md for large coding tasks, and DRIFT.md for periodic audits.
+- `skills:` `skills/zerospec/SKILL.md` now routes `impl` and lists 9 options; `skills/zerospec/prompts/` includes an IMPL copy kept in sync with `prompts/IMPL.md`.
+- `ci:` `scripts/verify-zerospec.sh` and `scripts/verify-zerospec.ps1` now assert IMPL Prompt Pack structure, prompt-copy parity, PR template presence, and AGENTS.md dogfood markers.
+- `docs:` `README.md` and `README.zh-TW.md` — bumped version headers to v0.5.2; added IMPL Prompt Pack row to the After Adoption / 導入後怎麼用 table so human users can discover the prompt directly without relying on AI auto-suggestion.
+
+---
+
 ## v0.5.1 — 2026-05-16
 
 ### Added

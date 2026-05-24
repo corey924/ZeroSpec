@@ -339,6 +339,8 @@ The most important covenant in this methodology:
 
 **Minimum maintenance rule**: For any PR involving interface or behavior changes, use the [SPEC Prompt Pack](prompts/SPEC.md) to let AI generate/update a SPEC draft. Human reviews and merges.
 
+**Coding-time bridge**: Use the `## Post-Edit Self-Check` section in your project's `AGENTS.md` as the lightweight in-line check — the AI assesses SPEC impact and appends a `### Docs Impact` block at the end of every response with code changes. For complex multi-module tasks (3+ Controllers/handlers or 2+ SPECs affected), use the [IMPL Prompt Pack](prompts/IMPL.md) for explicit step-by-step guidance.
+
 ### 4.3 ADR Trigger Examples
 
 ```markdown
@@ -548,23 +550,25 @@ After INIT-BUILD, run two parallel tracks:
 | Day-1 init (analyze)            | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | Analysis report (no files written)     |
 | Day-1 init (build)              | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`         |
 | API added/changed               | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`                |
+| Complex multi-module coding (3+ Controllers/handlers or 2+ SPECs) | [`prompts/IMPL.md`](prompts/IMPL.md) | Code changes + `### Docs Impact` block |
 | Cross-module technical decision | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`                  |
 | System snapshot needed          | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`              |
 | Project evolved, sync docs      | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | Updates `AGENTS.md` + `docs/README.md` |
 | Existing SPECs may have drifted | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | Drift report (no files written)        |
 | **None of the above**           | —                                                | **Create nothing**                     |
 
-#### SPEC Lifecycle: SPEC vs UPDATE vs DRIFT
+#### SPEC Lifecycle: SPEC vs IMPL vs UPDATE vs DRIFT
 
-The three maintenance Prompt Packs have distinct but complementary roles:
+The maintenance Prompt Packs have distinct but complementary roles:
 
 | Prompt      | When to use                                               | Writes files?    |
 | ----------- | --------------------------------------------------------- | ---------------- |
 | `SPEC.md`   | Creating or updating a SPEC for a specific API change     | Yes              |
+| `IMPL.md`   | Complex multi-module coding (3+ Controllers/handlers or 2+ SPECs) — inline coding guardrail with Docs Impact output | Yes (code + SPEC) |
 | `UPDATE.md` | Syncing `AGENTS.md` / `docs/README.md` navigation indices | Yes              |
 | `DRIFT.md`  | Checking whether existing SPEC content still matches code | No — report only |
 
-> Rule of thumb: `SPEC.md` when behavior changes, `UPDATE.md` when structure changes, `DRIFT.md` when you are unsure whether either was done.
+> Rule of thumb: `SPEC.md` when behavior changes, `IMPL.md` when a large task touches multiple modules, `UPDATE.md` when structure changes, `DRIFT.md` when you are unsure whether either was done.
 
 ### Step 5: Periodic Review
 

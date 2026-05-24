@@ -412,6 +412,33 @@ Workflow:
 
 ---
 
+### Scenario I: Multi-Module Coding with SPEC Impact — When to Use IMPL.md
+
+Use this when a coding task is large enough that you expect to touch multiple Controllers and affect multiple SPECs at once. The [IMPL Prompt Pack](prompts/IMPL.md) adds explicit step-by-step guardrails so the AI doesn't complete the code and silently skip the docs.
+
+```
+Trigger examples:
+- "Add a Group Management module" — 3 new Controllers, SPEC-002 and SPEC-003 both change
+- "Refactor auth layer" — AuthController, PermissionService, UserRepository all change
+- Any task where you know upfront it spans more than 2 docs/spec/ files
+
+When to use IMPL vs just relying on AGENTS.md Post-Edit Self-Check:
+- 1 Controller, 1 SPEC change  → AGENTS.md Post-Edit Self-Check is enough
+- 3+ Controllers/handlers, 2+ SPECs → Use IMPL.md for explicit step-by-step sync
+
+Workflow:
+1. Open prompts/IMPL.md from ZeroSpec, copy the Prompt
+2. Describe the task above or below the prompt (what module, what changes)
+3. Agent outputs a plan: changed code areas → affected SPEC files (before coding)
+4. Review the plan — edit or reject before agent implements
+5. Agent implements code changes, then runs Step 3 SPEC Sync for each affected SPEC
+6. Every response ends with a ### Docs Impact block listing all affected SPECs and status
+```
+
+**Why this matters**: Without IMPL.md, a multi-module task can finish successfully in code while 2–3 SPECs silently go stale. The Forcing Function (mandatory `### Docs Impact` block) makes the assessment visible in every response.
+
+---
+
 ## 5. Real Problems in Long-Term Maintenance
 
 ### 5.1 "I Forgot to Update the SPEC"
@@ -419,7 +446,7 @@ Workflow:
 **Root cause**: Event triggers depend on human discipline; no automatic reminders.
 
 **Mitigation strategies**:
-- **Lowest cost**: Add a checklist line to PR template: `- [ ] If API changed, did you run the SPEC Prompt?`
+- **Lowest cost**: Add a checklist line to PR template: `- [ ] If API changed, did you run the SPEC Prompt?`. A ready-to-use template is at [`templates/pull_request_template.md`](templates/pull_request_template.md) — copy it to `.github/pull_request_template.md` in your project.
 - **Medium cost**: During PR Review, build the habit — see Controller changes → ask "SPEC updated?"
 - **Higher cost**: CI script detects Controller file changes without corresponding `docs/spec/` modifications; emits a warning
 
