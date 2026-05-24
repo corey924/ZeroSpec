@@ -212,12 +212,20 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 | Multi-module coding task (3+ Controllers/handlers or 2+ SPECs) | [`prompts/IMPL.md`](prompts/IMPL.md)                                                                                                                                        |
 | Project evolved, sync docs                                  | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                       |
 | Verify existing SPECs still match code                      | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                         |
-| Need platform pointer setup (optional)                      | Use [`templates/pointers/`](templates/pointers/) for Copilot/Claude/Cursor/Windsurf; Codex CLI, JetBrains, and generic CLI use `AGENTS.md` directly when supported             |
-| Want one-click trigger shortcuts (optional VS Code adapter) | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/` (⚠️ requires `#file:prompts/` to resolve; see [DAILY-USAGE.md](DAILY-USAGE.md)) |
-| Want a skill-style shortcut for Claude Code                 | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install` (see [`skills/README.md`](skills/README.md))                      |
+| Need platform pointer setup (optional)                     | Copy [`templates/pointers/`](templates/pointers/) entry files that import/link to `AGENTS.md`; Codex CLI, JetBrains, and generic CLI usually use `AGENTS.md` directly |
+| Want VS Code prompt shortcuts (optional)                   | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/`; ensure `#file:prompts/` can resolve. See [DAILY-USAGE.md](DAILY-USAGE.md) |
+| Want intent-based Prompt Pack routing (optional Agent-Skill) | **Local**: `.agents/skills/zerospec/` for VS Code Copilot. **Global**: `~/.claude/skills/` via `sync-skills` helper scripts; Codex CLI uses manual `$HOME/.agents/skills/` copy when user skills are enabled. See [`skills/README.md`](skills/README.md). |
 | None of the above                                           | **Create nothing**                                                                                                                                                             |
 
-> `templates/prompts/*.prompt.md` is an optional shortcut layer for VS Code prompt UIs. ZeroSpec core remains tool-agnostic: Cursor, Codex CLI, Claude Code, Windsurf, and JetBrains users can use the same Prompt Packs via copy-paste/bookmark/symlink.
+> **Optional adapters at a glance** — ZeroSpec's canonical interface is `prompts/*.md` (copy-paste works everywhere). Adapters reduce manual steps; they do not replace the canonical prompts:
+>
+> | Adapter           | What it does                                           | Install target                     |
+> | ----------------- | ------------------------------------------------------ | ---------------------------------- |
+> | **Prompt Files**  | VS Code prompt UI shortcuts to `prompts/*.md`          | `.github/prompts/` + resolvable `prompts/` |
+> | **Agent-Skill**   | Intent trigger that routes to the right Prompt Pack    | Project-local or user skill folder |
+> | **Pointers**      | Platform entry files that import/link to `AGENTS.md`   | Repo root                          |
+>
+> None are required. Details in [DAILY-USAGE §2.2](DAILY-USAGE.md#22-coexistence-of-copilot-instructionsmd-and-agentsmd).
 
 Monthly quick review + quarterly full review recommended. Details in [GUIDE.md Section 7](GUIDE.md#7-adoption-and-continuous-operation).
 
@@ -281,17 +289,17 @@ zerospec/
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md sub-index template (threshold-triggered)
 │   ├── prompts/                 ← Optional: VS Code Prompt Files adapters (copy to .github/prompts/)
 │   │   └── *.prompt.md          ← Thin adapters that reference prompts/*.md
-│   └── pointers/                ← Optional: platform pointer templates (Copilot / Claude Code / Cursor / Windsurf; Codex CLI, JetBrains, and generic CLI usually use AGENTS.md directly)
+│   └── pointers/                ← Optional: platform entry templates that import/link to AGENTS.md
 ├── skills/
-│   ├── README.md                ← Adapter assets guide (cross-tool path selection + install instructions)
+│   ├── README.md                ← Adapter assets guide (path selection, install/copy commands, verification checklist)
 │   └── zerospec/
 │       ├── SKILL.md             ← Skill-style Router (verified with Claude Code)
 │       └── prompts/             ← Prompt sub-files (synced from prompts/ via sync-skills.sh / sync-skills.ps1)
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux verification script
 │   ├── verify-zerospec.ps1      ← Windows PowerShell verification script
-│   ├── sync-skills.sh           ← macOS/Linux: sync prompts/ → skills/ and optionally install
-│   └── sync-skills.ps1          ← Windows PowerShell: sync prompts/ → skills/ and optionally install
+│   ├── sync-skills.sh           ← macOS/Linux: sync prompts/ → skills/, install to Claude global, or check drift (CI gate)
+│   └── sync-skills.ps1          ← Windows PowerShell: sync prompts/ → skills/, install to Claude global, or check drift (CI gate)
 ├── examples/
 │   ├── minimal-day1/            ← Day-1 minimal output (starting point)
 │   ├── dotnet-dual-api/         ← .NET dual API Host example

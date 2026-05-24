@@ -210,12 +210,20 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 | 多模組開發任務（3+ Controller/handler 檔案或 2+ SPEC） | [`prompts/IMPL.md`](prompts/IMPL.md)                                                                                                                                        |
 | 專案演進需同步文件                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                    |
 | 驗證既有 SPEC 是否仍跟程式碼一致           | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                      |
-| 需要平台 pointer 設定（可選）              | Copilot/Claude/Cursor/Windsurf 可由 [`templates/pointers/`](templates/pointers/) 複製；Codex CLI、JetBrains、generic CLI 支援時直接使用 `AGENTS.md`                         |
-| 想使用一鍵觸發捷徑（可選 VS Code adapter） | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/`（⚠️ 需讓 `#file:prompts/` 可解析；見 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md)） |
-| 想在 Claude Code 使用 Skill-style 捷徑     | macOS/Linux：`bash scripts/sync-skills.sh --install`；Windows：`pwsh -File scripts/sync-skills.ps1 -Install`（見 [`skills/README.md`](skills/README.md)）                   |
+| 需要平台 pointer 設定（可選）              | 複製 [`templates/pointers/`](templates/pointers/) 中引用/連結 `AGENTS.md` 的進入點檔案；Codex CLI、JetBrains、generic CLI 通常直接使用 `AGENTS.md`                         |
+| 想使用 VS Code Prompt 捷徑（可選）         | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/`；確認 `#file:prompts/` 可解析。見 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) |
+| 想以意圖觸發 Prompt Pack 路由（可選 Agent-Skill） | **專案內**：VS Code Copilot 使用 `.agents/skills/zerospec/`。**個人全域**：Claude Code 透過 `sync-skills` 輔助腳本安裝到 `~/.claude/skills/`；Codex CLI 在支援 user skills 時手動複製到 `$HOME/.agents/skills/`。詳見 [`skills/README.md`](skills/README.md)。 |
 | 未觸發以上事件                             | **不建立任何文件**                                                                                                                                                          |
 
-> `templates/prompts/*.prompt.md` 是提供 VS Code Prompt 介面的可選快捷層。ZeroSpec 核心仍維持跨工具：Cursor、Codex CLI、Claude Code、Windsurf、JetBrains 也可透過複製貼上 / 書籤 / Symlink 使用同一套 Prompt Packs。
+> **可選 adapter 一覽** — ZeroSpec 的標準入口永遠是 `prompts/*.md`（複製貼上即可用）。Adapter 只減少手動步驟，不取代標準 Prompt：
+>
+> | Adapter           | 功能                                               | 安裝位置                           |
+> | ----------------- | -------------------------------------------------- | ---------------------------------- |
+> | **Prompt Files**  | VS Code Prompt 介面的 `prompts/*.md` 快捷入口      | `.github/prompts/` + 可解析的 `prompts/` |
+> | **Agent-Skill**   | 依意圖路由到正確 Prompt Pack                       | 專案內或個人 skill 資料夾          |
+> | **Pointers**      | 引用/連結 `AGENTS.md` 的平台進入點檔案             | Repo 根目錄                        |
+>
+> 三者皆為可選。詳見 [DAILY-USAGE.zh-TW §2.2](DAILY-USAGE.zh-TW.md#22-githubcopilot-instructionsmd-與-agentsmd-的共存)。
 
 建議每月做一次快速回顧、每季做一次完整回顧，詳細做法見 [GUIDE.zh-TW.md §7](GUIDE.zh-TW.md#7-導入與持續運作流程)。
 
@@ -282,17 +290,17 @@ zerospec/
 │   ├── SPEC-INDEX-TEMPLATE.md   ← docs/spec/README.md 子索引模板（門檻觸發）
 │   ├── prompts/                 ← 可選：VS Code Prompt Files adapters（可複製到 .github/prompts/）
 │   │   └── *.prompt.md          ← 只引用 prompts/*.md 的輕量 adapter
-│   └── pointers/                ← 可選：各平台 pointer 模板（Copilot / Claude Code / Cursor / Windsurf；Codex CLI、JetBrains、generic CLI 通常直接使用 AGENTS.md）
+│   └── pointers/                ← 可選：引用或連結 AGENTS.md 的平台進入點模板
 ├── skills/
-│   ├── README.md                ← Adapter 資產指南（跨工具路徑選擇與安裝說明）
+│   ├── README.md                ← Adapter 資產指南（路徑選擇、安裝/複製指令、驗證清單）
 │   └── zerospec/
 │       ├── SKILL.md             ← Skill-style Router（已用 Claude Code 驗證）
 │       └── prompts/             ← Prompt 子檔（由 sync-skills.sh / sync-skills.ps1 從 prompts/ 同步）
 ├── scripts/
 │   ├── verify-zerospec.sh       ← macOS/Linux 驗收腳本
 │   ├── verify-zerospec.ps1      ← Windows PowerShell 驗收腳本
-│   ├── sync-skills.sh           ← macOS/Linux：同步 prompts/ → skills/ 並可選擇安裝
-│   └── sync-skills.ps1          ← Windows PowerShell：同步 prompts/ → skills/ 並可選擇安裝
+│   ├── sync-skills.sh           ← macOS/Linux：同步 prompts/ → skills/、安裝至 Claude 全域、或檢查漂移（CI 門檻）
+│   └── sync-skills.ps1          ← Windows PowerShell：同步 prompts/ → skills/、安裝至 Claude 全域、或檢查漂移（CI 門檻）
 ├── examples/
 │   ├── minimal-day1/            ← Day-1 最小產出範例（起步長這樣）
 │   ├── dotnet-dual-api/         ← .NET 雙 API Host 範例
