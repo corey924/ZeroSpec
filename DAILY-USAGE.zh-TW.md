@@ -138,11 +138,12 @@ ZeroSpec 的標準入口仍是 `prompts/*.md`：任何工具都可以用複製�
 
 | 工具                     | 可選 Adapter                    | 備註                                                                                                         |
 | ------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| GitHub Copilot (VS Code) | `templates/prompts/*.prompt.md` | 需讓 `#file:prompts/` 可解析；手動貼上仍是 fallback                                                          |
-| Claude Code              | `skills/zerospec/` Router Skill | macOS/Linux：`bash scripts/sync-skills.sh --install`；Windows：`pwsh -File scripts/sync-skills.ps1 -Install` |
-| Codex CLI / Generic CLI  | 不需要                          | 支援時使用 `AGENTS.md`；否則直接貼入 `prompts/*.md`                                                          |
+| GitHub Copilot (VS Code) | `templates/prompts/*.prompt.md` 或專案內 `skills/zerospec/` | Prompt Files adapter：需讓 `#file:prompts/` 可解析。Local skill：將本 repo 的 `skills/zerospec/` 複製或 symlink 到目標 repo 的 `.agents/skills/zerospec/`。 |
+| Claude Code              | `skills/zerospec/` Router Skill（Global） | macOS/Linux：`bash scripts/sync-skills.sh --install`；Windows：`pwsh -File scripts/sync-skills.ps1 -Install`。安裝到 `~/.claude/skills/`。 |
+| Codex CLI                | `skills/zerospec/` Router Skill（Global） | 若你的 Codex CLI 支援 user skills，將 `skills/zerospec/` 複製到 `$HOME/.agents/skills/zerospec/`；否則直接貼入 `prompts/*.md`。 |
+| Cursor / Windsurf / Generic CLI  | 不需要                          | 支援時使用 `AGENTS.md`；否則直接貼入 `prompts/*.md`                                                          |
 
-安裝 Claude Code skill 後，第一次導入可說 `"幫我跑 ZeroSpec init-scan"`；專案已經有 `AGENTS.md` 時再說 `"幫我跑 ZeroSpec audit"`。Claude 會自動讀取對應 Prompt，並在輸出前執行內建自審（Self-Review）。跨平台同步指令與 Claude Code 驗證清單見 [`skills/README.md`](skills/README.md)。
+加入 Agent-Skill adapter 後，以意圖觸發即可——例如：第一次導入說 `"幫我跑 ZeroSpec init-scan"`；專案已有 `AGENTS.md` 時再說 `"幫我跑 ZeroSpec audit"`。該 Skill 會自動讀取對應 Prompt，並在輸出前執行內建自審（Self-Review）。安裝 / 複製指令與驗證清單見 [`skills/README.md`](skills/README.md)。
 
 ### 2.3 Plan 模式 vs Agent 模式的選用時機
 

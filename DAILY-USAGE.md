@@ -139,13 +139,13 @@ bookmark, or CLI stdin. Use adapters only when they reduce repeated manual work.
 
 | Tool                     | Optional Adapter                | Notes                                                                                                        |
 | ------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| GitHub Copilot (VS Code) | `templates/prompts/*.prompt.md` | Requires `#file:prompts/` to resolve; manual paste remains the fallback                                      |
-| Claude Code              | `skills/zerospec/` Router Skill | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install` |
-| Codex CLI / Generic CLI  | None required                   | Use `AGENTS.md` when supported; otherwise paste `prompts/*.md` directly                                      |
+| GitHub Copilot (VS Code) | `templates/prompts/*.prompt.md` or project-local `skills/zerospec/` | Prompt Files: requires `#file:prompts/` to resolve. Local skill: copy/symlink this repo's `skills/zerospec/` to `.agents/skills/zerospec/` in your target repo. |
+| Claude Code              | `skills/zerospec/` Router Skill (Global) | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install`. Installs to `~/.claude/skills/`. |
+| Codex CLI                | `skills/zerospec/` Router Skill (Global) | If your Codex CLI supports user skills, copy `skills/zerospec/` to `$HOME/.agents/skills/zerospec/`; otherwise paste `prompts/*.md` directly. |
+| Cursor / Windsurf / Generic CLI  | None required                   | Use `AGENTS.md` when supported; otherwise paste `prompts/*.md` directly                          |
 
-After installing the Claude Code skill, say `"Run ZeroSpec init-scan on this project"` for first-time onboarding, or `"Run ZeroSpec audit on this project"` when `AGENTS.md` already exists. Claude reads the
-right prompt automatically and applies a built-in Self-Review before outputting results. See
-[`skills/README.md`](skills/README.md) for cross-platform sync commands and the Claude Code verification checklist.
+After adding an Agent-Skill adapter, invoke by intent — for example: `"Run ZeroSpec init-scan on this project"` for first-time onboarding, or `"Run ZeroSpec audit on this project"` when `AGENTS.md` already exists. The skill routes to the right prompt and applies a built-in Self-Review before outputting results. See
+[`skills/README.md`](skills/README.md) for install/copy commands and the verification checklist.
 
 ### 2.3 Plan Mode vs Agent Mode
 
