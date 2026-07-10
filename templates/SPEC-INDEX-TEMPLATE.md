@@ -4,7 +4,7 @@
 > When instantiating this template, localize human-facing prose and table labels to the repository language or explicit `Respond in {locale}` override.
 > Keep file paths, code identifiers, SPEC filenames, commands, and links literal.
 > This file is a **navigation layer only** — do NOT duplicate contract details from individual SPECs.
-> Each SPEC file remains its own Source of Truth.
+> Each SPEC remains the narrative source of truth for its owned behavior. Link to any machine-verifiable contract instead of duplicating it.
 
 ## Purpose
 
@@ -28,9 +28,9 @@
 
 ## Maintenance Rules
 
-> Map code change types to their corresponding SPEC update obligations.
+> Map code change types to the SPECs that may own their narrative behavior.
 
-- When code, API, DTO, permission, component interface, or business behavior changes, use the "How to Choose a SPEC" table above to locate and update the affected SPEC.
+- Apply `docs/README.md` Contract Ownership before updating a SPEC. Update an in-scope narrative SPEC; otherwise record why the machine contract or no narrative update is sufficient.
 - Each SPEC update modifies only affected sections + appends one Changelog row
 - Do NOT rewrite unchanged contract content
 

@@ -3,11 +3,9 @@
 > **Zero-dependency Markdown baseline for AI-readable repositories.**
 > Give AI coding agents a clear pre-coding brief: where code lives, which rules matter, and which files are source of truth.
 
-> Derived from: [GUIDE.zh-TW.md](GUIDE.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-23
+> **🌐 [Traditional Chinese (zh-TW)](GUIDE.zh-TW.md)**
 
-> **🌐 [台灣正體中文版](GUIDE.zh-TW.md)**
-
-**Version**: v0.4 — 2026-04-23
+**Version source**: [README.md](README.md) (`**Version**`)
 **Audience**: Engineering teams using GenAI Agents (GitHub Copilot / Codex / Claude / Gemini / Cursor)
 **Validation**: Verified across backend (.NET C# / Python), frontend (React + TypeScript), and shared library ecosystems
 
@@ -38,7 +36,7 @@
 
 ## 0. What is ZeroSpec
 
-ZeroSpec is a zero-dependency, pure-Markdown AI readability framework. It operates as **Layer 0 (Context Readiness)**.
+ZeroSpec is a zero-dependency, pure-Markdown AI readability framework. It uses **Layer 0 (Context Readiness)** as a practical label, not as an industry-standard taxonomy.
 
 Think of ZeroSpec as the project's pre-coding brief for AI agents: not a workflow engine, but the minimum context handoff before implementation starts.
 
@@ -49,9 +47,9 @@ Think of ZeroSpec as the project's pre-coding brief for AI agents: not a workflo
 | **Layer 0** | Make the project "AI-readable" — constraints, navigation, SoT | **ZeroSpec**         |
 | **Layer 1** | Make AI "execute by process" — workflows, phase gates         | OpenSpec, Spec Kit   |
 
-ZeroSpec is not bound to any IDE, agent platform, or language. Its sole function: **ensure AI has precise project context before starting any task.**
+ZeroSpec is not bound to any IDE, agent platform, or language. Its sole function: **make precise project context and documentation ownership available before work starts.** It does not orchestrate coding or enforce workflow gates.
 
-From an SDD workflow perspective, ZeroSpec is a lightweight Layer 0 baseline: API changes trigger SPEC updates, architecture decisions trigger ADRs, and system snapshots trigger SA updates.
+From an SDD workflow perspective, ZeroSpec is a lightweight Layer 0 baseline: existing SPEC scope or high-risk interface changes trigger narrative SPEC updates, architecture decisions trigger ADRs, and system snapshots trigger SA updates.
 
 ### How ZeroSpec Relates to SDD
 
@@ -154,16 +152,7 @@ Keep a "minimum viable spec" in every project: architecture constraints, build/t
 
 ### Optional Note: Model Selection
 
-Model choice can matter, but it is separate from ZeroSpec adoption. If you are also choosing models for specific tasks, these broad tendencies can help. For more day-to-day usage patterns, see [DAILY-USAGE.md](DAILY-USAGE.md).
-
-| Task Type                                 | Recommended Series               | Rationale                                                     |
-| ----------------------------------------- | -------------------------------- | ------------------------------------------------------------- |
-| Daily coding (CRUD, refactor, bug fix)    | Claude Sonnet / GPT / Gemini Pro | Speed–quality balance, manageable token cost                  |
-| Architecture analysis (INIT-SCAN / SA)    | Claude Opus / o-series           | Long context + deep reasoning for global analysis             |
-| Heavy code generation (INIT-BUILD / SPEC) | Claude Sonnet / GPT-Codex        | Code-output oriented, repo read/write, cross-file consistency |
-| Quick lookup, lightweight tasks           | Gemini Flash                     | Low latency, fast response                                    |
-
-**Switching strategy**: Start with fast models for exploration; switch to high-reasoning models when facing ambiguous requirements, multi-module changes, or CI-breaking refactors.
+Model choice is separate from ZeroSpec adoption and changes faster than this framework. Choose a model and tool configuration that can inspect the repository, follow explicit constraints, and run the required validation; evaluate it against a representative task before standardizing it.
 
 ---
 
@@ -217,7 +206,7 @@ Use **intent-driven** (not file-driven) tables:
 
 #### Navigation in the Semantic Search Era
 
-When the Agent has full-text indexing / semantic search (Copilot `#codebase`, Cursor indexing, Claude Code native search), "finding a file" is no longer the table's core value. Shift focus to:
+When the Agent has full-text indexing or semantic search, "finding a file" is no longer the table's core value. Shift focus to:
 
 - **Stable business-intent ↔ code mappings**: Clarify ambiguities like "does 'Warehouse' mean ERP inventory or physical warehouse?" — search indexes cannot resolve this
 - **Cross-module derived relationships**: Domain-to-code maps show "Product Management" spans `WarehouseProductController` + `StoreProductController` + `ImportTemplateController` — hard for semantic search to associate
@@ -233,7 +222,7 @@ When the Agent has full-text indexing / semantic search (Copilot `#codebase`, Cu
 
 Guidelines:
 
-- **Recommended length**: Keep concise; 150–300 lines ≈ 2,000–4,000 tokens, which fits comfortably within mainstream LLM system prompt budgets (typically 4K–16K tokens) while leaving room for task-specific context. Exceeding this range risks crowding out conversation context and degrades response quality. Move overflowing sections to `docs/` sub-files and reference them via the navigation table.
+- **Recommended length**: Aim for roughly 200 lines. If a file grows beyond that, review whether each rule is needed on most tasks and move low-frequency guidance to scoped rules or referenced docs. Platform context limits and loading behavior differ.
 - **Required fields**: Project summary, anchor info, navigation table, code generation rules, verification commands, docs sync triggers
 - **Remove candidates**: Long background stories, beginner setup tutorials, unimplemented future roadmap details
 
@@ -260,7 +249,7 @@ This principle comes from Anthropic's official guidance for CLAUDE.md. Treat AGE
 
 #### HTML Comments as Human-Only Notes
 
-Wrap maintainer-only notes in block HTML comments to avoid consuming AI context tokens:
+Wrap maintainer-only notes in block HTML comments to distinguish them from instructions:
 
 ```markdown
 <!--
@@ -270,7 +259,7 @@ Maintainer note: This naming convention was decided in 2024-Q3 cross-team meetin
 
 ### 3.5 Section Order and Attention Weight
 
-Earlier sections are more likely to survive context compression in long conversations. In long conversations, chat history dilutes guidance file influence — front-section content has the highest survival rate.
+Put the most consequential rules near the start because concise, well-structured guidance is easier for both people and agents to inspect. Do not assume a universal loading or compaction order across platforms.
 
 Order AGENTS.md sections by "impact when violated" — descending:
 
@@ -299,7 +288,7 @@ Large monorepos can place additional AGENTS.md files in subdirectories for layer
 
 In long conversations, agent platforms trigger summary/compression (Claude Code `/compact`, Copilot summary insertion). Per Claude Code official docs:
 
-- **Root CLAUDE.md is auto-re-injected after compaction**; other agents behave similarly though not guaranteed
+- **Claude Code root `CLAUDE.md` is auto-re-injected after compaction**; do not generalize this behavior to other agents
 - **Subdirectory nested AGENTS.md is NOT auto-re-injected** — only reloaded when the Agent reads that directory again
 
 | Location | Suitable Content                                                  | Compaction Survival                  |
@@ -309,7 +298,7 @@ In long conversations, agent platforms trigger summary/compression (Claude Code 
 
 Principle: **"Rules that must survive even after memory loss" go in Root; "details needed only when deep in that module" go in Sub.**
 
-- **Behavior**: AGENTS.md standard specifies — the agent reads the **nearest AGENTS.md** to the currently edited file; deepest match wins
+- **Behavior**: instruction discovery differs by agent. Codex concatenates ancestor files; Cursor and Devin Desktop combine nested files; VS Code nested `AGENTS.md` support is experimental. Verify the target platform before relying on nested scope.
 - **When needed**: Nx / Turborepo / Lerna monorepo; multi-endpoint Web + Mobile dual-channel; sub-packages with independent architecture rules
 - **Design**: Root AGENTS.md holds project-wide rules only (tech stack, version SoT, CI entry). Sub AGENTS.md holds module-specific rules. Sub does not repeat Root content but may link back with `../AGENTS.md`
 - **Reference**: [AGENTS.md official standard](https://agents.md/), OpenAI main repo (88 AGENTS.md files), Apache Airflow, Temporal Java SDK
@@ -320,26 +309,26 @@ Principle: **"Rules that must survive even after memory loss" go in Root; "detai
 
 ### 4.1 Standard Four-Layer Classification
 
-| Layer                                  | Prefix      | Responsibility                                        | Trigger                                     |
-| -------------------------------------- | ----------- | ----------------------------------------------------- | ------------------------------------------- |
-| **SA** (System Analysis)               | `SA-xxx`    | Milestone system snapshots                            | Architecture or core dependency change      |
-| **ADR** (Architecture Decision Record) | `ADR-xxx`   | Single decision permanent record (append-only)        | Cross-phase either/or choice                |
-| **SPEC** (Interface Specification)     | `SPEC-xxx`  | Interface contracts + Changelog (**Source of Truth**) | **Mandatory**: PR modifies public interface |
-| **INFRA** (Infrastructure)             | `INFRA-xxx` | Infrastructure selection and topology                 | Deploy/CI config change                     |
+| Layer                                  | Prefix      | Responsibility                                                   | Trigger                                                |
+| -------------------------------------- | ----------- | ---------------------------------------------------------------- | ------------------------------------------------------ |
+| **SA** (System Analysis)               | `SA-xxx`    | Milestone system snapshots                                       | Architecture or core dependency change                 |
+| **ADR** (Architecture Decision Record) | `ADR-xxx`   | Single decision permanent record (append-only)                   | Cross-phase either/or choice                           |
+| **SPEC** (Narrative Specification)     | `SPEC-xxx`  | Behavior, rules, permissions, compatibility, and consumer impact | Existing scope changes or high-risk interface behavior |
+| **INFRA** (Infrastructure)             | `INFRA-xxx` | Infrastructure selection and topology                            | Deploy/CI config change                                |
 
 **Flexible extension**: Library projects may use **INTEGRATION** instead of INFRA. Frontend projects may add **Components** (component index).
 
 > **ZeroSpec principle**: No trigger → no document. All docs AI-drafted via Prompt Packs; humans review only.
 
-### 4.2 SPEC is Source of Truth
+### 4.2 Contract Ownership
 
-The most important covenant in this methodology:
+Every project declares which artifact owns each kind of contract information:
 
-> SPEC usually serves as a primary reference for development and GenAI work. Interface additions or behavior changes should typically update the SPEC directly, with changes tracked in its Changelog.
+- A machine-verifiable artifact such as OpenAPI, protobuf, JSON Schema, generated clients, or code owns paths, fields, types, and requiredness when it exists.
+- A narrative SPEC owns behavior, business rules, permissions, state transitions, compatibility, and consumer impact. It links to rather than copies the machine contract.
+- Without a machine-verifiable contract, the SPEC may own the full interface description.
 
-**Minimum maintenance rule**: For any PR involving interface or behavior changes, use the [SPEC Prompt Pack](prompts/SPEC.md) to let AI generate/update a SPEC draft. Human reviews and merges.
-
-**Coding-time bridge**: Use the `## Post-Edit Self-Check` section in your project's `AGENTS.md` as the lightweight in-line check — the AI assesses SPEC impact and appends a `### Docs Impact` block at the end of every response with code changes. For complex multi-module tasks (3+ Controllers/handlers or 2+ SPECs affected), use the [IMPL Prompt Pack](prompts/IMPL.md) for explicit step-by-step guidance.
+Update an existing SPEC when its scope changes. Create a new SPEC only for high-risk interface behavior: cross-system or multi-consumer behavior, complex rules/state, permission or security boundaries, or compatibility commitments. At task completion, state the documentation impact once with a reason.
 
 ### 4.3 ADR Trigger Examples
 
@@ -515,10 +504,10 @@ After INIT-BUILD, **proceed directly to Step 4's event-driven mode**. Each new A
 
 After INIT-BUILD, run two parallel tracks:
 
-| Track                   | Work                                   | Priority Principle              |
-| ----------------------- | -------------------------------------- | ------------------------------- |
-| **Development** (daily) | New/changed APIs trigger SPEC normally | All new changes need SPEC       |
-| **Backfill** (gradual)  | Existing APIs get SPECs over time      | By priority — not 100% required |
+| Track                   | Work                                   | Priority Principle                                               |
+| ----------------------- | -------------------------------------- | ---------------------------------------------------------------- |
+| **Development** (daily) | Assess contract impact for each change | Update an in-scope SPEC or create one only when risk warrants it |
+| **Backfill** (gradual)  | Existing APIs get SPECs over time      | By priority — not 100% required                                  |
 
 **Backfill priority** (high → low):
 
@@ -533,7 +522,7 @@ After INIT-BUILD, run two parallel tracks:
 
 - `AGENTS.md` + `docs/README.md` ✅ (Day-1 complete)
 - At least one high-priority API SPEC ✅
-- All new changes have corresponding SPECs ✅ (development track operating)
+- High-risk or already-specified changes have corresponding SPEC updates ✅
 
 > Not all APIs ultimately need SPECs. Dead Zone APIs with no consumers and no changes can permanently skip SPEC. Documents exist only when there are consumers.
 
@@ -545,30 +534,28 @@ After INIT-BUILD, run two parallel tracks:
 
 ### Step 4: Event-Triggered Expansion
 
-| Trigger Event                   | Prompt Pack                                      | Output                                 |
-| ------------------------------- | ------------------------------------------------ | -------------------------------------- |
-| Day-1 init (analyze)            | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | Analysis report (no files written)     |
-| Day-1 init (build)              | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`         |
-| API added/changed               | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`                |
-| Complex multi-module coding (3+ Controllers/handlers or 2+ SPECs) | [`prompts/IMPL.md`](prompts/IMPL.md) | Code changes + `### Docs Impact` block |
-| Cross-module technical decision | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`                  |
-| System snapshot needed          | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`              |
-| Project evolved, sync docs      | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | Updates `AGENTS.md` + `docs/README.md` |
-| Existing SPECs may have drifted | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | Drift report (no files written)        |
-| **None of the above**           | —                                                | **Create nothing**                     |
+| Trigger Event                                      | Prompt Pack                                      | Output                                 |
+| -------------------------------------------------- | ------------------------------------------------ | -------------------------------------- |
+| Day-1 init (analyze)                               | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | Analysis report (no files written)     |
+| Day-1 init (build)                                 | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`         |
+| Existing SPEC scope or high-risk interface changes | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`                |
+| Cross-module technical decision                    | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`                  |
+| System snapshot needed                             | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`              |
+| Project evolved, sync docs                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | Updates `AGENTS.md` + `docs/README.md` |
+| Existing SPECs may have drifted                    | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | Drift report (no files written)        |
+| **None of the above**                              | —                                                | **Create nothing**                     |
 
-#### SPEC Lifecycle: SPEC vs IMPL vs UPDATE vs DRIFT
+#### SPEC Lifecycle: SPEC vs UPDATE vs DRIFT
 
 The maintenance Prompt Packs have distinct but complementary roles:
 
-| Prompt      | When to use                                               | Writes files?    |
-| ----------- | --------------------------------------------------------- | ---------------- |
-| `SPEC.md`   | Creating or updating a SPEC for a specific API change     | Yes              |
-| `IMPL.md`   | Complex multi-module coding (3+ Controllers/handlers or 2+ SPECs) — inline coding guardrail with Docs Impact output | Yes (code + SPEC) |
-| `UPDATE.md` | Syncing `AGENTS.md` / `docs/README.md` navigation indices | Yes              |
-| `DRIFT.md`  | Checking whether existing SPEC content still matches code | No — report only |
+| Prompt      | When to use                                                                    | Writes files?    |
+| ----------- | ------------------------------------------------------------------------------ | ---------------- |
+| `SPEC.md`   | Creating or updating a narrative SPEC for existing scope or high-risk behavior | Yes              |
+| `UPDATE.md` | Syncing `AGENTS.md` / `docs/README.md` navigation indices                      | Yes              |
+| `DRIFT.md`  | Checking whether existing SPEC content still matches code                      | No — report only |
 
-> Rule of thumb: `SPEC.md` when behavior changes, `IMPL.md` when a large task touches multiple modules, `UPDATE.md` when structure changes, `DRIFT.md` when you are unsure whether either was done.
+> Rule of thumb: use `SPEC.md` for existing or high-risk narrative contract behavior, `UPDATE.md` when structure or ownership changes, and `DRIFT.md` when an existing SPEC may no longer match its owned behavior.
 
 ### Step 5: Periodic Review
 
@@ -596,13 +583,13 @@ All quick review items, plus:
 
 Use these as directional targets for projects with reasonably stable architecture and team agreement on conventions. They are useful review goals, not guarantees.
 
-| Metric                               | Target   |
-| ------------------------------------ | -------- |
-| Day-1 human effort                   | ≤ 30 min |
-| Human-written content share (Tier C) | ≤ 20%    |
-| First-round merge rate               | ≥ 70%    |
-| Hard rule violation rate             | ≤ 10%    |
-| SPEC draft coverage after API change | ≥ 90%    |
+| Metric                                                     | Target   |
+| ---------------------------------------------------------- | -------- |
+| Day-1 human effort                                         | ≤ 30 min |
+| Human-written content share (Tier C)                       | ≤ 20%    |
+| First-round merge rate                                     | ≥ 70%    |
+| Hard rule violation rate                                   | ≤ 10%    |
+| Narrative SPEC coverage after in-scope or high-risk change | ≥ 90%    |
 
 > **Day-2+ usage**: daily operation modes, IDE configuration, Plan vs Agent selection, scenario playbooks → see [DAILY-USAGE.md](DAILY-USAGE.md).
 

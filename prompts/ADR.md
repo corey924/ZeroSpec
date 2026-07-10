@@ -70,7 +70,7 @@ Generate an ADR document for this technical decision.
 | Field         | Value                              |
 | ------------- | ---------------------------------- |
 | Decision Date | {today's date}                     |
-| Status        | Accepted                           |
+| Status        | Proposed                           |
 | Related       | SA-xxx, ADR-yyy, SPEC-xxx (if any) |
 | Impact Scope  | (Affected modules or domains)      |
 
@@ -99,7 +99,7 @@ Chose Option X because...
 ## Rules
 
 - Naming format: `ADR-{3-digit}_{lowercase-hyphenated-desc}.md`
-- ADRs are append-only or supersede-only (new ADR marks old one as `Superseded by ADR-yyy`) — MUST NOT edit accepted content
+- Draft ADRs may be edited. After acceptance, preserve the decision body; a later ADR may update only the old record's Status/Related metadata to `Superseded by ADR-yyy`.
 - Numbering starts from max existing ADR number + 1
 - If no verifiable evidence exists, DO NOT fill in context details — mark `[unverified]` instead
 

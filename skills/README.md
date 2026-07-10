@@ -6,12 +6,12 @@ assets for tools that support a skill-style package.
 
 ## Which Path Should I Use?
 
-| Tool / Environment            | Recommended Path                                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- |
-| GitHub Copilot (VS Code)      | **Local**: copy/symlink this repo's `skills/zerospec/` as `.agents/skills/zerospec/` in your repo (Git-distributed) |
-| Claude Code                   | **Global**: install to `~/.claude/skills/` — see [Global Install](#global-install) below           |
+| Tool / Environment            | Recommended Path                                                                                                               |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| GitHub Copilot (VS Code)      | **Local**: copy/symlink this repo's `skills/zerospec/` as `.agents/skills/zerospec/` in your repo (Git-distributed)            |
+| Claude Code                   | **Global**: install to `~/.claude/skills/` — see [Global Install](#global-install) below                                       |
 | Codex CLI                     | **Global**: if user skills are enabled, copy to `$HOME/.agents/skills/zerospec/` — see [Global Install](#global-install) below |
-| Cursor / Windsurf / JetBrains | Use `AGENTS.md` and paste Prompt Packs directly when needed                                       |
+| Cursor / Windsurf / JetBrains | Use `AGENTS.md` and paste Prompt Packs directly when needed                                                                    |
 
 ## Structure
 
@@ -20,12 +20,11 @@ skills/
 └── zerospec/
     ├── SKILL.md              ← Router skill for tools that support SKILL.md packages
     └── prompts/
-        ├── INIT-SCAN.md      ← Prompt sub-files (9 files, copied from /prompts/)
+        ├── INIT-SCAN.md      ← Prompt sub-files (8 files, copied from /prompts/)
         ├── INIT-BUILD.md
         ├── UPDATE.md
         ├── AUDIT.md
         ├── DRIFT.md
-        ├── IMPL.md
         ├── SPEC.md
         ├── ADR.md
         └── SA.md

@@ -2,9 +2,9 @@
 
 > **ZeroSpec is a zero-dependency Markdown baseline that gives AI coding agents the project context they need — architecture rules, module navigation, and source of truth — before they start editing files.**
 
-> **🌐 [台灣正體中文版](README.zh-TW.md)**
+> **🌐 [Traditional Chinese (zh-TW)](README.zh-TW.md)**
 
-**Version**: v0.5.2
+**Version**: v0.5.3
 **Status**: Active
 
 ---
@@ -49,7 +49,7 @@ Think of it as a pre-coding brief for AI agents: not a workflow engine, but a co
 
 It builds on the open [AGENTS.md](https://agents.md/) format instead of inventing a proprietary one, and keeps everything in plain Markdown so teams can review and update it with normal code review practices.
 
-From an SDD workflow perspective, ZeroSpec is a lightweight Layer 0 baseline: API changes trigger SPEC updates, architecture decisions trigger ADRs, and system snapshots trigger SA updates.
+From an SDD workflow perspective, ZeroSpec is a lightweight Layer 0 baseline: existing SPEC scope or high-risk interface changes trigger narrative SPEC updates, architecture decisions trigger ADRs, and system snapshots trigger SA updates.
 
 ## When to Use ZeroSpec
 
@@ -62,7 +62,7 @@ From an SDD workflow perspective, ZeroSpec is a lightweight Layer 0 baseline: AP
 
 ## Layer 0 Positioning
 
-ZeroSpec is **Layer 0 (Context Readiness)**, not an execution engine:
+ZeroSpec is a **Layer 0 (Context Readiness)** baseline, not an execution engine or a standards-body taxonomy:
 
 | Layer       | Responsibility                                                | Representative Tools |
 | ----------- | ------------------------------------------------------------- | -------------------- |
@@ -149,19 +149,19 @@ Full examples in [`examples/`](examples/): .NET dual-API, Java Library, Python P
 
 | Tool                     | Activation                                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------------------------- |
-| GitHub Copilot (VS Code) | Switch to **Agent mode** (confirm `#codebase` works)                                              |
-| Cursor                   | Use **Composer — Agent** (not Chat mode)                                                          |
+| GitHub Copilot (VS Code) | Use Agent mode; keep `AGENTS.md` in the workspace root                                            |
+| Cursor                   | Use Agent mode at the project root                                                                |
 | Codex CLI                | Start at project root; reads `AGENTS.md` at root (per [agents.md](https://agents.md/) convention) |
 | Generic CLI              | Start at project root; paste Prompt Pack content                                                  |
 | Claude Code              | Read/write enabled by default                                                                     |
 | Windsurf                 | Use **Cascade mode**                                                                              |
-| JetBrains AI Assistant   | Enable **Attach project files**                                                                   |
+| JetBrains AI Assistant   | Use an agent that supports repository instruction files                                           |
 
 > Not recommended: environments that cannot access local repos end-to-end (for example ChatGPT / Claude.ai web).
 >
 > For steps that write files, avoid pure Plan mode. Analysis-only steps like `INIT-SCAN` can use Plan mode where supported.
 
-> **GitHub Copilot users**: Copilot may not auto-read `AGENTS.md` by default. Use `@AGENTS.md` reference or create `.github/copilot-instructions.md`. See [DAILY-USAGE Section 2.2](DAILY-USAGE.md#22-coexistence-of-copilot-instructionsmd-and-agentsmd).
+> **GitHub Copilot users**: VS Code can automatically load a root `AGENTS.md`. Nested `AGENTS.md` support is experimental; use `.github/copilot-instructions.md` only for complementary repository-wide guidance, not as a duplicate.
 
 > **Non-English projects**: Prompt Packs are in English, and output language often follows project context. If the output locale is not what you expect, explicitly request your target locale in the first instruction (for example: `Respond in zh-TW`). For English-first repos that need zh-TW (or another locale), see [DAILY-USAGE Section 5.8](DAILY-USAGE.md#58-specifying-output-language-eg-zh-tw).
 
@@ -204,18 +204,17 @@ This bridges the gap from "one-time output" to **continuous SDD operation**.
 
 ### After Adoption
 
-| Trigger Event                                               | Prompt Pack / Method                                                                                                                                                           |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| API added/changed                                           | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                           |
-| Architecture decision                                       | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                             |
-| System snapshot needed                                      | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                               |
-| Multi-module coding task (3+ Controllers/handlers or 2+ SPECs) | [`prompts/IMPL.md`](prompts/IMPL.md)                                                                                                                                        |
-| Project evolved, sync docs                                  | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                       |
-| Verify existing SPECs still match code                      | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                         |
-| Need platform pointer setup (optional)                     | Copy [`templates/pointers/`](templates/pointers/) entry files that import/link to `AGENTS.md`; Codex CLI, JetBrains, and generic CLI usually use `AGENTS.md` directly |
-| Want VS Code prompt shortcuts (optional)                   | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to your project's `.github/prompts/`; ensure `#file:prompts/` can resolve. See [DAILY-USAGE.md](DAILY-USAGE.md) |
+| Trigger Event                                                | Prompt Pack / Method                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Existing SPEC scope changes, or a high-risk interface change | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                                                                                                      |
+| Architecture decision                                        | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                                                                                                        |
+| System snapshot needed                                       | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                                                                                                          |
+| Project evolved, sync docs                                   | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                                                                                                  |
+| Verify existing SPECs still match code                       | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                                                                                                    |
+| Need platform pointer setup (optional)                       | Copy [`templates/pointers/`](templates/pointers/) entry files that import/link to `AGENTS.md`; Codex CLI, JetBrains, and generic CLI usually use `AGENTS.md` directly                                                                                     |
+| Want VS Code prompt shortcuts (optional)                     | Copy [`templates/prompts/*.prompt.md`](templates/prompts/) to `.github/prompts/` **and** copy or symlink the canonical `prompts/` directory at the target repo root. See [DAILY-USAGE.md](DAILY-USAGE.md)                                                 |
 | Want intent-based Prompt Pack routing (optional Agent-Skill) | **Local**: `.agents/skills/zerospec/` for VS Code Copilot. **Global**: `~/.claude/skills/` via `sync-skills` helper scripts; Codex CLI uses manual `$HOME/.agents/skills/` copy when user skills are enabled. See [`skills/README.md`](skills/README.md). |
-| None of the above                                           | **Create nothing**                                                                                                                                                             |
+| None of the above                                            | **Create nothing**                                                                                                                                                                                                                                        |
 
 > **Optional adapters at a glance** — ZeroSpec's canonical interface is `prompts/*.md` (copy-paste works everywhere). Adapters reduce manual steps; they do not replace the canonical prompts:
 >
@@ -279,7 +278,6 @@ zerospec/
 │   ├── SA.md                    ← Trigger: system snapshot → produce SA
 │   ├── AUDIT.md                 ← Trigger: audit AGENTS.md quality (no files written)
 │   ├── DRIFT.md                 ← Trigger: verify existing SPECs still match code (no files written)
-│   ├── IMPL.md                  ← Trigger: complex coding task → implement with SPEC sync
 │   └── UPDATE.md                ← Ongoing: update AGENTS.md + docs/README.md
 ├── templates/
 │   ├── ADR-TEMPLATE.md          ← Ready-to-use ADR template
@@ -305,7 +303,8 @@ zerospec/
 │   ├── dotnet-dual-api/         ← .NET dual API Host example
 │   ├── java-library/            ← Java Library example
 │   ├── python-package/          ← Python Package example
-│   └── react-nx-monorepo/       ← React + Nx Monorepo frontend example
+│   ├── react-nx-monorepo/       ← React + Nx Monorepo frontend example
+│   └── optional-bridges/        ← Non-core migration examples
 ├── anti-patterns.md             ← Anti-pattern catalog
 ├── CHANGELOG.md
 └── LICENSE

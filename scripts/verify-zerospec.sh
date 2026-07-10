@@ -176,6 +176,12 @@ assert_grep "### 8\. Domain-to-Code Map" "prompts/AUDIT.md"
 assert_grep "### 9\." "prompts/AUDIT.md"
 assert_grep "Actionable Fix List" "prompts/AUDIT.md"
 
+# English Markdown must not contain Han characters. Localized content belongs only
+# in explicitly named language variants such as *.zh-TW.md.
+while IFS= read -r english_asset; do
+  assert_no_grep "[一-龥]" "$english_asset"
+done < <(find . -type f -name '*.md' ! -name '*zh-TW.md' ! -path './.git/*' -print)
+
 assert_grep "^## Background / Problem$" ".github/pull_request_template.md"
 assert_grep "^## SDD Sync Checklist$" ".github/pull_request_template.md"
 assert_no_grep "背景 / 問題|SDD 同步檢查項|驗證方式|額外說明" ".github/pull_request_template.md"
@@ -208,8 +214,8 @@ assert_grep "avoid verb-based paths.*multi-version mixing" "README.md"
 assert_grep "Responsibility definition" "GUIDE.md"
 assert_grep "decision source is C3 \(human decision\)" "GUIDE.md"
 
-assert_grep "128K[–-]200K context" "DAILY-USAGE.md"
-assert_grep "10[–-]15 rounds" "DAILY-USAGE.md"
+assert_grep "Contract Ownership" "GUIDE.md"
+assert_grep "Contract Ownership" "templates/DOCS-README-TEMPLATE.md"
 
 assert_grep "Quick Constraints as a pinned projection of C3 decisions" "prompts/UPDATE.md"
 assert_grep "write only after user confirmation" "prompts/UPDATE.md"
@@ -351,30 +357,27 @@ assert_grep "^name: zerospec$" "skills/zerospec/SKILL.md"
 assert_grep "Route Table" "skills/zerospec/SKILL.md"
 assert_grep "Self-Review" "skills/zerospec/SKILL.md"
 assert_grep "prompts/AUDIT\.md" "skills/zerospec/SKILL.md"
-assert_grep "^\| impl[[:space:]]+\|" "skills/zerospec/SKILL.md"
 assert_grep "sync-skills" "skills/README.md"
 assert_grep "sync-skills\.sh --install" "skills/README.md"
 assert_grep "sync-skills\.ps1 -Install" "skills/README.md"
-for prompt_file in INIT-SCAN.md INIT-BUILD.md UPDATE.md AUDIT.md DRIFT.md IMPL.md SPEC.md ADR.md SA.md; do
+for prompt_file in INIT-SCAN.md INIT-BUILD.md UPDATE.md AUDIT.md DRIFT.md SPEC.md ADR.md SA.md; do
   assert_files_equal "prompts/$prompt_file" "skills/zerospec/prompts/$prompt_file"
 done
 assert_grep "exclude-path skills/zerospec/prompts" ".github/workflows/verify-zerospec.yml"
 
-# IMPL prompt pack (v0.5.2)
-assert_file_exists "prompts/IMPL.md"
-assert_file_exists "skills/zerospec/prompts/IMPL.md"
-assert_count_eq "^---BEGIN PROMPT---$" "prompts/IMPL.md" 1
-assert_count_eq "^---END PROMPT---$" "prompts/IMPL.md" 1
-assert_count_eq "^\`\`\`\`$" "prompts/IMPL.md" 2
-assert_grep "^## Trigger Conditions$" "prompts/IMPL.md"
-assert_grep "^## Relationship to Other Prompts$" "prompts/IMPL.md"
-assert_first_line_starts_with_header "prompts/IMPL.md"
-
-# Spec-Aware Coding Discipline: INIT-BUILD template and AGENTS.md dogfood (v0.5.2)
-assert_grep "assess whether.*docs/spec/" "prompts/INIT-BUILD.md"
-assert_grep "Forcing Function" "prompts/INIT-BUILD.md"
-assert_grep "Post-Edit Self-Check" "prompts/INIT-BUILD.md"
-assert_grep "assess whether.*docs/spec/" "AGENTS.md"
+# Risk-based contract discipline
+assert_grep "Contract Ownership" "prompts/INIT-BUILD.md"
+assert_grep "high-risk interface" "prompts/INIT-BUILD.md"
+assert_grep "documented contract" "AGENTS.md"
+assert_no_grep "prompts/IMPL\.md" "skills/zerospec/SKILL.md"
+assert_file_exists "examples/optional-bridges/IMPL.md"
+assert_no_grep "If interface, schema, permission, or business rules changed, update the relevant SPEC\." "prompts/INIT-BUILD.md"
+assert_no_grep "If interface, schema, permission, or business rules changed, update the relevant SPEC\." "prompts/UPDATE.md"
+for adapter_file in templates/prompts/*.prompt.md; do
+  assert_no_grep "^mode:" "$adapter_file"
+  assert_grep "^agent:" "$adapter_file"
+  assert_grep "\]\(\.\./\.\./prompts/" "$adapter_file"
+done
 
 # PR template (v0.5.2)
 assert_file_exists "templates/pull_request_template.md"
@@ -390,6 +393,9 @@ for example_agents in examples/minimal-day1/AGENTS.md examples/minimal-day1/AGEN
   if [[ -f "$example_agents" ]]; then
     if ! grep -Eq "## (Post-Edit Self-Check|完成前自我檢查)" "$example_agents"; then
       echo "WARNING: '$example_agents' is missing Post-Edit Self-Check section."
+    fi
+    if ! grep -Fq "Contract Ownership" "$example_agents"; then
+      echo "WARNING: '$example_agents' is missing Contract Ownership guidance."
     fi
   fi
 done

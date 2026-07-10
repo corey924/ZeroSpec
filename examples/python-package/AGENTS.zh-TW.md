@@ -82,7 +82,7 @@
 1. 列出本次 diff 涉及的所有異動檔案。
 2. 對照上方「程式碼 → 文件對照表」（Code-to-Docs Map），找出每份候選文件。
 3. 對每份候選文件回答：`需要更新` 或 `不需要更新（原因）`。
-4. 若介面、schema、Permission 或 Business Rule 有異動，更新對應 SPEC。
+4. 套用 Contract Ownership：需要時更新既有範圍的敘事 SPEC；否則說明 machine contract 或不更新文件已足夠的理由。
 5. 執行 `make test` 與 `make lint` 確認無回歸錯誤。
 
 **強制輸出（Forcing Function）**：AI agent 在任何含程式碼異動的回覆末尾，必須附上 `### Docs Impact` 區塊，列出：(a) 受影響的 `docs/spec/` 檔案及更新狀態；(b) 不需要更新時的說明理由。

@@ -82,7 +82,7 @@ Before declaring work complete:
 1. List changed files from the current diff.
 2. Cross-reference every changed file with the Code-to-Docs Map above.
 3. For each candidate doc, state `Update needed` or `No update needed` with a reason.
-4. If interface, schema, permission, or business rules changed, update the relevant SPEC.
+4. Apply Contract Ownership: update an in-scope narrative SPEC when required; otherwise state why the machine contract or no document update is sufficient.
 5. Run `make test` and `make lint` to confirm no regressions.
 
 **Forcing Function**: AI agents MUST append a `### Docs Impact` block at the end of any response containing code changes, listing: (a) affected `docs/spec/` files and their update status; (b) reason if no update is needed.

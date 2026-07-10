@@ -4,7 +4,7 @@
 
 > **在 AI Coding Agent 動手前，先把它需要的專案上下文整理好：架構規則、模組導航、版本真相來源。零依賴，純 Markdown。**
 
-**版本**：v0.5.2
+**版本**：v0.5.3
 **狀態**：Active
 
 ---
@@ -49,7 +49,7 @@ ZeroSpec 把 Agent 在動手前通常需要的最小上下文固定下來：
 
 它建立在開放的 [AGENTS.md](https://agents.md/) 格式上，不另外發明專屬格式，也不要求新的服務或執行環境。所有內容都維持在一般 Markdown，方便團隊用既有的 code review 流程維護。
 
-如果用 SDD 的開發模式來看，ZeroSpec 是一個輕量的 Layer 0 基線：API 變更觸發 SPEC 更新，架構決策觸發 ADR，需要系統快照時觸發 SA。
+如果用 SDD 的開發模式來看，ZeroSpec 是一個輕量的 Layer 0 基線：既有 SPEC 範圍或高風險介面行為變更會觸發敘事 SPEC 更新，架構決策觸發 ADR，需要系統快照時觸發 SA。
 
 ## 何時適合導入 ZeroSpec
 
@@ -62,7 +62,7 @@ ZeroSpec 把 Agent 在動手前通常需要的最小上下文固定下來：
 
 ## Layer 0 定位
 
-ZeroSpec 是 **Layer 0（Context Readiness）**，不是執行引擎：
+ZeroSpec 是 **Layer 0（Context Readiness）** 基線，不是執行引擎，也不是業界標準分層：
 
 | 層級        | 職責                                        | 代表工具           |
 | ----------- | ------------------------------------------- | ------------------ |
@@ -149,19 +149,19 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 | 工具                     | 啟用方式                                                                    |
 | ------------------------ | --------------------------------------------------------------------------- |
-| GitHub Copilot (VS Code) | 切換至 **Agent 模式**（確認 `#codebase` 可用）                              |
-| Cursor                   | 使用 **Composer — Agent**（非 Chat 模式）                                   |
+| GitHub Copilot (VS Code) | 使用 Agent 模式，並將 `AGENTS.md` 放在 workspace 根目錄                     |
+| Cursor                   | 在專案根目錄使用 Agent 模式                                                 |
 | Codex CLI                | 在專案根目錄啟動；根據 [agents.md](https://agents.md/) 慣例讀取 `AGENTS.md` |
 | Generic CLI              | 在專案根目錄啟動，貼入 Prompt Pack 內容                                     |
 | Claude Code              | 預設即具備讀寫能力                                                          |
 | Windsurf                 | 使用 **Cascade 模式**                                                       |
-| JetBrains AI Assistant   | 開啟 **Attach project files** 選項                                          |
+| JetBrains AI Assistant   | 使用支援 repository instruction files 的 Agent                              |
 
 > 不建議：無法完整存取本機 Repo 的環境（例如 ChatGPT / Claude.ai 網頁版）
 >
 > 若需要實際寫入檔案，請避免使用純 Plan 模式；`INIT-SCAN` 這類只做分析、不寫檔的步驟，則可視平台能力使用。
 
-> GitHub Copilot 用戶：Copilot 不一定自動讀 `AGENTS.md`，需用 `@AGENTS.md` 引用或建立 `.github/copilot-instructions.md`，詳見 [DAILY-USAGE.zh-TW.md §2.2](DAILY-USAGE.zh-TW.md#22-githubcopilot-instructionsmd-與-agentsmd-的共存)。
+> GitHub Copilot 用戶：VS Code 可自動讀取根目錄 `AGENTS.md`；nested `AGENTS.md` 仍屬 experimental。`.github/copilot-instructions.md` 僅放互補的 repository-wide 指引，不重複 AGENTS.md。
 
 > **非英文專案提示**：Prompt Pack 以英文撰寫，產出語言通常會依專案語境判斷。若產出語言不符合預期，請在第一句明確指定目標語系（例如：`請用 zh-TW 回覆`）。若你的 Repo 以英文為主、但希望產出台灣正體中文，請見 [DAILY-USAGE.zh-TW.md §5.8](DAILY-USAGE.zh-TW.md#58-指定產出語言例如-zh-tw)。
 
@@ -202,18 +202,17 @@ Version source of truth: package versions per `.csproj`; .NET SDK per `global.js
 
 ### 導入後怎麼用？
 
-| 觸發事件                                   | 使用 Prompt Pack / 方式                                                                                                                                                     |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 新增/變更 API                              | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                        |
-| 架構決策                                   | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                          |
-| 系統快照                                   | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                            |
-| 多模組開發任務（3+ Controller/handler 檔案或 2+ SPEC） | [`prompts/IMPL.md`](prompts/IMPL.md)                                                                                                                                        |
-| 專案演進需同步文件                         | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                    |
-| 驗證既有 SPEC 是否仍跟程式碼一致           | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                      |
-| 需要平台 pointer 設定（可選）              | 複製 [`templates/pointers/`](templates/pointers/) 中引用/連結 `AGENTS.md` 的進入點檔案；Codex CLI、JetBrains、generic CLI 通常直接使用 `AGENTS.md`                         |
-| 想使用 VS Code Prompt 捷徑（可選）         | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到專案的 `.github/prompts/`；確認 `#file:prompts/` 可解析。見 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) |
+| 觸發事件                                          | 使用 Prompt Pack / 方式                                                                                                                                                                                                                                        |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 既有 SPEC 範圍變更，或高風險介面變更              | [`prompts/SPEC.md`](prompts/SPEC.md)                                                                                                                                                                                                                           |
+| 架構決策                                          | [`prompts/ADR.md`](prompts/ADR.md)                                                                                                                                                                                                                             |
+| 系統快照                                          | [`prompts/SA.md`](prompts/SA.md)                                                                                                                                                                                                                               |
+| 專案演進需同步文件                                | [`prompts/UPDATE.md`](prompts/UPDATE.md)                                                                                                                                                                                                                       |
+| 驗證既有 SPEC 是否仍跟程式碼一致                  | [`prompts/DRIFT.md`](prompts/DRIFT.md)                                                                                                                                                                                                                         |
+| 需要平台 pointer 設定（可選）                     | 複製 [`templates/pointers/`](templates/pointers/) 中引用/連結 `AGENTS.md` 的進入點檔案；Codex CLI、JetBrains、generic CLI 通常直接使用 `AGENTS.md`                                                                                                             |
+| 想使用 VS Code Prompt 捷徑（可選）                | 將 [`templates/prompts/*.prompt.md`](templates/prompts/) 複製到 `.github/prompts/`，並在目標 Repo 根目錄複製或 symlink canonical `prompts/` 目錄。見 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md)                                                              |
 | 想以意圖觸發 Prompt Pack 路由（可選 Agent-Skill） | **專案內**：VS Code Copilot 使用 `.agents/skills/zerospec/`。**個人全域**：Claude Code 透過 `sync-skills` 輔助腳本安裝到 `~/.claude/skills/`；Codex CLI 在支援 user skills 時手動複製到 `$HOME/.agents/skills/`。詳見 [`skills/README.md`](skills/README.md)。 |
-| 未觸發以上事件                             | **不建立任何文件**                                                                                                                                                          |
+| 未觸發以上事件                                    | **不建立任何文件**                                                                                                                                                                                                                                             |
 
 > **可選 adapter 一覽** — ZeroSpec 的標準入口永遠是 `prompts/*.md`（複製貼上即可用）。Adapter 只減少手動步驟，不取代標準 Prompt：
 >
@@ -280,7 +279,6 @@ zerospec/
 │   ├── SA.md                    ← 觸發：系統快照 → 產 SA
 │   ├── AUDIT.md                 ← 觸發：稽核 AGENTS.md 品質（不寫檔）
 │   ├── DRIFT.md                 ← 觸發：驗證既有 SPEC 是否仍跟程式碼一致（不寫檔）
-│   ├── IMPL.md                  ← 觸發：複雜多模組開發 → 實作並同步 SPEC
 │   └── UPDATE.md                ← 持續：更新 AGENTS.md + docs/README.md
 ├── templates/
 │   ├── ADR-TEMPLATE.md          ← 直接可用的 ADR 模板
@@ -306,7 +304,8 @@ zerospec/
 │   ├── dotnet-dual-api/         ← .NET 雙 API Host 範例
 │   ├── java-library/            ← Java Library 範例
 │   ├── python-package/          ← Python Package 範例
-│   └── react-nx-monorepo/       ← React + Nx Monorepo 前端範例
+│   ├── react-nx-monorepo/       ← React + Nx Monorepo 前端範例
+│   └── optional-bridges/        ← 非核心的遷移範例
 ├── anti-patterns.md             ← 反模式清單
 ├── CHANGELOG.md
 └── LICENSE

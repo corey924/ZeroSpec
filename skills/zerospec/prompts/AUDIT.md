@@ -81,7 +81,7 @@ List content that **could be removed**, including:
 - Version numbers derivable from `.csproj` / `package.json` / `build.gradle`
 - Generic code quality advice ("write clean code", "add appropriate comments")
 - Build/test process already covered by Common Commands
-- **Domain-to-code map necessity in small projects**: If the project is small AND the Agent supports semantic search (`#codebase` / Cursor indexing / Claude Code), the domain-to-code map's value is lower than the Agent's on-the-fly scanning — consider removing or heavily trimming
+- **Domain-to-code map necessity in small projects**: If the project is small AND the Agent supports semantic search, the domain-to-code map's value is lower than the Agent's on-the-fly scanning — consider removing or heavily trimming
 
 Apply this principle: **"Would removing this line cause the AI to make an error on its next task?" If not, it's a removal candidate.**
 
@@ -105,7 +105,7 @@ Assess whether the top section of AGENTS.md contains the most important informat
 
 ### 7. Token Usage Observation (Optional)
 
-AGENTS.md is injected into every Agent conversation's system context; longer content dilutes attention for other files. This dimension does not require precise calculation — provide a semantic judgment:
+AGENTS.md loading behavior differs by agent. Assess whether the file is concise enough for frequent tasks without assuming a universal system-context implementation:
 
 - **Low**: Minimal impact on other file attention
 - **Moderate**: Noticeable but acceptable — review removal candidates from Dimension 4
@@ -131,6 +131,10 @@ Check whether paths referenced in AGENTS.md resolve correctly:
 - **Broken links**: Any path reference that clearly does not exist → flag as FAIL
 
 > Note: For cross-repo paths, use workspace context to determine whether the sibling repo is present. If it cannot be confirmed, mark as `⚠️ not verified` rather than FAIL.
+
+### 10. Contract Ownership Health
+
+When the project has public interfaces, check whether its docs distinguish machine-verifiable interface details (for example OpenAPI, schemas, generated clients, or code) from narrative SPEC responsibilities (behavior, rules, permissions, compatibility, and consumer impact). Flag duplicate or conflicting sources of truth.
 
 ## Output Format
 
@@ -186,6 +190,9 @@ Total lines: {n}
 | Path Referenced | Target Exists?                |
 | --------------- | ----------------------------- |
 | `docs/spec/...` | ✅ / ⚠️ not verified / ❌ broken |
+
+### 10. Contract Ownership Health
+...
 
 ## Suggested Trim List (by priority)
 

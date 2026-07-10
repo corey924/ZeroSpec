@@ -5,19 +5,20 @@
 
 ## SDD 文件四層分類
 
-| 分類              | 目錄             | 命名格式                   | 觸發條件                       |
-| ----------------- | ---------------- | -------------------------- | ------------------------------ |
-| SA（系統分析）    | `docs/analysis/` | `SA-{三位數}_{描述}.md`    | 里程碑或架構重大變更           |
-| ADR（架構決策）   | `docs/adr/`      | `ADR-{三位數}_{描述}.md`   | 跨模組技術二選一決策           |
-| SPEC（介面契約）  | `docs/spec/`     | `SPEC-{三位數}_{描述}.md`  | API 新增或行為變更（**強制**） |
-| INFRA（基礎設施） | `docs/infra/`    | `INFRA-{三位數}_{描述}.md` | 部署拓樸或 CI 變更             |
+| 分類               | 目錄             | 命名格式                   | 觸發條件                           |
+| ------------------ | ---------------- | -------------------------- | ---------------------------------- |
+| SA（系統分析）     | `docs/analysis/` | `SA-{三位數}_{描述}.md`    | 里程碑或架構重大變更               |
+| ADR（架構決策）    | `docs/adr/`      | `ADR-{三位數}_{描述}.md`   | 跨模組技術二選一決策               |
+| SPEC（敘述型契約） | `docs/spec/`     | `SPEC-{三位數}_{描述}.md`  | 高風險公開行為或既有 SPEC 範圍變更 |
+| INFRA（基礎設施）  | `docs/infra/`    | `INFRA-{三位數}_{描述}.md` | 部署拓樸或 CI 變更                 |
 
 - 命名正規式：`^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$`
 - **彈性擴充**：Library 專案可用 INTEGRATION 取代 INFRA
 
-## Source of Truth
+## Contract Ownership
 
-SPEC 是開發與 GenAI 的主要參照檔案。每次介面新增或修改都直接更新 SPEC，並在 Changelog 追蹤變更歷程。
+- **Machine-verifiable contract**：Python public signature 負責 field 與 type。
+- **Narrative SPEC**：負責行為、業務規則、權限、相容性與 consumer impact。
 
 **最低維護規則**：凡 PR 涉及 `PipelineService` 介面異動，必須同步更新 SPEC 內容與 Changelog。
 

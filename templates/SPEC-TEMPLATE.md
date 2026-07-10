@@ -14,6 +14,12 @@
 
 Describe the domain's business goal and API endpoint scope.
 
+## Contract Ownership
+
+- **Machine-verifiable contract**: {OpenAPI/schema/generated client/code path, or `not configured`}
+- **This SPEC owns**: behavior, business rules, permissions, state transitions, compatibility, and consumer impact.
+- Do not duplicate fields, types, or requiredness owned by the machine-verifiable contract.
+
 ## Interface Definitions
 
 ### `METHOD /api/v1/resource`

@@ -7,21 +7,23 @@
 
 ## SDD Document Classification
 
-| Category                    | Directory        | Naming Format               | Trigger                                         |
-| --------------------------- | ---------------- | --------------------------- | ----------------------------------------------- |
-| SA (System Analysis)        | `docs/analysis/` | `SA-{3-digit}_{desc}.md`    | Milestone or major architecture change          |
-| ADR (Architecture Decision) | `docs/adr/`      | `ADR-{3-digit}_{desc}.md`   | Cross-module either/or tech decision            |
-| SPEC (Interface Contract)   | `docs/spec/`     | `SPEC-{3-digit}_{desc}.md`  | API addition or behavior change (**mandatory**) |
-| INFRA (Infrastructure)      | `docs/infra/`    | `INFRA-{3-digit}_{desc}.md` | Deployment topology or CI change                |
+| Category                    | Directory        | Naming Format               | Trigger                                                        |
+| --------------------------- | ---------------- | --------------------------- | -------------------------------------------------------------- |
+| SA (System Analysis)        | `docs/analysis/` | `SA-{3-digit}_{desc}.md`    | Milestone or major architecture change                         |
+| ADR (Architecture Decision) | `docs/adr/`      | `ADR-{3-digit}_{desc}.md`   | Cross-module either/or tech decision                           |
+| SPEC (Narrative Contract)   | `docs/spec/`     | `SPEC-{3-digit}_{desc}.md`  | High-risk interface behavior, or an existing SPEC scope change |
+| INFRA (Infrastructure)      | `docs/infra/`    | `INFRA-{3-digit}_{desc}.md` | Deployment topology or CI change                               |
 
 - Naming regex: `^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$`
 - **Flexible extension**: Library projects may use INTEGRATION instead of INFRA; frontend projects may add a Components index
 
-## Source of Truth
+## Contract Ownership
 
-SPEC is the primary reference for development and GenAI. Update SPEC directly on every interface addition or change, and track changes in the Changelog.
+- **Machine-verifiable contract** (for example OpenAPI, protobuf, JSON Schema, generated client, or code): {path or `not configured`} owns paths, fields, types, and requiredness.
+- **Narrative SPEC**: owns behavior, business rules, permissions, state transitions, compatibility, and consumer impact. Link to the machine contract instead of copying it.
+- If no machine-verifiable contract exists, a SPEC may own the complete interface description.
 
-**Minimum maintenance rule**: Every PR involving interface or behavior changes MUST update the SPEC content and Changelog.
+**Maintenance rule**: Update an existing SPEC when its scope changes. Create a new SPEC only for a high-risk interface change: cross-system or multi-consumer behavior, complex business rules/state, permission or security boundary, or compatibility commitment.
 
 ## ADR Trigger Conditions
 
@@ -30,7 +32,7 @@ SPEC is the primary reference for development and GenAI. Update SPEC directly on
 
 ## SA Trigger Conditions
 
-> SA is a system-level snapshot. Unlike SPEC (mandatory on every interface change), SA is created on-demand when global understanding is lacking.
+> SA is a system-level snapshot. Unlike narrative SPECs, it is created on-demand when global understanding is lacking.
 
 - ✅ Suggest SA: entering a Brownfield codebase with no current architecture overview, cross-module boundaries shifting (3+ modules restructured), team members repeatedly asking "how does this system work?", or recent architecture-level changes not reflected in existing docs
 - ❌ No SA needed: routine feature work within a single module, adding endpoints, bug fixes
@@ -41,13 +43,14 @@ SPEC is the primary reference for development and GenAI. Update SPEC directly on
 > GenAI Agents MUST autonomously assess document needs during every coding task.
 > This table is the **single decision matrix** — no external tooling required.
 
-| Signal Detected in Task | Document to Create/Update | AI Action Mode |
-| :--- | :--- | :--- |
-| New/modified endpoint, handler, or public API; Request/Response schema change; permission or business rule change; behavioral bugfix | **SPEC** | **Mandatory**: update in the same changeset. |
-| Cross-module either/or tech decision; new third-party integration choice; shared pattern introduction | **ADR** | **Propose**: explain alternatives, draft ADR after human approval. |
-| Brownfield codebase with no current architecture overview; large-scale module restructure (3+ modules); team onboarding gaps | **SA** | **Propose**: suggest scope, wait for human confirmation. |
-| Deployment topology, runtime configuration, IaC, or CI/CD release behavior changes | **INFRA** | **Mandatory** when deployment behavior changes. |
-| None of the above signals detected | — | State "No doc update needed" with reason in `### Docs Impact`. |
+| Signal Detected in Task                                                                                                                   | Document to Create/Update | AI Action Mode                                                     |
+| :---------------------------------------------------------------------------------------------------------------------------------------- | :------------------------ | :----------------------------------------------------------------- |
+| Existing SPEC scope changes; cross-system or multi-consumer interface; complex rules/state; permission/security; compatibility commitment | **SPEC**                  | **Mandatory**: update in the same changeset.                       |
+| Simple internal CRUD or a machine-contract-only field change with no narrative impact                                                     | —                         | State why no narrative SPEC update is needed.                      |
+| Cross-module either/or tech decision; new third-party integration choice; shared pattern introduction                                     | **ADR**                   | **Propose**: explain alternatives, draft ADR after human approval. |
+| Brownfield codebase with no current architecture overview; large-scale module restructure (3+ modules); team onboarding gaps              | **SA**                    | **Propose**: suggest scope, wait for human confirmation.           |
+| Deployment topology, runtime configuration, IaC, or CI/CD release behavior changes                                                        | **INFRA**                 | **Mandatory** when deployment behavior changes.                    |
+| None of the above signals detected                                                                                                        | —                         | State "No doc update needed" with reason in `### Docs Impact`.     |
 
 ### Route Selection
 

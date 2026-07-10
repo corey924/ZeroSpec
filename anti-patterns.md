@@ -1,8 +1,6 @@
 # ZeroSpec Anti-Patterns
 
-> Derived from: [anti-patterns.zh-TW.md](anti-patterns.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-23
-
-> **🌐 [台灣正體中文版](anti-patterns.zh-TW.md)**
+> **🌐 [Traditional Chinese (zh-TW)](anti-patterns.zh-TW.md)**
 
 Common mistakes discovered across multi-project ecosystems. Each entry includes the problem and its fix.
 
@@ -59,10 +57,11 @@ Common mistakes discovered across multi-project ecosystems. Each entry includes 
 
 ## AI Edit Hygiene
 
-| #   | Anti-Pattern                     | Problem                                                                                                                                                                                                      | Fix                                                                                                                                                                                                                                                         |
-| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 23  | **Reformatting untouched lines** | AI edits a few lines but also realigns tables, re-indents blocks, re-sorts imports, or strips trailing spaces across the whole file — git diff becomes unreadable; reviewers cannot identify the real change | Declare a `<formatting_policy>` in your AI instructions: detect original style, only touch the requested range, never run full-file formatters. Provide an explicit opt-in trigger (`#format` / `#reformat` / `please reformat`) for intentional reformats. |
-| 25  | **Code-without-SPEC-assessment** | AI completes a code change (new endpoint, schema change, permission change, or behavioral bugfix) without evaluating whether any SPEC document needs updating — docs silently drift from code over time      | Add a `## Post-Edit Self-Check` section to `AGENTS.md` and a `## Quick Constraints` first item mandating SPEC assessment. Use the IMPL Prompt Pack for complex multi-module tasks. See [`prompts/IMPL.md`](prompts/IMPL.md).                             |
+| #   | Anti-Pattern                         | Problem                                                                                                                                                                                                      | Fix                                                                                                                                                                                                                                                         |
+| --- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 23  | **Reformatting untouched lines**     | AI edits a few lines but also realigns tables, re-indents blocks, re-sorts imports, or strips trailing spaces across the whole file — git diff becomes unreadable; reviewers cannot identify the real change | Declare a `<formatting_policy>` in your AI instructions: detect original style, only touch the requested range, never run full-file formatters. Provide an explicit opt-in trigger (`#format` / `#reformat` / `please reformat`) for intentional reformats. |
+| 25  | **Code-without-contract assessment** | AI completes a code change without deciding whether an existing SPEC, machine-verifiable contract, or neither is affected — docs silently drift or duplicate code over time                                  | Add a task-end contract assessment to `AGENTS.md`: update an in-scope SPEC, create one only for high-risk interface behavior, or state why the machine contract/no document is sufficient.                                                                  |
+| 26  | **Competing contract sources**       | Markdown copies endpoint fields or DTO schemas already owned by OpenAPI, schemas, generated clients, or code; the copies diverge                                                                             | Declare Contract Ownership. Machine artifacts own fields/types; narrative SPECs own behavior, rules, permissions, compatibility, and consumer impact.                                                                                                       |
 
 ---
 

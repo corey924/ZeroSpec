@@ -4,6 +4,22 @@ This file tracks the version history of the ZeroSpec framework.
 
 ---
 
+## v0.5.3 — 2026-07-10
+
+### Changed
+
+- **Layer 0 boundary**: clarified that ZeroSpec provides context readiness and documentation governance, not code-execution orchestration or workflow gates. The former `IMPL.md` execution bridge moved to `examples/optional-bridges/` and is no longer routed by the core skill.
+- **Contract Ownership**: replaced the blanket "every API change needs a Markdown SPEC" rule with a project-declared ownership model. Machine-verifiable artifacts such as OpenAPI, schemas, generated clients, or code own paths and field/type details; narrative SPECs own behavior, rules, permissions, compatibility, and consumer impact. New SPECs are risk-based.
+- **Policy propagation**: aligned generated AGENTS templates, examples, PR checklist, pointer fallbacks, SPEC index guidance, and maintenance prompts with the same risk-based rule; agents now state why a machine contract or no narrative update is sufficient when applicable.
+- **Prompt safety**: added evidence-versus-instruction boundaries to repository-scanning prompts to reduce indirect prompt-injection risk.
+- **Platform guidance**: updated VS Code/Copilot, Cursor, Devin Desktop/Windsurf, JetBrains, and Prompt File guidance for current instruction discovery and adapter metadata. Prompt Files now use `agent:` metadata and relative Markdown links; their optional target-root `prompts/` prerequisite is explicit.
+- **Guidance hygiene**: removed stale model-family routing, universal context-window budgets, and fixed conversation-round thresholds. Retained symptom-based re-anchoring and concise-rule guidance.
+- **Language isolation**: removed zh-TW prose from English Prompt Packs, templates, pointers, and user-facing docs. Cross-platform verification now rejects Han characters in any non-zh-TW Markdown file.
+
+### Verification
+
+- Updated shell and PowerShell verification to cover the eight core Prompt Packs, Contract Ownership, and current Prompt File metadata while removing retired IMPL assertions.
+
 ## v0.5.2 — 2026-05-24
 
 ### Added
@@ -24,7 +40,7 @@ This file tracks the version history of the ZeroSpec framework.
 - `docs:` `GUIDE.md`, `GUIDE.zh-TW.md`, `DAILY-USAGE.md`, and `DAILY-USAGE.zh-TW.md` now clarify the roles of always-on AGENTS.md checks, IMPL.md for large coding tasks, and DRIFT.md for periodic audits.
 - `skills:` `skills/zerospec/SKILL.md` now routes `impl` and lists 9 options; `skills/zerospec/prompts/` includes an IMPL copy kept in sync with `prompts/IMPL.md`.
 - `ci:` `scripts/verify-zerospec.sh` and `scripts/verify-zerospec.ps1` now assert IMPL Prompt Pack structure, prompt-copy parity, PR template presence, and AGENTS.md dogfood markers.
-- `docs:` `README.md` and `README.zh-TW.md` — bumped version headers to v0.5.2; added IMPL Prompt Pack row to the After Adoption / 導入後怎麼用 table so human users can discover the prompt directly without relying on AI auto-suggestion.
+- `docs:` `README.md` and `README.zh-TW.md` — bumped version headers to v0.5.2; added an IMPL Prompt Pack row to both language variants of the After Adoption table so human users can discover the prompt directly without relying on AI auto-suggestion.
 
 ---
 
@@ -102,7 +118,7 @@ This file tracks the version history of the ZeroSpec framework.
 - `.github:` PR template SDD Sync Checklist — added `AGENTS.md` rule admission check linking to GUIDE §3.4 per-line self-check
 - `core:` `AGENTS.md` Quick Constraints / Domain-to-Code Map / maintenance reminders now explicitly cover GitHub community health files
 - `scripts:` `verify-zerospec.sh` + `verify-zerospec.ps1` — added Bloat Check section (WARNING only, does not affect PASS/FAIL): alerts when any `examples/*/AGENTS.md` exceeds 300 lines or ~4K tokens (aligned with GUIDE §3.4); verification now also asserts OSS community health entry files exist
-- `docs:` `CONTRIBUTING.md` + `CONTRIBUTING.zh-TW.md` — renamed misleadingly-titled `## Code of Conduct` / `## 行為準則` section to `## Discussion Norms` / `## 討論規範` (content is project-specific discussion norms, not the formal community code of conduct); added cross-reference to `CODE_OF_CONDUCT.md`
+- `docs:` `CONTRIBUTING.md` + `CONTRIBUTING.zh-TW.md` — renamed the misleadingly titled discussion-norms section in both language variants (the content is project-specific discussion guidance, not the formal community code of conduct); added a cross-reference to `CODE_OF_CONDUCT.md`
 - `docs:` zh-TW docs now link community entry points to zh-TW companion files (`CODE_OF_CONDUCT.zh-TW.md`, `SECURITY.zh-TW.md`, `SUPPORT.zh-TW.md`) for lower-friction local-language navigation while keeping canonical English files intact
 
 ---
@@ -138,7 +154,7 @@ This file tracks the version history of the ZeroSpec framework.
 
 - **File renames**: `README.md`, `GUIDE.md`, `DAILY-USAGE.md`, `anti-patterns.md`, `CONTRIBUTING.md` renamed to `*.zh-TW.md` suffix. New English versions take the original filenames.
 - **CI assertion updates**: Verification scripts now check English content strings. Projects using custom CI checks against these files MUST update assertions.
-- **Cross-reference anchors changed**: English versions use English heading anchors (e.g. `#34-guardrails-against-instruction-overload` instead of `#34-指令過載防護guardrails`).
+- **Cross-reference anchors changed**: English versions use English heading anchors (for example `#34-guardrails-against-instruction-overload`) instead of the former zh-TW anchors.
 
 ### Migration Guide
 

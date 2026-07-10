@@ -5,7 +5,7 @@
 > **Zero-dependency Markdown baseline for AI-readable repositories.**
 > 幫 AI Coding Agent 在開始改檔前，先把專案上下文交接清楚：知道檔案在哪裡、哪些規則不能踩、哪份文件才是真相來源。
 
-**版本**：v0.4 — 2026-04-24
+**版本來源**：[README.md](README.md) 的 `**Version**`
 **適用對象**：想讓 GenAI Agent（GitHub Copilot / Codex / Claude / Gemini / Cursor）高效理解專案的工程團隊
 **驗證背景**：已於含後端（.NET（C#）/ Python）、前端（React + TypeScript）與共用 Library 的多專案生態圈中實際驗證
 
@@ -36,7 +36,7 @@
 
 ## 0. 什麼是 ZeroSpec
 
-ZeroSpec 是一套零依賴、純 Markdown 的專案 AI 可讀性框架，定位為 **Layer 0（Context Readiness）**。
+ZeroSpec 是一套零依賴、純 Markdown 的專案 AI 可讀性框架，以 **Layer 0（Context Readiness）** 作為實務標籤，而非業界標準分層。
 
 你可以把它想成 AI Agent 開工前的技術交接單：不是流程引擎，而是先把必要上下文交接清楚。
 
@@ -47,9 +47,9 @@ ZeroSpec 是一套零依賴、純 Markdown 的專案 AI 可讀性框架，定位
 | **Layer 0** | 讓專案「可被 AI 讀懂」— 架構約束、導航、Source of Truth        | **ZeroSpec**       |
 | **Layer 1** | 讓 AI「照流程執行任務」— 工作流引擎、phase gate、change-folder | OpenSpec, Spec Kit |
 
-ZeroSpec 不綁定任何 IDE、代理平台或程式語言。它只做一件事：**確保 AI 在開始任何任務前，已擁有精準的專案脈絡。**
+ZeroSpec 不綁定任何 IDE、代理平台或程式語言。它只做一件事：**在工作開始前，提供精準的專案脈絡與文件責任邊界。**它不編排程式碼實作，也不強制工作流 gate。
 
-如果用 SDD 的開發模式來看，ZeroSpec 是一個輕量的 Layer 0 基線：API 變更觸發 SPEC 更新，架構決策觸發 ADR，需要系統快照時觸發 SA。
+如果用 SDD 的開發模式來看，ZeroSpec 是一個輕量的 Layer 0 基線：既有 SPEC 範圍或高風險介面行為變更會觸發敘事 SPEC 更新，架構決策觸發 ADR，需要系統快照時觸發 SA。
 
 ### ZeroSpec 和 SDD 的關係
 
@@ -158,26 +158,9 @@ project-root/
 
 如此即使代理平台不同，也能保持一致的交付品質。
 
-### 補充說明：模型選用建議
+### 補充說明：模型選用
 
-模型選擇會影響使用體驗，但它不是 ZeroSpec 是否成立的前提。若你同時在評估不同模型做不同任務，可把下面這份表格當成一般性參考；較偏日常操作的建議，可放到 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md) 理解。
-
-不同任務情境適合不同模型系列。以下為一般性建議，只列系列名、不綁版號，依個人方案與額度自行選擇：
-
-| 任務情境                             | 推薦模型系列                     | 選用理由                                     |
-| ------------------------------------ | -------------------------------- | -------------------------------------------- |
-| 日常編碼（CRUD、重構、bug fix）      | Claude Sonnet / GPT / Gemini Pro | 速度與品質平衡，token 成本可控               |
-| 架構分析、系統掃描（INIT-SCAN / SA） | Claude Opus / o-series           | 長 context window 搭配深度推理，適合全局分析 |
-| 大量程式碼生成（INIT-BUILD / SPEC）  | Claude Sonnet / GPT-Codex        | 程式碼產出導向，支援 Repo 讀寫與跨檔一致重構 |
-| 快速查詢、輕量任務                   | Gemini Flash                     | 低延遲快速回應，適合簡單問答或格式轉換       |
-
-**模型切換策略**：先用快速模型（如 Gemini Flash、Claude Sonnet）做初步探索或小範圍修改；當遇到以下情境時，切換到高推理或高生成模型：
-
-- **需求歧義高**：問題跨多模組、缺乏明確邊界 → 切換 Claude Opus / o-series 做深度分析
-- **跨多檔一致重構**：需要穩定 diff 導向產出 → 切換 GPT-Codex
-- **補測試與修 CI**：需要大量程式碼生成且維持既有風格 → 切換 Claude Sonnet / GPT-Codex
-
-> 模型能力持續演進，上述建議僅供參考方向。實務上以「context window 是否足夠」與「是否支援 Repo 讀寫」作為最低門檻即可。
+模型選擇會影響使用體驗，但不是 ZeroSpec 是否成立的前提。選擇能檢視 Repo、遵守明確約束並執行必要驗證的模型與工具組合；在標準化前，先以代表性任務評估。
 
 ---
 
@@ -235,7 +218,7 @@ project-root/
 
 #### 語意搜尋時代的導航表定位調整
 
-當 Agent 已具備全文索引 / 語意搜尋能力（GitHub Copilot `#codebase`、Cursor indexing、Claude Code 原生檔案搜尋），「找到檔案」本身不再是導航表的核心價值，價值重心應轉移到：
+當 Agent 已具備全文索引 / 語意搜尋能力時，「找到檔案」本身不再是導航表的核心價值，價值重心應轉移到：
 
 - **業務意圖 ↔ 程式碼的穩定映射**：幫 Agent 確認「Warehouse 是指 ERP 庫存還是實體倉庫」這類語意歧義，搜尋索引無法提供
 - **跨模組衍生關係**：對照表能顯示「商品管理」同時涉及 `WarehouseProductController` + `StoreProductController` + `ImportTemplateController`，這是語意搜尋很難聯想的
@@ -251,7 +234,7 @@ project-root/
 
 建議控制原則：
 
-- **建議長度**：以精簡為主；150–300 行約等於 2,000–4,000 tokens，在主流 LLM system prompt 配額（通常為 4K–16K tokens）中留有充足空間。超出此範圍會擠壓任務 context，降低回應品質。主線明顕偏長時應拆分至 docs/ 子文件，並透過導航表格參照
+- **建議長度**：以約 200 行為目標。超過時檢查每條規則是否適用於多數任務，將低頻指引移至 scoped rules 或按需參考的文件。不同平台的 context 上限與載入行為不同。
 - **必備欄位**：專案定位、定錨資訊、導航表、產生規範、驗證指令、文件同步條件
 - **可移除欄位**：長篇背景故事、新手安裝教學、尚未採用的未來藍圖細節
 
@@ -292,7 +275,7 @@ project-root/
 
 ### 3.5 段落排序與注意力權重
 
-AI 模型對文件開頭的注意力權重最高，隨位置遞減。在長對話中，對話歷史與工具輸出會逐步稀釋指引檔案的影響力，此時文件前段的內容存活率最高。
+將影響最大的規則放在文件前段，因為精簡且結構良好的指引更容易被人與 Agent 檢視；不要假設所有平台都有相同的載入或 compaction 順序。
 
 因此 AGENTS.md 的段落應按「違反時影響程度」降序排列：
 
@@ -337,7 +320,7 @@ AI 模型對文件開頭的注意力權重最高，隨位置遞減。在長對�
 
 長對話中，Context 將超載時各 Agent 平台會觸發摘要 / 壓縮（Claude Code 的 `/compact`、Copilot 的 summary insertion）。根據 Claude Code 官方文件：
 
-- **Root 層 CLAUDE.md 在 compaction 後會被自動 re-inject**；其他 Agent 雖無明確保證但行為類似
+- **Claude Code 的 Root `CLAUDE.md` 在 compaction 後會自動 re-inject**；不可把此行為泛化到其他 Agent
 - **子目錄 nested AGENTS.md 不會自動 re-inject**，只在 Agent 再次讀取該目錄檔案時重新載入
 
 對應的結構建議：
@@ -349,7 +332,7 @@ AI 模型對文件開頭的注意力權重最高，隨位置遞減。在長對�
 
 實務原則：**「死了也要記得的規則」放 Root，「深入該模組再想起來也行的細節」放 Sub**。不要把業務硬規則埋在某個子目錄的 AGENTS.md，否則長對話中一旦 Agent 離開該目錄就會漏掉。
 
-- **行為**：AGENTS.md 官方標準規定——代理會讀取**目前編輯檔最接近的 AGENTS.md**，層次最深者優先，其他層級為取代背景
+- **行為**：各 Agent 的指引探索方式不同。Codex 串接祖先目錄檔案；Cursor 與 Devin Desktop 合併 nested 檔案；VS Code 的 nested `AGENTS.md` 仍屬 experimental。採用 nested scope 前先驗證目標平台。
 - **何時需要**：Nx / Turborepo / Lerna monorepo；多對外端點的 Web + Mobile 雙通道；子 package 有獨立架構規範
 - **設計原則**：
   - Root AGENTS.md 只放全專案通用規範（技術棧、版本真相來源、CI 入口）
@@ -365,12 +348,12 @@ AI 模型對文件開頭的注意力權重最高，隨位置遞減。在長對�
 
 ### 4.1 標準文件四層分類
 
-| 層級                                   | 前綴        | 職責                                            | 觸發條件                        |
-| -------------------------------------- | ----------- | ----------------------------------------------- | ------------------------------- |
-| **SA** (System Analysis)               | `SA-xxx`    | 里程碑式系統快照                                | 架構或核心依賴變更時            |
-| **ADR** (Architecture Decision Record) | `ADR-xxx`   | 單一決策永久記錄（只 Append）                   | 跨 Phase 的 either/or 選擇時    |
-| **SPEC** (Interface Specification)     | `SPEC-xxx`  | 介面行為契約 + Changelog（**Source of Truth**） | **強制**：PR 修改公用介面即觸發 |
-| **INFRA** (Infrastructure)             | `INFRA-xxx` | 基礎設施選型與拓撲                              | 部署/CI 配置變更時              |
+| 層級                                   | 前綴        | 職責                                       | 觸發條件                     |
+| -------------------------------------- | ----------- | ------------------------------------------ | ---------------------------- |
+| **SA** (System Analysis)               | `SA-xxx`    | 里程碑式系統快照                           | 架構或核心依賴變更時         |
+| **ADR** (Architecture Decision Record) | `ADR-xxx`   | 單一決策永久記錄（只 Append）              | 跨 Phase 的 either/or 選擇時 |
+| **SPEC** (Narrative Specification)     | `SPEC-xxx`  | 行為、規則、權限、相容性與 Consumer impact | 既有範圍變更或高風險介面行為 |
+| **INFRA** (Infrastructure)             | `INFRA-xxx` | 基礎設施選型與拓撲                         | 部署/CI 配置變更時           |
 
 **彈性擴充**：
 - Library 專案可用 **INTEGRATION** 取代 INFRA（記錄跨專案整合步驟）
@@ -378,15 +361,15 @@ AI 模型對文件開頭的注意力權重最高，隨位置遞減。在長對�
 
 > **ZeroSpec 原則**：未觸發事件 → 不建立文件。所有文件由 Prompt Pack 讓 AI 產生草稿，人只審核。
 
-### 4.2 SPEC 是 Source of Truth
+### 4.2 契約所有權（Contract Ownership）
 
-這是整套方法中最重要的約定：
+每個專案先宣告不同類型契約資訊的真相來源：
 
-> SPEC 通常作為開發與 GenAI 的主要參照檔案。當介面或行為有明確變更時，建議同步更新 SPEC，並在 Changelog 追蹤變更歷程。
+- OpenAPI、protobuf、JSON Schema、generated client 或程式碼等可機器驗證的 artifact，存在時負責 path、field、type 與 requiredness。
+- Narrative SPEC 負責行為、業務規則、權限、狀態轉移、相容性與 consumer impact；以連結取代複製 machine contract。
+- 沒有 machine-verifiable contract 時，SPEC 可以負責完整介面描述。
 
-**最低維護規則**：凡 PR 涉及介面或行為異動，使用 [SPEC Prompt Pack](prompts/SPEC.md) 讓 AI 產生/更新 SPEC 草稿，人審核後合併。
-
-**開發時銜接**：在專案的 `AGENTS.md` 加入 `## Post-Edit Self-Check` 段落作為輕量的就地檢查——AI 評估 SPEC 影響，並在每次含程式碼異動的回覆末尾附上 `### Docs Impact` 區塊。複雜多模組任務（3+ Controller/handler 檔案或影響 2+ SPEC）請改用 [IMPL Prompt Pack](prompts/IMPL.md)，取得明確的逐步同步指引。
+既有 SPEC 範圍變更時必須更新；只有跨系統或多 Consumer、複雜規則/狀態、權限/安全邊界或相容性承諾等高風險介面行為，才新建 SPEC。任務結束時輸出一次文件影響與理由。
 
 ### 4.3 ADR 觸發條件的 ✅/❌ 範例
 
@@ -570,10 +553,10 @@ Step 2 的 INIT-BUILD 完成後，**直接進入 Step 4 的事件驅動模式**�
 
 INIT-BUILD 完成後，你有兩條任務軌道並行：
 
-| 軌道               | 工作內容                      | 優先原則                |
-| ------------------ | ----------------------------- | ----------------------- |
-| **開發軌**（每日） | 新增/變更的 API 正常觸發 SPEC | 所有新變更都要有 SPEC   |
-| **補登軌**（漸進） | 既有 API 逐步補 SPEC          | 依優先序補，不強求 100% |
+| 軌道               | 工作內容             | 優先原則                                |
+| ------------------ | -------------------- | --------------------------------------- |
+| **開發軌**（每日） | 每次變更評估契約影響 | 更新既有範圍 SPEC，或僅在風險值得時新建 |
+| **補登軌**（漸進） | 既有 API 逐步補 SPEC | 依優先序補，不強求 100%                 |
 
 **補登優先序**（由高至低）：
 
@@ -588,7 +571,7 @@ INIT-BUILD 完成後，你有兩條任務軌道並行：
 
 - `AGENTS.md` + `docs/README.md` ✅（Day-1 已完成）
 - 至少一份高優先 API 的 SPEC ✅
-- 所有新變更都有對應 SPEC ✅（開發軌正常運作）
+- 高風險或已有 SPEC 的變更都有對應更新 ✅
 
 > 正規化不完整：並非所有 API 最終都需要 SPEC。Dead Zone 的 API 若無人消費且不再異動，可接受永遠沒有 SPEC。文件存在的前提是有消費者。
 
@@ -600,30 +583,28 @@ INIT-BUILD 完成後，你有兩條任務軌道並行：
 
 ### Step 4：事件觸發擴張
 
-| 觸發事件                     | 使用 Prompt Pack                                 | 產生/更新文件                       |
-| ---------------------------- | ------------------------------------------------ | ----------------------------------- |
-| Day-1 初始化（分析）         | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | 現況盤點報告（不寫檔）              |
-| Day-1 初始化（建置）         | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`      |
-| 新增/變更對外 API            | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`             |
-| 複雜多模組開發（3+ Controller/handler 檔案或影響 2+ SPEC） | [`prompts/IMPL.md`](prompts/IMPL.md) | 程式碼變更 + `### Docs Impact` 區塊 |
-| 跨模組技術二選一決策         | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`               |
-| 需要系統全貌快照             | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`           |
-| 專案演進需同步文件           | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | 更新 `AGENTS.md` + `docs/README.md` |
-| 懷疑既有 SPEC 已與程式碼漂移 | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | 漂移報告（不寫檔）                  |
-| **未觸發以上事件**           | —                                                | **不建立任何文件**                  |
+| 觸發事件                           | 使用 Prompt Pack                                 | 產生/更新文件                       |
+| ---------------------------------- | ------------------------------------------------ | ----------------------------------- |
+| Day-1 初始化（分析）               | [`prompts/INIT-SCAN.md`](prompts/INIT-SCAN.md)   | 現況盤點報告（不寫檔）              |
+| Day-1 初始化（建置）               | [`prompts/INIT-BUILD.md`](prompts/INIT-BUILD.md) | `AGENTS.md` + `docs/README.md`      |
+| 既有 SPEC 範圍變更或高風險介面行為 | [`prompts/SPEC.md`](prompts/SPEC.md)             | `docs/spec/SPEC-xxx.md`             |
+| 跨模組技術二選一決策               | [`prompts/ADR.md`](prompts/ADR.md)               | `docs/adr/ADR-xxx.md`               |
+| 需要系統全貌快照                   | [`prompts/SA.md`](prompts/SA.md)                 | `docs/analysis/SA-xxx.md`           |
+| 專案演進需同步文件                 | [`prompts/UPDATE.md`](prompts/UPDATE.md)         | 更新 `AGENTS.md` + `docs/README.md` |
+| 懷疑既有 SPEC 已與程式碼漂移       | [`prompts/DRIFT.md`](prompts/DRIFT.md)           | 漂移報告（不寫檔）                  |
+| **未觸發以上事件**                 | —                                                | **不建立任何文件**                  |
 
-#### SPEC 生命週期：SPEC vs IMPL vs UPDATE vs DRIFT 分工
+#### SPEC 生命週期：SPEC vs UPDATE vs DRIFT 分工
 
 各維護用 Prompt Pack 各有定位，彼此互補：
 
 | Prompt      | 適用時機                                     | 是否寫檔       |
 | ----------- | -------------------------------------------- | -------------- |
-| `SPEC.md`   | 為特定 API 變更建立或更新 SPEC               | 是             |
-| `IMPL.md`   | 複雜多模組開發（3+ Controller/handler 檔案或 2+ SPEC）——含就地 SPEC 同步指引 | 是（程式碼 + SPEC） |
+| `SPEC.md`   | 為既有範圍或高風險行為建立或更新敘事 SPEC    | 是             |
 | `UPDATE.md` | 同步 `AGENTS.md` / `docs/README.md` 導航索引 | 是             |
 | `DRIFT.md`  | 確認既有 SPEC 內容是否仍與程式碼一致         | 否（只產報告） |
 
-> 判斷原則：行為有變更用 `SPEC.md`；大型多模組任務用 `IMPL.md`；結構有變更用 `UPDATE.md`；不確定是否有人做過以上步驟用 `DRIFT.md`。
+> 判斷原則：已有或高風險的 narrative contract 行為用 `SPEC.md`；結構或所有權異動用 `UPDATE.md`；懷疑既有 SPEC 不再符合其負責行為時用 `DRIFT.md`。
 
 ### Step 5：定期回顧
 
@@ -653,13 +634,13 @@ SDD 機制的持續運作不只依賴事件觸發，還需要定期回顧以確�
 
 以下指標比較適合拿來當方向性目標，前提是專案架構已相對穩定，且團隊對規範有基本共識。它們不是保證值，而是回顧與調整時的參考。
 
-| 指標                       | 目標      |
-| -------------------------- | --------- |
-| Day-1 人工投入時間         | ≤ 30 分鐘 |
-| 人工新寫內容比例（C 類）   | ≤ 20%     |
-| 首次回合可合併率           | ≥ 70%     |
-| 架構硬規則違反率           | ≤ 10%     |
-| API 變更後 SPEC 草稿覆蓋率 | ≥ 90%     |
+| 指標                                     | 目標      |
+| ---------------------------------------- | --------- |
+| Day-1 人工投入時間                       | ≤ 30 分鐘 |
+| 人工新寫內容比例（C 類）                 | ≤ 20%     |
+| 首次回合可合併率                         | ≥ 70%     |
+| 架構硬規則違反率                         | ≤ 10%     |
+| 既有範圍或高風險變更後的敘事 SPEC 覆蓋率 | ≥ 90%     |
 
 > **Day-2 以後怎麼用？** 日常操作模式、IDE 配置、Plan vs Agent 選用時機、典型情境劇本等實務指引，見 [DAILY-USAGE.zh-TW.md](DAILY-USAGE.zh-TW.md)。
 

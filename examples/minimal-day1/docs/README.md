@@ -5,20 +5,21 @@
 
 ## SDD Document Classification
 
-| Category                    | Directory        | Naming Format               | Trigger                                         |
-| --------------------------- | ---------------- | --------------------------- | ----------------------------------------------- |
-| SA (System Analysis)        | `docs/analysis/` | `SA-{3-digit}_{desc}.md`    | Milestone or major architecture change          |
-| ADR (Architecture Decision) | `docs/adr/`      | `ADR-{3-digit}_{desc}.md`   | Cross-module either/or tech decision            |
-| SPEC (Interface Contract)   | `docs/spec/`     | `SPEC-{3-digit}_{desc}.md`  | API addition or behavior change (**mandatory**) |
-| INFRA (Infrastructure)      | `docs/infra/`    | `INFRA-{3-digit}_{desc}.md` | Deployment topology or CI change                |
+| Category                    | Directory        | Naming Format               | Trigger                                                        |
+| --------------------------- | ---------------- | --------------------------- | -------------------------------------------------------------- |
+| SA (System Analysis)        | `docs/analysis/` | `SA-{3-digit}_{desc}.md`    | Milestone or major architecture change                         |
+| ADR (Architecture Decision) | `docs/adr/`      | `ADR-{3-digit}_{desc}.md`   | Cross-module either/or tech decision                           |
+| SPEC (Narrative Contract)   | `docs/spec/`     | `SPEC-{3-digit}_{desc}.md`  | High-risk interface behavior, or an existing SPEC scope change |
+| INFRA (Infrastructure)      | `docs/infra/`    | `INFRA-{3-digit}_{desc}.md` | Deployment topology or CI change                               |
 
 - Naming regex: `^(SA|ADR|SPEC|INFRA)-\d{3}_[a-z0-9-]+\.md$`
 
-## Source of Truth
+## Contract Ownership
 
-SPEC is the primary reference for development and GenAI. Update SPEC directly on every interface addition or change, and track changes in the Changelog.
+- **Machine-verifiable contract**: Not configured; this SPEC owns the complete interface when needed.
+- **Narrative SPEC**: Owns behavior, business rules, permissions, compatibility, and consumer impact.
 
-**Minimum maintenance rule**: Every PR involving interface or behavior changes MUST update the SPEC content and Changelog.
+**Maintenance rule**: Update an existing SPEC when its scope changes. Create one for high-risk cross-system, multi-consumer, security, compatibility, or complex-rule behavior.
 
 ## ADR Trigger Conditions
 

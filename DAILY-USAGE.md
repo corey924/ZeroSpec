@@ -3,7 +3,7 @@
 > This guide describes how engineers integrate ZeroSpec's SDD practices into daily development after Day-1 initialization.
 > For teams that have completed INIT-SCAN + INIT-BUILD and have `AGENTS.md` + `docs/README.md` in place.
 
-> **🌐 [台灣正體中文版](DAILY-USAGE.zh-TW.md)**
+> **🌐 [Traditional Chinese (zh-TW)](DAILY-USAGE.zh-TW.md)**
 
 **Version source**: [README.md](README.md) (`**Version**`)
 **Audience**: Individual developers or small teams that have adopted ZeroSpec
@@ -56,14 +56,14 @@ Monthly or quarterly, run an UPDATE Prompt for a health check. See [Section 6](#
 
 Different AI platforms read different guidance files at startup or task start. The core principle: **prefer platform-specific entry files that import or reference `AGENTS.md`** rather than duplicating its content. Duplicated rules can create competing instruction sets and consume the agent's limited attention budget.
 
-| Platform                     | Primary Entry File                              | Auto-Read                                                            | Pointer Strategy                                                    |
-| ---------------------------- | ----------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| **GitHub Copilot (VS Code)** | `.github/copilot-instructions.md` + `AGENTS.md` | copilot-instructions ✅ / AGENTS.md ❌ (requires `@AGENTS.md` mention) | Add `@AGENTS.md` reference inside copilot-instructions              |
-| **Cursor**                   | `AGENTS.md` / `.cursorrules`                    | ✅                                                                    | Keep AGENTS.md as source of truth; other entry files import from it |
-| **Claude Code**              | `CLAUDE.md`                                     | ✅                                                                    | `@AGENTS.md` at top of CLAUDE.md (Claude Code import syntax)        |
-| **Windsurf**                 | `AGENTS.md`                                     | ✅                                                                    | Use directly                                                        |
-| **JetBrains AI Assistant**   | `AGENTS.md`                                     | ✅ (requires Attach project files enabled)                            | Use directly                                                        |
-| **Codex CLI / Generic CLI**  | `AGENTS.md` (when supported)                    | Codex ✅ / generic varies                                             | Use `AGENTS.md` when supported; otherwise paste Prompt Pack content |
+| Platform                     | Primary Entry File                                       | Auto-Read                              | Pointer Strategy                                                              |
+| ---------------------------- | -------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------- |
+| **GitHub Copilot (VS Code)** | `AGENTS.md` + optional `.github/copilot-instructions.md` | Root AGENTS.md ✅ / nested experimental | Keep AGENTS.md as project source; do not duplicate it in Copilot instructions |
+| **Cursor**                   | `AGENTS.md` / `.cursor/rules/*.mdc`                      | ✅                                      | Use AGENTS.md for shared guidance; use scoped rules only when needed          |
+| **Claude Code**              | `CLAUDE.md`                                              | ✅                                      | `@AGENTS.md` at top of CLAUDE.md (Claude Code import syntax)                  |
+| **Windsurf**                 | `AGENTS.md`                                              | ✅                                      | Use directly                                                                  |
+| **JetBrains AI Assistant**   | Agent-supported `AGENTS.md` / `CLAUDE.md`                | ✅                                      | Use repository instructions; chat-only project rules are separate             |
+| **Codex CLI / Generic CLI**  | `AGENTS.md` (when supported)                             | Codex ✅ / generic varies               | Use `AGENTS.md` when supported; otherwise paste Prompt Pack content           |
 
 > Entry files and optional adapters are covered in §2.2; multi-root behavior is covered in §2.4. This table is the at-a-glance reference.
 
@@ -71,14 +71,14 @@ Different AI platforms read different guidance files at startup or task start. T
 
 Pick your tool and follow 3 steps to experience ZeroSpec on any existing project:
 
-| Tool                    | Step 1                                    | Step 2                                                                                            | Step 3 (Verify)                                 |
-| ----------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| **GitHub Copilot**      | Open Agent mode at project root           | Paste `prompts/INIT-SCAN.md` content                                                              | Confirm AI references real file paths in output |
-| **Cursor**              | Open Composer Agent at project root       | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
-| **Claude Code**         | `cd` to project root, start session       | Say "Run ZeroSpec init-scan on this project" (if skill installed) or paste `prompts/INIT-SCAN.md` | Confirm output cites real project paths         |
-| **Windsurf**            | Open Cascade at project root              | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
-| **JetBrains**           | Enable Attach project files, open AI chat | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
-| **Codex CLI / Generic** | Start the CLI at project root             | Paste `prompts/INIT-SCAN.md` content into the prompt                                              | Confirm output cites real project paths         |
+| Tool                    | Step 1                                        | Step 2                                                                                            | Step 3 (Verify)                                 |
+| ----------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| **GitHub Copilot**      | Open Agent mode at project root               | Paste `prompts/INIT-SCAN.md` content                                                              | Confirm AI references real file paths in output |
+| **Cursor**              | Open Agent at project root                    | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
+| **Claude Code**         | `cd` to project root, start session           | Say "Run ZeroSpec init-scan on this project" (if skill installed) or paste `prompts/INIT-SCAN.md` | Confirm output cites real project paths         |
+| **Windsurf**            | Open Cascade at project root                  | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
+| **JetBrains**           | Open a supported coding agent at project root | Paste `prompts/INIT-SCAN.md` content                                                              | Same                                            |
+| **Codex CLI / Generic** | Start the CLI at project root                 | Paste `prompts/INIT-SCAN.md` content into the prompt                                              | Confirm output cites real project paths         |
 
 ### 2.1 ZeroSpec Repo Does NOT Need to Stay Open
 
@@ -86,19 +86,19 @@ ZeroSpec itself (`prompts/`, `templates/`, `GUIDE.md`) is a "toolbox," not a wor
 
 **Recommended approaches**:
 
-| Approach                | Description                                                                                                                               | Best For                                     |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **Bookmark**            | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed                                                                     | Individual developers                        |
-| **Snippet**             | Save frequently used Prompt Packs as IDE User Snippets or Text Expander                                                                   | Power users                                  |
-| **Prompt Files**        | Copy `templates/prompts/*.prompt.md` to your project's `.github/prompts/`; invoke the same Prompt Packs from supported VS Code prompt UIs | VS Code users (optional adapter)             |
-| **Skill-style Adapter** | Install via `sync-skills.sh` or `sync-skills.ps1`; invoke by intent globally                                                              | Claude Code / SKILL.md-capable tools         |
-| **Pointers**            | Copy the matching file from `templates/pointers/` to your project; connects `AGENTS.md` to your AI platform without duplication           | All platforms (Day-1 setup)                  |
-| **Symlink**             | Expose ZeroSpec `prompts/` to the target project as `prompts/` (copy or symlink)                                                          | VS Code Prompt Files / multi-project teams   |
-| **Copy-paste**          | Simplest — open ZeroSpec README, follow the link, copy the Prompt                                                                         | Everyone (recommended Day-1 starting method) |
+| Approach                | Description                                                                                                                      | Best For                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Bookmark**            | Bookmark ZeroSpec folder in browser or IDE; open and copy when needed                                                            | Individual developers                        |
+| **Snippet**             | Save frequently used Prompt Packs as IDE User Snippets or Text Expander                                                          | Power users                                  |
+| **Prompt Files**        | Copy `templates/prompts/*.prompt.md` to `.github/prompts/` and expose the canonical `prompts/` directory at the target repo root | VS Code users who need prompt shortcuts      |
+| **Skill-style Adapter** | Install via `sync-skills.sh` or `sync-skills.ps1`; invoke by intent globally                                                     | Claude Code / SKILL.md-capable tools         |
+| **Pointers**            | Copy the matching file from `templates/pointers/` to your project; connects `AGENTS.md` to your AI platform without duplication  | All platforms (Day-1 setup)                  |
+| **Symlink**             | Expose ZeroSpec `prompts/` to the target project as `prompts/` (copy or symlink)                                                 | VS Code Prompt Files / multi-project teams   |
+| **Copy-paste**          | Simplest — open ZeroSpec README, follow the link, copy the Prompt                                                                | Everyone (recommended Day-1 starting method) |
 
 > **Do not** add the entire ZeroSpec folder to your target project's workspace. This causes the Agent to read irrelevant Markdown and wastes context.
 
-> **⚠️ Prompt Files setup**: These adapters use `#file:prompts/XXX.md`. Ensure that path resolves by keeping ZeroSpec open in the same VS Code multi-root workspace, or by copying/symlinking ZeroSpec's `prompts/` directory into the target project as `prompts/`. If it does not resolve, use the fallback text inside each `.prompt.md` and paste the source prompt manually.
+> **⚠️ Prompt Files setup**: This is an optional installation, not part of the Day-1 baseline. The adapters use relative Markdown links, so copy or symlink the canonical `prompts/` directory to the target repo root together with `.github/prompts/`. If that directory is unavailable, use copy-paste or the Agent-Skill adapter instead.
 
 ### 2.2 Coexistence of `copilot-instructions.md` and `AGENTS.md`
 
@@ -137,12 +137,12 @@ Claude Code reads `CLAUDE.md` by default, not `AGENTS.md`. To reuse ZeroSpec's A
 The canonical interface is still `prompts/*.md`: every tool can use the Prompt Packs by copy-paste,
 bookmark, or CLI stdin. Use adapters only when they reduce repeated manual work.
 
-| Tool                     | Optional Adapter                | Notes                                                                                                        |
-| ------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| GitHub Copilot (VS Code) | `templates/prompts/*.prompt.md` or project-local `skills/zerospec/` | Prompt Files: requires `#file:prompts/` to resolve. Local skill: copy/symlink this repo's `skills/zerospec/` to `.agents/skills/zerospec/` in your target repo. |
-| Claude Code              | `skills/zerospec/` Router Skill (Global) | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install`. Installs to `~/.claude/skills/`. |
-| Codex CLI                | `skills/zerospec/` Router Skill (Global) | If your Codex CLI supports user skills, copy `skills/zerospec/` to `$HOME/.agents/skills/zerospec/`; otherwise paste `prompts/*.md` directly. |
-| Cursor / Windsurf / Generic CLI  | None required                   | Use `AGENTS.md` when supported; otherwise paste `prompts/*.md` directly                          |
+| Tool                            | Optional Adapter                                 | Notes                                                                                                                                                                         |
+| ------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GitHub Copilot (VS Code)        | Prompt Files or project-local `skills/zerospec/` | Prompt Files require both `.github/prompts/` and root `prompts/`. Local skill: copy/symlink this repo's `skills/zerospec/` to `.agents/skills/zerospec/` in your target repo. |
+| Claude Code                     | `skills/zerospec/` Router Skill (Global)         | macOS/Linux: `bash scripts/sync-skills.sh --install`; Windows: `pwsh -File scripts/sync-skills.ps1 -Install`. Installs to `~/.claude/skills/`.                                |
+| Codex CLI                       | `skills/zerospec/` Router Skill (Global)         | If your Codex CLI supports user skills, copy `skills/zerospec/` to `$HOME/.agents/skills/zerospec/`; otherwise paste `prompts/*.md` directly.                                 |
+| Cursor / Windsurf / Generic CLI | None required                                    | Use `AGENTS.md` when supported; otherwise paste `prompts/*.md` directly                                                                                                       |
 
 After adding an Agent-Skill adapter, invoke by intent — for example: `"Run ZeroSpec init-scan on this project"` for first-time onboarding, or `"Run ZeroSpec audit on this project"` when `AGENTS.md` already exists. The skill routes to the right prompt and applies a built-in Self-Review before outputting results. See
 [`skills/README.md`](skills/README.md) for install/copy commands and the verification checklist.
@@ -182,12 +182,12 @@ IDE Agents typically use the **workspace folder of the currently active file** a
 
 #### Platform Behavior Summary
 
-| Platform                 | Primary Signal                            | Notes                                                      |
-| ------------------------ | ----------------------------------------- | ---------------------------------------------------------- |
-| GitHub Copilot (VS Code) | Active editor's workspace folder          | Multi-root: all folders visible; active file sets priority |
-| Cursor                   | Composer Agent uses active file's project | Use `@file` to further specify                             |
-| Claude Code              | `cwd` is context starting point           | `cd` to target project before launching                    |
-| Windsurf                 | Cascade infers from active file           | Behavior similar to Copilot                                |
+| Platform                 | Primary Signal                          | Notes                                                      |
+| ------------------------ | --------------------------------------- | ---------------------------------------------------------- |
+| GitHub Copilot (VS Code) | Active editor's workspace folder        | Multi-root: all folders visible; active file sets priority |
+| Cursor                   | Agent uses the active project's context | Use `@file` to further specify                             |
+| Claude Code              | `cwd` is context starting point         | `cd` to target project before launching                    |
+| Windsurf                 | Cascade infers from active file         | Behavior similar to Copilot                                |
 
 #### Example Naming in Open-Source Docs
 
@@ -195,12 +195,12 @@ To avoid leaking internal information, use generic names in public examples: `my
 
 ### 2.5 Long-Conversation Re-Anchor Strategy
 
-AI Agents in long conversations (~15–20 rounds) may gradually drift from AGENTS.md constraints. The main cause is NOT that AGENTS.md is too long — it is that accumulated conversation history and tool outputs dilute the guidance file's attention weight. That said, keeping the file concise still improves re-anchor efficiency.
+AI Agents in long conversations may gradually drift from AGENTS.md constraints as history and tool outputs accumulate. Keeping the file concise improves re-anchor efficiency, but the useful boundary is task complexity and observed drift, not a universal round count.
 
 #### When to Re-Anchor
 
 - Agent starts violating architecture rules (e.g. business logic in Controller)
-- Conversation exceeds 15 rounds and next tasks involve core constraints
+- The conversation has accumulated unrelated exploration or tool output before a constraint-sensitive task
 - Switching to a different business module
 
 #### How to Re-Anchor
@@ -226,13 +226,7 @@ This conversation's context is too bloated. Start a new conversation so the Agen
 
 #### Re-Anchor Frequency Guide
 
-| Conversation Rounds | Recommended Action                                     |
-| ------------------- | ------------------------------------------------------ |
-| 1–15 rounds         | Normal operation, no re-anchor needed                  |
-| 15–25 rounds        | Lightweight re-anchor for architecture-sensitive tasks |
-| 25+ rounds          | Start a new conversation                               |
-
-> Thresholds assume 128K–200K context models. Smaller context windows may enter the dilution zone at 10–15 rounds — re-anchor sooner.
+Re-anchor before architecture-sensitive work after a long exploration, a module switch, or any observed rule miss. Start a new conversation when the retained discussion no longer helps the next task.
 
 > **Why no automated mechanism?** ZeroSpec is a Layer 0 framework with no CLI or runtime dependency. Re-anchoring requires only a one-line reminder at the right moment.
 
@@ -276,7 +270,7 @@ Beyond re-anchoring, context hygiene is key to maintaining Agent quality:
 ```
 Timeline:
   1. Start writing the new API → Agent auto-reads AGENTS.md → generates code following rules
-  2. After writing → you recall "AGENTS.md says API changes require SPEC update"
+   2. After writing → assess whether a narrative SPEC, a machine-verifiable contract, or neither needs updating
   3. Open ZeroSpec → copy SPEC Prompt → paste into Agent
   4. Agent reads existing SPEC → generates update draft → you review → include in PR
   5. Extra time: ~8 minutes
@@ -342,7 +336,7 @@ Week 1: Build Global Understanding
   4. Commit SA + SPEC together → ZeroSpec officially launched
 
 Week 2–4: Two Parallel Tracks
-  Development track: All new/changed APIs → trigger SPEC normally (mandatory)
+   Development track: Assess contract ownership for all changes; update a narrative SPEC only when its scope or risk criteria apply
   Backfill track: Pick 1–2 Tier 1 APIs per week for SPEC (maintain pace; do not rush)
 
   As-Is principle for backfill SPECs:
@@ -359,7 +353,7 @@ Extra time: Week 1 ~45–60 min (SA + first SPEC); Weeks 2–4 ~10–20 min/week
 
 ### Scenario G: Explore → Plan → Implement Rhythm (Recommended for Medium+ Tasks)
 
-Most Agent platforms (Claude Code Plan mode, Copilot Chat, Cursor Composer) support "analyze first, implement later." For multi-file tasks, staged execution often yields better quality:
+Most Agent platforms (Claude Code Plan mode, Copilot Chat, Cursor Agent) support "analyze first, implement later." For multi-file tasks, staged execution often yields better quality:
 
 ```
 Task: Add OAuth login flow to my-backend (spans AuthController, SecurityConfig, User entity)
@@ -409,33 +403,6 @@ Workflow:
 ```
 
 **Key constraint**: DRIFT does **not** write files. It only produces a report — you decide which findings need action.
-
----
-
-### Scenario I: Multi-Module Coding with SPEC Impact — When to Use IMPL.md
-
-Use this when a coding task is large enough that you expect to touch multiple Controllers and affect multiple SPECs at once. The [IMPL Prompt Pack](prompts/IMPL.md) adds explicit step-by-step guardrails so the AI doesn't complete the code and silently skip the docs.
-
-```
-Trigger examples:
-- "Add a Group Management module" — 3 new Controllers, SPEC-002 and SPEC-003 both change
-- "Refactor auth layer" — AuthController, PermissionService, UserRepository all change
-- Any task where you know upfront it spans more than 2 docs/spec/ files
-
-When to use IMPL vs just relying on AGENTS.md Post-Edit Self-Check:
-- 1 Controller, 1 SPEC change  → AGENTS.md Post-Edit Self-Check is enough
-- 3+ Controllers/handlers, 2+ SPECs → Use IMPL.md for explicit step-by-step sync
-
-Workflow:
-1. Open prompts/IMPL.md from ZeroSpec, copy the Prompt
-2. Describe the task above or below the prompt (what module, what changes)
-3. Agent outputs a plan: changed code areas → affected SPEC files (before coding)
-4. Review the plan — edit or reject before agent implements
-5. Agent implements code changes, then runs Step 3 SPEC Sync for each affected SPEC
-6. Every response ends with a ### Docs Impact block listing all affected SPECs and status
-```
-
-**Why this matters**: Without IMPL.md, a multi-module task can finish successfully in code while 2–3 SPECs silently go stale. The Forcing Function (mandatory `### Docs Impact` block) makes the assessment visible in every response.
 
 ---
 
@@ -506,12 +473,12 @@ Workflow:
 
 **Decision criterion**: Does the document have a clear consumer?
 
-| Consumer         | Doc Type | Keep Producing                                      |
-| ---------------- | -------- | --------------------------------------------------- |
-| AI Agent         | SPEC     | ✅ Update on every API change (Source of Truth)      |
-| New members / AI | SA       | ⚠️ Only at milestones or when system snapshot needed |
-| Team decisions   | ADR      | ⚠️ Only for either/or architectural decisions        |
-| DevOps / AI      | INFRA    | ⚠️ Only on deployment changes                        |
+| Consumer         | Doc Type | Keep Producing                                                                         |
+| ---------------- | -------- | -------------------------------------------------------------------------------------- |
+| AI Agent         | SPEC     | ✅ Update when an existing scope or high-risk behavior requires narrative documentation |
+| New members / AI | SA       | ⚠️ Only at milestones or when system snapshot needed                                    |
+| Team decisions   | ADR      | ⚠️ Only for either/or architectural decisions                                           |
+| DevOps / AI      | INFRA    | ⚠️ Only on deployment changes                                                           |
 
 If a document has never been referenced since creation, it probably should not exist.
 
@@ -521,7 +488,7 @@ If a document has never been referenced since creation, it probably should not e
 
 1. **AGENTS.md too long / core rules buried in noise**: File is noticeably long with generic knowledge the AI already has → core rules fall into the attention dilution zone
 2. **Rule description is ambiguous**: Same rule described inconsistently in two places, or wording too abstract to verify (e.g. "write clean code")
-3. **Conversation too long / context diluted**: Beyond 15–20 rounds, AGENTS.md attention weight is diluted by subsequent conversation output
+3. **Conversation context diluted**: Long exploration, unrelated tool output, or a module switch has buried the relevant constraints
 4. **Domain-to-Code Map entries are stale**: The map references deleted Controllers or renamed packages — run AUDIT Dimension 8 to spot-check entries, or use DRIFT Prompt to verify SPEC content consistency
 
 **Diagnostic flow**:
@@ -537,8 +504,8 @@ If a document has never been referenced since creation, it probably should not e
    → Make it specific or unify wording, then observe
 
 3. If rule is already specific and AGENTS.md is not long, check conversation length
-   → If > 15 rounds: use lightweight re-anchor (see Section 2.5)
-   → If > 25 rounds: start a new conversation
+   → Re-anchor before the next constraint-sensitive task
+   → Start a new conversation when retained context is no longer useful
 
 4. Last resort: prefix the rule with IMPORTANT: or YOU MUST
    → But note: if every rule has emphasis, none does
@@ -686,7 +653,7 @@ When handling PRs with API additions or behavior changes, proactively ask if SPE
 
 ZeroSpec's design explicitly combats this:
 - **Lazy Evaluation**: No pre-created empty shells; create on trigger only
-- **SPEC is the only mandatory document**: Others are "nice to have," not required
+- **Narrative SPECs are risk-based**: update existing scopes and high-risk interface behavior; do not create low-value duplicates of machine contracts
 - **Every document has a consumer**: SA for new members and Agents, ADR for future decision-makers, SPEC for daily Agent use
 - If a document goes unreferenced for 3 months, consider archiving it
 

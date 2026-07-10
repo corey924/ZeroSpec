@@ -155,6 +155,12 @@ Assert-Contains 'prompts/AUDIT.md' '### 8\. Domain-to-Code Map'
 Assert-Contains 'prompts/AUDIT.md' '### 9\.'
 Assert-Contains 'prompts/AUDIT.md' 'Actionable Fix List'
 
+# English Markdown must not contain Han characters. Localized content belongs only
+# in explicitly named language variants such as *.zh-TW.md.
+Get-ChildItem -Path '.' -Filter '*.md' -Recurse |
+    Where-Object { $_.Name -notlike '*zh-TW.md' -and $_.FullName -notmatch '[\\/]\.git[\\/]' } |
+    ForEach-Object { Assert-NotContains $_.FullName '[\u4E00-\u9FFF]' }
+
 Assert-Contains '.github/pull_request_template.md' '^## Background / Problem$'
 Assert-Contains '.github/pull_request_template.md' '^## SDD Sync Checklist$'
 Assert-NotContains '.github/pull_request_template.md' '背景 / 問題|SDD 同步檢查項|驗證方式|額外說明'
@@ -187,8 +193,8 @@ Assert-Contains 'README.md' 'avoid verb-based paths.*multi-version mixing'
 Assert-Contains 'GUIDE.md' 'Responsibility definition'
 Assert-Contains 'GUIDE.md' 'decision source is C3 \(human decision\)'
 
-Assert-Contains 'DAILY-USAGE.md' '128K[–-]200K context'
-Assert-Contains 'DAILY-USAGE.md' '10[–-]15 rounds'
+Assert-Contains 'GUIDE.md' 'Contract Ownership'
+Assert-Contains 'templates/DOCS-README-TEMPLATE.md' 'Contract Ownership'
 
 Assert-Contains 'prompts/UPDATE.md' 'Quick Constraints as a pinned projection of C3 decisions'
 Assert-Contains 'prompts/UPDATE.md' 'write only after user confirmation'
@@ -330,30 +336,27 @@ Assert-Contains 'skills/zerospec/SKILL.md' '^name: zerospec$'
 Assert-Contains 'skills/zerospec/SKILL.md' 'Route Table'
 Assert-Contains 'skills/zerospec/SKILL.md' 'Self-Review'
 Assert-Contains 'skills/zerospec/SKILL.md' 'prompts/AUDIT\.md'
-Assert-Contains 'skills/zerospec/SKILL.md' '^\| impl\s+\|'
 Assert-Contains 'skills/README.md' 'sync-skills'
 Assert-Contains 'skills/README.md' 'sync-skills\.sh --install'
 Assert-Contains 'skills/README.md' 'sync-skills\.ps1 -Install'
-@('INIT-SCAN.md', 'INIT-BUILD.md', 'UPDATE.md', 'AUDIT.md', 'DRIFT.md', 'IMPL.md', 'SPEC.md', 'ADR.md', 'SA.md') | ForEach-Object {
+@('INIT-SCAN.md', 'INIT-BUILD.md', 'UPDATE.md', 'AUDIT.md', 'DRIFT.md', 'SPEC.md', 'ADR.md', 'SA.md') | ForEach-Object {
     Assert-FilesEqual "prompts/$_" "skills/zerospec/prompts/$_"
 }
 Assert-Contains '.github/workflows/verify-zerospec.yml' 'exclude-path skills/zerospec/prompts'
 
-# IMPL prompt pack (v0.5.2)
-Assert-FileExists 'prompts/IMPL.md'
-Assert-FileExists 'skills/zerospec/prompts/IMPL.md'
-Assert-MatchCount 'prompts/IMPL.md' '^---BEGIN PROMPT---$' 1
-Assert-MatchCount 'prompts/IMPL.md' '^---END PROMPT---$' 1
-Assert-MatchCount 'prompts/IMPL.md' '^````$' 2
-Assert-Contains 'prompts/IMPL.md' '^## Trigger Conditions$'
-Assert-Contains 'prompts/IMPL.md' '^## Relationship to Other Prompts$'
-Assert-FirstLineStartsWithHeader 'prompts/IMPL.md'
-
-# Spec-Aware Coding Discipline: INIT-BUILD template and AGENTS.md dogfood (v0.5.2)
-Assert-Contains 'prompts/INIT-BUILD.md' 'assess whether.*docs/spec/'
-Assert-Contains 'prompts/INIT-BUILD.md' 'Forcing Function'
-Assert-Contains 'prompts/INIT-BUILD.md' 'Post-Edit Self-Check'
-Assert-Contains 'AGENTS.md' 'assess whether.*docs/spec/'
+# Risk-based contract discipline
+Assert-Contains 'prompts/INIT-BUILD.md' 'Contract Ownership'
+Assert-Contains 'prompts/INIT-BUILD.md' 'high-risk interface'
+Assert-Contains 'AGENTS.md' 'documented contract'
+Assert-NotContains 'skills/zerospec/SKILL.md' 'prompts/IMPL\.md'
+Assert-FileExists 'examples/optional-bridges/IMPL.md'
+Assert-NotContains 'prompts/INIT-BUILD.md' 'If interface, schema, permission, or business rules changed, update the relevant SPEC\.'
+Assert-NotContains 'prompts/UPDATE.md' 'If interface, schema, permission, or business rules changed, update the relevant SPEC\.'
+Get-ChildItem -Path 'templates/prompts' -Filter '*.prompt.md' | ForEach-Object {
+    Assert-NotContains $_.FullName '^mode:'
+    Assert-Contains $_.FullName '^agent:'
+    Assert-Contains $_.FullName '\]\(\.\./\.\./prompts/'
+}
 
 # PR template (v0.5.2)
 Assert-FileExists 'templates/pull_request_template.md'
@@ -369,6 +372,9 @@ Write-Host '=== Post-Edit Self-Check presence in examples (warning only) ==='
     $content = Get-Content $_ -Raw -ErrorAction SilentlyContinue
     if ($null -eq $content -or $content -notmatch '## (Post-Edit Self-Check|完成前自我檢查)') {
         Write-Host "WARNING: '$_' is missing Post-Edit Self-Check section."
+    }
+    if ($null -eq $content -or $content -notmatch 'Contract Ownership') {
+        Write-Host "WARNING: '$_' is missing Contract Ownership guidance."
     }
 }
 

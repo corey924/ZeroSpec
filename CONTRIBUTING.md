@@ -1,8 +1,6 @@
 # Contributing to ZeroSpec
 
-> Derived from: [CONTRIBUTING.zh-TW.md](CONTRIBUTING.zh-TW.md) @ commit 96d51d5 | Last sync: 2026-04-25
-
-> **🌐 [台灣正體中文版](CONTRIBUTING.zh-TW.md)**
+> **🌐 [Traditional Chinese (zh-TW)](CONTRIBUTING.zh-TW.md)**
 
 Thank you for helping improve ZeroSpec.
 
